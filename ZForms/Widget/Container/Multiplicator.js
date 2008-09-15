@@ -196,9 +196,9 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			
 			this.updateMultipliers();
 			
-			this.addTemplateDependencies(this.oTemplate, oNewChild, oNewChild);
+			this.addTemplateDependencies(this.oTemplate, oNewChild, oNewChild);			
 			
-			oNewChild.processEvents(true, true);
+			oNewChild.afterClone();			
 			
 			this.repaintFix();
 			

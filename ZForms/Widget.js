@@ -596,6 +596,12 @@ ZForms.Widget = Abstract.inheritTo(
 	
 		},
 		
+		afterClone : function() {
+		
+			this.processEvents(true, true);
+		
+		},
+		
 		prepareForSubmit : function() {},
 	
 		addExtendedHandlers : function() {},

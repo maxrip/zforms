@@ -17,12 +17,9 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 	
 			this.iMaxLength = oElement.maxLength? oElement.maxLength : 0;	
 		
-			if(!this.isTemplate()) {
-						
-				this.enablePlaceHolder();		
-				this.addExtendedHandlers();
-		
-			}
+			if(!this.isTemplate()) {										
+				this.addExtendedHandlers();		
+			}		
 			
 		},
 		
@@ -73,6 +70,24 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 			
 			this.__base();							
 
+		},
+		
+		init : function() {
+		
+			this.__base();
+		
+			if(!this.isTemplate()) {
+				this.enablePlaceHolder();
+			}
+			
+		},			
+
+		afterClone : function() {
+		
+			this.__base();
+		
+			this.enablePlaceHolder();
+			
 		},
 		
 		hasPlaceHolder : function() {
