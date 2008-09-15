@@ -162,10 +162,20 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 
 			this.__base();
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				this.aChildren[i].init();
 			}
 
+		},
+		
+		afterClone : function() {
+		
+			this.__base();
+
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
+				this.aChildren[i].afterClone();
+			}
+		
 		},
 
 		hasValue : function() {
