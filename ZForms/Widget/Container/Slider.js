@@ -39,6 +39,8 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 		
 			this.iLastControlPosition = 0;
 			this.iCurrentControlIndex = -1;
+			
+			this.iFocusedChildIndex = -1;
 		
 			this.oContainerOffset = null;
 		
@@ -175,7 +177,11 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 				this.__self.DOM_EVENT_TYPE_MOUSEDOWN,
 				function(oEvent) {					
 
-					oEvent.cancelBubble = true;
+					if(oThis.iFocusedChildIndex > -1) {
+						oThis.aChildren[oThis.iFocusedChildIndex].oElement.blur();
+					}
+
+					Common.Event.cancel(oEvent);
 					
 					oThis.__self.setActiveIndex(oThis.iIndex);
 					oThis.fDragStartHandler(iIndex);
@@ -253,14 +259,25 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 
 			var
 				oThis = this,
-				iIndex = this.getChildren().length - 1
+				iIndex = this.getChildren().length - 1		
 				;
+
+			Common.Event.add(
+				oChild.oElement,
+				this.__self.DOM_EVENT_TYPE_FOCUS,
+				function() {
+					
+					oThis.iFocusedChildIndex = iIndex;				
+
+				}
+				);
 
 			Common.Event.add(
 				oChild.oElement,
 				this.__self.DOM_EVENT_TYPE_BLUR,
 				function() {
 					
+					oThis.iFocusedChildIndex = -1;
 					oThis.fSyncHandler(iIndex);					
 
 				}
@@ -371,6 +388,12 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 				this.__self.DOM_EVENT_TYPE_MOUSEDOWN,
 				function(oEvent) {					
 
+					Common.Event.cancel(oEvent);
+					
+					if(oThis.iFocusedChildIndex > -1) {
+						oThis.aChildren[oThis.iFocusedChildIndex].oElement.blur();
+					}
+			
 					var iNearestControlIndex = oThis.fClickHandler(oEvent);
 
 					if(iNearestControlIndex >= 0) {

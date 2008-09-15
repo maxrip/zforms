@@ -71,7 +71,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				
 			this.oValue.set(this.oElement.value);
 			
-			this.__base(bInit);							
+			this.__base();							
 
 		},
 		

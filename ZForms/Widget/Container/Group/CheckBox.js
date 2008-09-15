@@ -24,7 +24,7 @@ ZForms.Widget.Container.Group.CheckBox = ZForms.Widget.Container.Group.inheritTo
 
 		},
 
-		setValueFromElement : function(bInit) {
+		setValueFromElement : function() {
 
 			this.oValue.reset();
 
@@ -34,7 +34,7 @@ ZForms.Widget.Container.Group.CheckBox = ZForms.Widget.Container.Group.inheritTo
 				}
 			}
 
-			this.__base(bInit);
+			this.__base();
 
 		},
 

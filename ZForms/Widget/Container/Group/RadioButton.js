@@ -13,7 +13,7 @@ ZForms.Widget.Container.Group.RadioButton = ZForms.Widget.Container.Group.inheri
 
 		},
 
-		setValueFromElement : function(bInit) {
+		setValueFromElement : function() {
 
 			this.oValue.reset();
 
@@ -26,7 +26,7 @@ ZForms.Widget.Container.Group.RadioButton = ZForms.Widget.Container.Group.inheri
 				}
 			}
 
-			this.__base(bInit);
+			this.__base();
 
 		},
 

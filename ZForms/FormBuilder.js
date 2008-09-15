@@ -673,7 +673,7 @@ ZForms.Builder = Abstract.inheritTo(
 				iLogic = (oRequired.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND)
 				;
 	
-			oElement.addDependence(ZForms.createRequiredDependence(oElement, null, iLogic, false, oRequired.iMin? oRequired.iMin : 1));
+			oElement.addDependence(ZForms.createRequiredDependence(oElement, iLogic, oRequired.iMin? oRequired.iMin : 1));
 	
 			if(oRequired.aFrom) {
 				for(var i = 0, oWidgetFrom; i < oRequired.aFrom.length; i++) {
@@ -688,7 +688,7 @@ ZForms.Builder = Abstract.inheritTo(
 						oElement.addDependence(ZForms.createFunctionDependence(ZForms.Dependence.TYPE_REQUIRE, oWidgetFrom, oRequired.aFrom[i].mData, iLogic, oRequired.aFrom[i].bInverse));
 					}
 					else {						
-						oElement.addDependence(ZForms.createRequiredDependence(oWidgetFrom, oRequired.aFrom[i].mData || /.+/, iLogic, oRequired.aFrom[i].bInverse, oRequired.iMin? oRequired.iMin : 1));
+						oElement.addDependence(new ZForms.Dependence.Required(oWidgetFrom, oRequired.aFrom[i].mData || /.+/, iLogic, oRequired.aFrom[i].bInverse, oRequired.iMin? oRequired.iMin : 1));
 					}
 	
 				}

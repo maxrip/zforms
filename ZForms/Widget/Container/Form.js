@@ -56,7 +56,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 						return Common.Event.cancel(oEvent);
 					}
 
-					oThis.notifyOuterObservers(oThis.__self.EVENT_TYPE_ON_BEFORE_SUBMIT);
+					oThis.notifyOuterObservers(ZForms.EVENT_TYPE_ON_BEFORE_SUBMIT);
 
 					if(oThis.oOptions.bPreventSubmit) {
 						return Common.Event.cancel(oEvent);
@@ -266,9 +266,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 	
 		CLASS_NAME_SUBMITTED : 'submitted',
 
-		DOM_EVENT_TYPE_SUBMIT : 'submit',
-
-		EVENT_TYPE_ON_BEFORE_SUBMIT : 'onbeforesubmit'		
+		DOM_EVENT_TYPE_SUBMIT : 'submit'			
 		
 	}
 	);

@@ -45,7 +45,7 @@ ZForms.Widget.Select = ZForms.Widget.inheritTo(
 
 		},
 
-		setValueFromElement : function(bInit) {
+		setValueFromElement : function() {
 
 			if(this.oElement.selectedIndex >= 0) {
 				this.oValue.set(this.oElement.options[this.oElement.selectedIndex].value);
@@ -54,7 +54,7 @@ ZForms.Widget.Select = ZForms.Widget.inheritTo(
 				this.oValue.reset();
 			}
 
-			this.__base(bInit);
+			this.__base();
 
 		},
 

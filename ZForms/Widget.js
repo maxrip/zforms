@@ -28,13 +28,14 @@ ZForms.Widget = Abstract.inheritTo(
 			this.bEnabled = true;
 			this.bRequired = false;
 			this.bValid = true;
-			this.bInitialValueChanged = false;
-			this.oInitialValue = this.createValue();
+			this.oMultiplier = null;
+									
 			this.oValue = this.createValue();
-			this.oLastProcessedValue = this.oInitialValue.clone();
-			this.oMultiplier = null;	
-	
 			this.setValueFromElement(true);
+			this.oInitialValue = this.oValue.clone();
+			this.oLastProcessedValue = this.oValue.clone();
+			this.bInitialValueChanged = false;		
+				
 			this.addHandlers();
 	
 		},
@@ -110,7 +111,7 @@ ZForms.Widget = Abstract.inheritTo(
 	
 			this.notifyObservers();
 			
-			this.notifyOuterObservers(this.__self.EVENT_TYPE_ON_CHANGE);
+			this.notifyOuterObservers(ZForms.EVENT_TYPE_ON_CHANGE);
 	
 			if(!bByParent) {
 	
@@ -170,7 +171,7 @@ ZForms.Widget = Abstract.inheritTo(
 	
 		},
 	
-		init : function() {
+		init : function() {				
 	
 			this.addClass(this.getInitedClassName());
 	
@@ -182,7 +183,9 @@ ZForms.Widget = Abstract.inheritTo(
 				this.disable();
 			}
 	
-			this.processEvents(false);
+			this.processEvents(false, true);
+			
+			this.notifyOuterObservers(ZForms.EVENT_TYPE_ON_INIT);
 	
 		},
 	
@@ -204,13 +207,7 @@ ZForms.Widget = Abstract.inheritTo(
 	
 		},
 	
-		setValueFromElement : function(bInit) {
-	
-			if(bInit) {
-				this.oInitialValue = this.oValue.clone();
-			}
-	
-		},
+		setValueFromElement : function() {},
 	
 		hasValue : function() {
 	
@@ -422,7 +419,7 @@ ZForms.Widget = Abstract.inheritTo(
 	
 			do {
 	
-				if(oAncestor instanceof ZForms.Sheet) {
+				if(oAncestor instanceof ZForms.Widget.Container.Sheet) {
 					oAncestor.oParent.select(oAncestor);
 				}
 	
@@ -661,8 +658,7 @@ ZForms.Widget = Abstract.inheritTo(
 				return;
 	
 			}
-	
-	
+		
 			if(mObserver instanceof Array) {
 	
 				for(var i = 0; i < mObserver.length; i++) {
@@ -698,9 +694,6 @@ ZForms.Widget = Abstract.inheritTo(
 	
 			if(mObserver instanceof Function) {
 				mObserver(sEventType, this);
-			}
-			else if(mObserver.update instanceof Function) {
-				mObserver.update(sEventType, this);
 			}
 			
 		},

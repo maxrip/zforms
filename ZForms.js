@@ -1,5 +1,9 @@
 var ZForms = {
 
+	EVENT_TYPE_ON_INIT          : 'oninit',
+	EVENT_TYPE_ON_CHANGE        : 'onchange',
+	EVENT_TYPE_ON_BEFORE_SUBMIT : 'onbeforesubmit',
+
 	// static widget creation methods
 
 	createWidget : function() {		
@@ -55,13 +59,19 @@ var ZForms = {
 		if(arguments[1][3]) {			
 			for(var i = 0; i < arguments[1][3].length; i++) {
 				oResult.addChild(
-					this.createWidget(ZForms.Widget.Text.State, [arguments[1][3][i][0], arguments[1][3][i][1], arguments[1][2]])
+					this.createStateInput(arguments[1][3][i][0], arguments[1][3][i][1], arguments[1][2])
 					);
 			}
 		}
 		
 		return oResult;
 		
+	},
+	
+	createStateInput : function() {
+	
+		return this.createWidget(ZForms.Widget.Text.State, arguments);
+	
 	},
 	
 	createCheckBoxGroup : function() {
@@ -145,21 +155,19 @@ var ZForms = {
 	
 	createRequiredDependence : function(
 		oWidget,
-		rPattern,
 		iLogic,
-		bInverse,
 		iMin
 		) {
 		
 		return new this.Dependence.Required(
 			oWidget,
-			rPattern? rPattern : (iMin? new RegExp('.{' + iMin + ',}') : /.+/),
+			iMin? new RegExp('.{' + iMin + ',}') : /.+/,
 			iLogic,
-			bInverse,
+			false,
 			iMin
 			);
 	
-	},
+	},		
 	
 	createValidDependence : function(
 		oWidget,

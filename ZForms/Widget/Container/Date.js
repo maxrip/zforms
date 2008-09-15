@@ -43,7 +43,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 		
 			this.replaceElement();
 				
-			this.setValueFromElement(true);		
+			this.setValueFromElement();		
 		
 			this.addExtendedHandlers();	
 		
@@ -283,7 +283,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 
 		},
 
-		setValueFromElement : function(bInit) {
+		setValueFromElement : function() {
 
 			if(this.isTemplate() || !this.oYearInput) {
 				return;
@@ -291,7 +291,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 
 			this.oValue.set(this.oYearInput.getValue().get() + '-' + this.oMonthInput.getValue().get() + '-' + (this.oOptions.bOnlyMonths && this.oDayInput.getValue().isEmpty()? 1 : this.oDayInput.getValue().get()) + (this.oOptions.bWithTime? ' ' + this.oHourInput.getValue().get() + ':' + this.oMinuteInput.getValue().get() + ':' + this.oSecondInput.getValue().get() : ''));
 
-			ZForms.Widget.prototype.setValueFromElement.call(this, bInit);
+			ZForms.Widget.prototype.setValueFromElement.call(this);
 
 		},
 

@@ -90,7 +90,7 @@ ZForms.DependenceProcessor = Abstract.inheritTo(
 				break;
 					
 				case ZForms.Dependence.TYPE_REQUIRED:
-					this.processRequireDependencies();
+					this.processRequiredDependencies();
 				break;
 					
 				case ZForms.Dependence.TYPE_OPTIONS:
@@ -131,7 +131,7 @@ ZForms.DependenceProcessor = Abstract.inheritTo(
 			
 		},
 		
-		processRequireDependencies : function() {
+		processRequiredDependencies : function() {
 				
 			if(this.aDependenceGroups[ZForms.Dependence.TYPE_REQUIRED].check() && this.oWidget.isValid()) {												
 				this.oWidget.unsetRequired();
