@@ -14,6 +14,8 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.sButtonRemoveId = oOptions.sButtonRemoveId;
 			this.sButtonUpId = oOptions.sButtonUpId;
 			this.sButtonDownId = oOptions.sButtonDownId;
+			this.sInitialChildrenHash = null;
+			this.sLastProcessedChildrenHash = null;
 
 			this.__base(
 				oElement,
@@ -28,8 +30,8 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			return Common.Object.extend(
 				this.__base(),
 				{
-					iMin      : 1,
-					iMax      : 10			
+					iMin : 1,
+					iMax : 10			
 				},
 				true
 				);							
@@ -95,17 +97,55 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			oTemplate.setId(oTemplate.oElement.id);
 
 		},
+		
+		calculateCurrentChildrenHash : function() {
+			
+			var sResult = '';
+		
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {				
+				sResult += Common.Dom.getUniqueId(this.aChildren[i].oElement);
+			}
+			
+			return sResult;
+		
+		},
+		
+		processChildrenHashChanged : function() {
+		
+			var sCurrentChildrenHash = this.calculateCurrentChildrenHash();								
+		
+			if(this.sInitialChildrenHash == sCurrentChildrenHash) {
+				if(this.sLastProcessedChildrenHash != this.sInitialChildrenHash) {
+				
+					this.oForm.decreaseChangedCounter();
+					this.oForm.updateSubmit();
+					
+				}
+			}
+			else if(this.sLastProcessedChildrenHash == this.sInitialChildrenHash) {			
+							
+				this.oForm.increaseChangedCounter();				
+				this.oForm.updateSubmit();
+				
+			}						
+			
+			this.sLastProcessedChildrenHash = sCurrentChildrenHash;
+		
+		},
 
 		init : function() {
 
 			this.__base();					
 
 			this.oTemplate.hide();
-			this.oTemplate.disable();
+			this.oTemplate.disable();												
 
 			this.normalizeTemplateAttributes(this.oTemplate);
 
 			this.updateMultipliers();
+			
+			this.sInitialChildrenHash = this.calculateCurrentChildrenHash();
+			this.sLastProcessedChildrenHash = this.sInitialChildrenHash;
 
 		},
 
@@ -161,6 +201,8 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			oNewChild.processEvents(true, true);
 			
 			this.repaintFix();
+			
+			this.processChildrenHashChanged();
 
 		},
 
@@ -282,6 +324,8 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.updateMultipliers();
 						
 			this.repaintFix();
+			
+			this.processChildrenHashChanged();
 
 		},
 
@@ -312,6 +356,8 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.updateMultipliers();
 			
 			this.repaintFix();
+			
+			this.processChildrenHashChanged();
 
 		},
 
@@ -347,6 +393,8 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.updateMultipliers();
 			
 			this.repaintFix();
+			
+			this.processChildrenHashChanged();
 
 		},
 
