@@ -71,7 +71,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 			Common.Event.add(
 				window,
-				this.__self.DOM_EVENT_TYPE_UNLOAD,
+				Common.Browser.isIE()? this.__self.DOM_EVENT_TYPE_BEFOREUNLOAD : this.__self.DOM_EVENT_TYPE_UNLOAD,
 				function() {
 
 					oThis.destruct();
@@ -266,7 +266,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 	
 		CLASS_NAME_SUBMITTED : 'submitted',
 
-		DOM_EVENT_TYPE_SUBMIT : 'submit'			
+		DOM_EVENT_TYPE_SUBMIT : 'submit'
 		
 	}
 	);
