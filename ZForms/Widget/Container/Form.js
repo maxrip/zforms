@@ -223,7 +223,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 					continue;
 				}
 
-				if(!aWidgets[sId].isReadyForSubmit(this.oOptions.bCheckForValid)) {
+				if(!aWidgets[sId].isReadyForSubmit()) {
 					return false;
 				}
 

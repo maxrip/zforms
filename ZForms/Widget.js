@@ -371,13 +371,13 @@ ZForms.Widget = Abstract.inheritTo(
 	
 		},
 	
-		isReadyForSubmit : function(bCheckForValid) {
+		isReadyForSubmit : function() {
 	
 			return !this.isEnabled() ||
 				(
 					!this.isRequired() &&
 					(
-						!bCheckForValid || this.isValid()
+						!this.oForm.oOptions.bCheckForValid || this.isValid()
 					)
 				);
 	
