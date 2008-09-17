@@ -24,7 +24,7 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 		
 		isEqual : function(mValue) {
 
-			if(!(mValue instanceof this.__self || mValue instanceof ZForms.Value || typeof(mValue) == 'number' || typeof(mValue) == 'string')) {
+			if(!(mValue instanceof this.__self || mValue instanceof ZForms.Value || typeof(mValue) == 'number')) {
 				return false;
 			} 												 
 
@@ -43,7 +43,7 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 
 		isGreater : function(mValue) {			
 	
-			if(!(mValue instanceof this.__self || mValue instanceof ZForms.Value || typeof(mValue) == 'number' || typeof(mValue) == 'string')) {
+			if(!(mValue instanceof this.__self || mValue instanceof ZForms.Value || typeof(mValue) == 'number')) {
 				return false;
 			} 
 
