@@ -59,7 +59,7 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 						return;
 					}
 					
-					oThis.setValue(new ZForms.Value.Number(oThis.oElement.value));					
+					oThis.setValue(oThis.createValue(oThis.oElement.value));					
 
 				}
 				);
@@ -79,12 +79,20 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				}				
 				
 			}
-			
-			this.oValue.get();
 		
 			return this.__base(oValue);
 		
-		}
+		},
+		
+		init : function() {
+		
+			this.__base();
+			
+			if(this.oElement.value != this.getValue().toStr()) {
+				this.setValue(this.getValue());
+			}
+		
+		},
 
 	}
 	);
