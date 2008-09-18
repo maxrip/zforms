@@ -17,15 +17,15 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 				return;
 			}
 			
-			this.oDayInput = this.createNumberInput('day', oElement.id, 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sDay? this.oOptions.oPlaceHolders.sDay : null);
-			this.oMonthInput = this.createMonthInput('month', oElement.id);
-			this.oYearInput = this.createNumberInput('year', oElement.id, 4, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sYear? this.oOptions.oPlaceHolders.sYear : null);
+			this.oDayInput = this.createNumberInput('day', 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sDay? this.oOptions.oPlaceHolders.sDay : null);
+			this.oMonthInput = this.createMonthInput('month');
+			this.oYearInput = this.createNumberInput('year', 4, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sYear? this.oOptions.oPlaceHolders.sYear : null);
 				
 			if(this.oOptions.bWithTime) {
 				
-				this.oHourInput = this.createNumberInput('hour', oElement.id, 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sHour? this.oOptions.oPlaceHolders.sHour : null);
-				this.oMinuteInput = this.createNumberInput('minute', oElement.id, 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sMinute? this.oOptions.oPlaceHolders.sMinute : null);
-				this.oSecondInput = this.createNumberInput('second', oElement.id, 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sSecond? this.oOptions.oPlaceHolders.sSecond : null);
+				this.oHourInput = this.createNumberInput('hour', 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sHour? this.oOptions.oPlaceHolders.sHour : null);
+				this.oMinuteInput = this.createNumberInput('minute', 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sMinute? this.oOptions.oPlaceHolders.sMinute : null);
+				this.oSecondInput = this.createNumberInput('second', 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sSecond? this.oOptions.oPlaceHolders.sSecond : null);
 					
 			}	
 		
@@ -85,14 +85,6 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 		hasValue : function() {
 
 			return true;
-
-		},
-
-		addChild : function(oChild) {
-
-			this.oElement.parentNode.insertBefore(oChild.oElement, this.oElement);
-
-			return this.__base(oChild);
 
 		},
 
@@ -234,19 +226,23 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 				
 		},
 
-		createNumberInput : function(sPrefix, sId, iSize, sPlaceHolder) {
+		createNumberInput : function(sPrefix, iSize, sPlaceHolder) {
 
 			return ZForms.createNumberInput(
-				Common.Dom.createElement(
-					'input',
-					{
-						'type'      : this.oOptions.bOnlyMonths && sPrefix == 'day'? 'hidden' : 'text',
-						'id'        : sPrefix + '-' + sId,
-						'size'      : iSize,
-						'maxlength' : iSize,
-						'class'     : 'input-' + sPrefix
-					}
-					),
+				this.oElement.parentNode.insertBefore(
+					Common.Dom.createElement(
+						'input',
+						{
+							'type'      : this.oOptions.bOnlyMonths && sPrefix == 'day'? 'hidden' : 'text',
+							'id'        : sPrefix + '-' + this.oElement.id,
+							'name'      : sPrefix + '-' + this.oElement.name,
+							'size'      : iSize,
+							'maxlength' : iSize,							
+							'class'     : 'input-' + sPrefix
+						}
+						),
+					this.oElement
+				),
 				null,
 				{
 					sPlaceHolder : sPlaceHolder
@@ -261,7 +257,8 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 				oElement = Common.Dom.createElement(
 					'select',
 					{
-						'id'    : sPrefix + '-' + sId,
+						'id'    : sPrefix + '-' + this.oElement.id,
+						'name'  : sPrefix + '-' + this.oElement.name,
 						'class' : 'input-' + sPrefix
 					}
 					),
@@ -279,7 +276,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 				oElement.options[oElement.options.length] = new Option(aMonths[i], i + 1);
 			}
 
-			return ZForms.createSelectInput(document.body.removeChild(oElement));
+			return ZForms.createSelectInput(this.oElement.parentNode.insertBefore(document.body.removeChild(oElement), this.oElement));
 
 		},
 

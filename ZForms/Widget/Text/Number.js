@@ -1,5 +1,45 @@
 ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 	{
+	
+		__constructor : function(
+			oElement,
+			oClassElement,
+			oOptions
+			) {				
+	
+			this.__base(
+				oElement,
+				oClassElement,
+				oOptions
+				);					
+				
+			this.oHiddenElement = null;	
+				
+			if(this.isTemplate()) {	
+				return;
+			}
+			
+			this.replaceElement(oElement);			
+		
+		},
+		
+		replaceElement : function(oElement) {
+		
+			this.oHiddenElement = oElement.parentNode.insertBefore(
+				Common.Dom.createElement(
+					'input',
+					{
+						'type'  : 'hidden',
+						'id'    : 'value-' + oElement.getAttribute('id'),
+						'name'  : oElement.getAttribute('name')
+					}
+					),
+				oElement
+				);
+				
+			oElement.name = 'to-str-' + oElement.name;			
+		
+		},
 		
 		getDefaultOptions : function() {
 		
@@ -66,8 +106,20 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 
 		},
 		
-		setValue : function(oValue) {
+		updateElementValue : function(oValue) {
+			
+			this.oHiddenElement.value = oValue.toStr();
+			
+			if(ZForms.Resources.getNumberSeparator() == ',') {
+				oValue = new ZForms.Value(oValue.toStr().replace(/\./g, ','));
+			}			
+			
+			this.__base(oValue);
 		
+		},
+		
+		setValue : function(oValue) {
+			
 			if(!oValue.isEmpty()) {						
 		
 				if(!this.oOptions.bFloat) {
@@ -78,7 +130,7 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 					oValue.set(oValue.get() * -1);
 				}				
 				
-			}
+			}		
 		
 			return this.__base(oValue);
 		
@@ -93,6 +145,14 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 			}
 		
 		},
+		
+		destruct : function() {
+		
+			this.oHiddenElement = null;
+		
+			this.__base();
+		
+		}
 
 	}
 	);

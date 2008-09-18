@@ -15,7 +15,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 		
 			this.bPlaceHolderEnabled = false;
 	
-			this.iMaxLength = oElement.maxLength? oElement.maxLength : 0;	
+			this.iMaxLength = oElement.maxLength? oElement.maxLength : 0;
 		
 			if(!this.isTemplate()) {										
 				this.addExtendedHandlers();		
@@ -33,20 +33,26 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				true
 				);							
 		
-		},				
+		},		
+
+		updateElementValue : function(oValue) {
+		
+			this.oElement.value = oValue.toStr();
+		
+		},
 
 		setValue : function(oValue) {						
 									
 			if(oValue.isEmpty()) {
 				
-				this.oElement.value = oValue.toStr();			
+				this.updateElementValue(oValue);
 				this.enablePlaceHolder();
 				
 			}
 			else {
 			
 				this.disablePlaceHolder();
-				this.oElement.value = oValue.toStr();
+				this.updateElementValue(oValue);
 				
 			}													
 

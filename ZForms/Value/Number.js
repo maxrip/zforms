@@ -58,15 +58,6 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 		
 			return this.get() > oValue.get();
 
-		},
-
-		toStr : function() {
-
-			return ZForms.Resources.getNumberSeparator() == ','?
-				this.mValue.toString().replace(/\./g, ',') :
-				this.mValue.toString()
-				;
-
 		}
 
 	}
