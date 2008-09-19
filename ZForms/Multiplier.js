@@ -30,7 +30,7 @@ ZForms.Multiplier = Abstract.inheritTo(
 			var oThis = this;
 
 			oButton.setHandler(
-				function(oEvent) {
+				function() {
 
 					oThis.oMultiplicator.add(oThis.oWidget);
 
@@ -48,7 +48,7 @@ ZForms.Multiplier = Abstract.inheritTo(
 			var oThis = this;
 
 			oButton.setHandler(
-				function(oEvent) {
+				function() {
 
 					oThis.oMultiplicator.remove(oThis.oWidget);
 
@@ -66,7 +66,7 @@ ZForms.Multiplier = Abstract.inheritTo(
 			var oThis = this;
 
 			oButton.setHandler(
-				function(oEvent) {
+				function() {
 
 					oThis.oMultiplicator.up(oThis.oWidget);
 
@@ -84,7 +84,7 @@ ZForms.Multiplier = Abstract.inheritTo(
 			var oThis = this;
 
 			oButton.setHandler(
-				function(oEvent) {
+				function() {
 
 					oThis.oMultiplicator.down(oThis.oWidget);
 
