@@ -43,7 +43,7 @@ ZForms.Dependence.Options = ZForms.Dependence.inheritTo(
 
 			for(var i = 0; i < this.aPatterns.length; i++) {			
 	
-				bMatched = mValue.match(this.aPatterns[i].rSource)? true : false;	
+				bMatched = mValue.match(this.aPatterns[i].rSource);	
 		
 				if(this.bInverse? !bMatched : bMatched) {
 					this.aResult.push(this.aPatterns[i].rDestination);

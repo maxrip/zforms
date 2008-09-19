@@ -34,15 +34,12 @@ ZForms.Dependence.Class = ZForms.Dependence.inheritTo(
 
 			this.aResult = [];
 
-			var
-				mValue = this.oFrom.getValue(),
-				bMatched = false
-				;
+			var mValue = this.oFrom.getValue();
 
 			for(var i = 0; i < this.aPatternToClasses.length; i++) {
 				this.aResult.push({
 					sClassName : this.aPatternToClasses[i].sClassName,
-					bMatched   : mValue.match(this.aPatternToClasses[i].rPattern)? true : false
+					bMatched   : mValue.match(this.aPatternToClasses[i].rPattern)
 					});
 			}
 

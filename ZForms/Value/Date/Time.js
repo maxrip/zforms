@@ -67,11 +67,9 @@ ZForms.Value.Date.Time = ZForms.Value.Date.inheritTo(
 				return this.get() == oValue.get();
 			}
 	
-			if(oValue instanceof ZForms.Value.Date) {
-				return this.get() == oValue.get() + ' 0:0:0';
-			}			
-	
-			return false;
+			return oValue instanceof ZForms.Value.Date &&
+				this.get() == oValue.get() + ' 0:0:0'
+				;
 	
 		},
 	

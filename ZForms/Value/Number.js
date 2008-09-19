@@ -6,8 +6,7 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 			var
 				sValue = mValue.toString().replace(/[^0-9\.\,\-]/g, '').replace(/\,/g, '.'),
 				mValue = parseFloat(sValue)
-				;
-			
+				;			
 
 			this.mValue = sValue == '' || isNaN(mValue)? '' : mValue;
 
@@ -17,7 +16,7 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 
 			return typeof(this.mValue) == 'string'?
 				this.__base(rPattern) :
-				rPattern.test(this.mValue.toString());
+				rPattern.test(this.mValue.toString())
 				;
 
 		},

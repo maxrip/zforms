@@ -251,7 +251,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 
 		},
 
-		createMonthInput : function(sPrefix, sId) {
+		createMonthInput : function(sPrefix) {
 
 			var
 				oElement = Common.Dom.createElement(
@@ -272,7 +272,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 
 			oElement.options.length = 0;
 
-			for(var i = 0, a; i < aMonths.length; i++) {			
+			for(var i = 0; i < aMonths.length; i++) {			
 				oElement.options[oElement.options.length] = new Option(aMonths[i], i + 1);
 			}
 

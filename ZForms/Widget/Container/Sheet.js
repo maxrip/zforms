@@ -66,7 +66,7 @@ ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 			var oThis = this;
 	
 			oButton.setHandler(
-				function(oEvent) {
+				function() {
 	
 					oThis.oParent.select(oThis);
 					
@@ -87,7 +87,7 @@ ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 			var oThis = this;
 	
 			oButton.setHandler(
-				function(oEvent) {
+				function() {
 	
 					oThis.oParent.prev(oThis);
 					
@@ -107,7 +107,7 @@ ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 			var oThis = this;
 	
 			oButton.setHandler(
-				function(oEvent) {
+				function() {
 	
 					oThis.oParent.next(oThis);
 					

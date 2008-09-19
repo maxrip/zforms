@@ -66,7 +66,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		},
 
-		setValueFromElement : function(bInit) {			
+		setValueFromElement : function() {			
 
 			if(this.bPlaceHolderEnabled) {
 				return;

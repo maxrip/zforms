@@ -36,7 +36,7 @@ ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
 			
 			this.aResult = [];
 	
-			var bMatched = this.fFunction(this.oFrom, this.aResult)? true : false;		
+			var bMatched = this.fFunction(this.oFrom, this.aResult);		
 		
 			return this.isInverse()? !bMatched : bMatched;
 

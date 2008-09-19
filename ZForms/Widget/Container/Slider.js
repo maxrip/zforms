@@ -110,7 +110,7 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 
 			var aResult = [];
 
-			for(var i = 0, oElement, oLabelElement; i < this.aSlideRules.length; i++) {
+			for(var i = 0, oElement; i < this.aSlideRules.length; i++) {
 
 				oElement = document.createElement('div');
 

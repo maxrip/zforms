@@ -60,10 +60,7 @@ ZForms.Widget = Abstract.inheritTo(
 				return;
 			}
 	
-			var
-				oThis = this,
-				aEvents = []
-				;
+			var oThis = this;
 	
 			function process(oEvent) {
 	

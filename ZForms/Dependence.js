@@ -23,7 +23,7 @@ ZForms.Dependence = Abstract.inheritTo(
 				return true;
 			}
 	
-			var bMatched = this.oFrom.getValue().match(this.sPattern)? true : false;
+			var bMatched = this.oFrom.getValue().match(this.sPattern);
 	
 			return this.isInverse()? !bMatched : bMatched;
 	

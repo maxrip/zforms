@@ -110,7 +110,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			Common.Event.add(
 				this.oElement,
 				this.__self.DOM_EVENT_TYPE_FOCUS,
-				function(oEvent) {				
+				function() {
 					
 					if(!bProcessFocus) {
 						
@@ -163,7 +163,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			Common.Event.add(
 				[this.oOptions.oOptionsElement, this.oElement],
 				this.__self.DOM_EVENT_TYPE_BLUR,
-				function(oEvent) {																			
+				function() {
 					
 					if(bProcessBlur && oThis.hasPlaceHolder()) {											
 						oThis.enablePlaceHolder();
@@ -181,7 +181,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			Common.Event.add(
 				this.oOptions.oOptionsElement,
 				this.__self.DOM_EVENT_TYPE_FOCUS,
-				function(oEvent) {
+				function() {
 					
 					oThis.showOptions();
 
@@ -507,7 +507,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 					bMatched = false;
 
 					for(var k = 0; k < aPatternGroups[j].length && !bMatched; k++) {
-						bMatched = oOption.sValue.match(aPatternGroups[j][k])? true : false;
+						bMatched = aPatternGroups[j][k].test(oOption.sValue);
 					}
 
 					if(bMatched) {

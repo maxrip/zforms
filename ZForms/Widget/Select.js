@@ -15,7 +15,7 @@ ZForms.Widget.Select = ZForms.Widget.inheritTo(
 
 			this.aOptions = [];
 
-			for(var i = 0, oThis = this; i < this.oElement.options.length; i++) {
+			for(var i = 0; i < this.oElement.options.length; i++) {
 				this.aOptions[i] = {
 					sLabel : this.oElement.options[i].innerHTML,
 					sValue : this.oElement.options[i].value
@@ -76,7 +76,7 @@ ZForms.Widget.Select = ZForms.Widget.inheritTo(
 					bMatched = false;
 
 					for(var k = 0; k < aPatternGroups[j].length && !bMatched; k++) {
-						bMatched = oOption.sValue.match(aPatternGroups[j][k])? true : false;
+						bMatched = aPatternGroups[j][k].test(oOption.sValue);
 					}
 
 					if(bMatched) {
