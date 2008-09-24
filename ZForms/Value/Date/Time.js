@@ -30,16 +30,16 @@ ZForms.Value.Date.Time = ZForms.Value.Date.inheritTo(
 			}
 			else {	
 
-				var aMatched = mValue.match(/^(-?\d{1,4})-(\d{1,2})-(-?\d{1,2}) (-?\d{1,2}):(-?\d{1,2}):(-?\d{1,2})/);
+				var aMatched = mValue.match(/^(-?\d{1,4})-(\d{1,2})-(-?\d{1,2})( (-?\d{1,2}):(-?\d{1,2}):(-?\d{1,2}))?/);
 		
 				if(aMatched) {												
 					oDate = new Date(
 						parseInt(aMatched[1], 10),
 						parseInt(aMatched[2], 10) - 1,
 						parseInt(aMatched[3], 10),
-						parseInt(aMatched[4], 10),
-						parseInt(aMatched[5], 10),
-						parseInt(aMatched[6], 10)
+						aMatched[5]? parseInt(aMatched[5], 10) : 0,
+						aMatched[6]? parseInt(aMatched[6], 10) : 0,
+						aMatched[7]? parseInt(aMatched[7], 10) : 0
 						);
 				}
 
@@ -61,15 +61,25 @@ ZForms.Value.Date.Time = ZForms.Value.Date.inheritTo(
 	
 		},
 	
-		isEqual : function(oValue) {
+		isEqual : function(mValue) {
 	
-			if(oValue instanceof this.__self) {
-				return this.get() == oValue.get();
+			if(mValue instanceof this.__self) {
+				return this.get() == mValue.get();
 			}
-	
-			return oValue instanceof ZForms.Value.Date &&
-				this.get() == oValue.get() + ' 0:0:0'
-				;
+
+			if(mValue instanceof ZForms.Value.Date) {
+				return this.get() == mValue.get() + ' 0:0:0';
+			}
+
+			if(mValue instanceof ZForms.Value || typeof(mValue) == 'string') {
+				return this.isEqual(new this.__self(typeof(mValue) == 'string'? mValue : mValue.get()));
+			}
+
+			if(mValue instanceof Date) {
+				return this.get() == new this.__self(mValue).get();
+			}
+
+			return false;
 	
 		},
 	
@@ -78,15 +88,18 @@ ZForms.Value.Date.Time = ZForms.Value.Date.inheritTo(
 			if(this.__base(mValue)) {
 				return true;
 			}
-
+			
 			var oValue = (mValue instanceof this.__self)?
 				mValue :
 				new this.__self(
-					(mValue instanceof ZForms.Value)?
-						mValue.get() :
-						mValue
-					)
-				;
+					(mValue instanceof ZForms.Value.Date?
+						mValue.get() + ' 0:0:0' :
+						(mValue instanceof ZForms.Value?
+							mValue.get() :
+							mValue
+							)
+						)
+					);
 		
 			if(this.getDay() == oValue.getDay()) {
 		
@@ -107,6 +120,24 @@ ZForms.Value.Date.Time = ZForms.Value.Date.inheritTo(
 			}
 	
 			return false;
+
+		},
+
+		checkForCompareTypes : function(mValue) {
+
+			if(mValue instanceof this.__self || mValue instanceof ZForms.Value.Date) {
+				return !mValue.isEmpty();
+			}
+
+			if(mValue instanceof ZForms.Value) {
+				return !(new ZForms.Value.Date(mValue.get()).isEmpty());
+			}
+
+			if(typeof(mValue) == 'string') {
+				return !(new ZForms.Value.Date.Time(mValue).isEmpty());
+			}
+
+			return mValue instanceof Date;				
 
 		},
 	

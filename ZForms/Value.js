@@ -52,7 +52,7 @@ ZForms.Value = Abstract.inheritTo(
 
 		isEqual : function(mValue) {		
 
-			if(!(mValue instanceof this.__self || typeof(mValue) == 'string')) {
+			if(!this.checkForCompareTypes(mValue)) {
 				return false;
 			}
 
@@ -64,7 +64,7 @@ ZForms.Value = Abstract.inheritTo(
 		
 		isGreater : function(mValue) {
 
-			if(!(mValue instanceof this.__self || typeof(mValue) == 'string')) {
+			if(!this.checkForCompareTypes(mValue)) {
 				return false;
 			}
 
@@ -82,13 +82,19 @@ ZForms.Value = Abstract.inheritTo(
 
 		isLess : function(mValue) {
 
-			return !(this.isGreater(mValue) || this.isEqual(mValue));
+			return this.checkForCompareTypes(mValue) && !this.isGreaterOrEqual(mValue);
 
 		},
 
 		isLessOrEqual : function(mValue) {
-		
-			return !this.isGreater(mValue);
+
+			return this.checkForCompareTypes(mValue) && !this.isGreater(mValue);				 
+
+		},
+
+		checkForCompareTypes : function(mValue) {
+
+			return mValue instanceof this.__self || typeof(mValue) == 'string'; 
 
 		},
 

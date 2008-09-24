@@ -3,27 +3,25 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 
 		set : function(mValue) {
 
-			var
-				sValue = mValue.toString().replace(/[^0-9\.\,\-]/g, '').replace(/\,/g, '.'),
-				mValue = parseFloat(sValue)
-				;			
-
-			this.mValue = sValue == '' || isNaN(mValue)? '' : mValue;
+			this.mValue = parseFloat(mValue.toString().replace(/[^0-9\.\,\-]/g, '').replace(/\,/g, '.'));			
 
 		},
 
 		match : function(rPattern) {
 
-			return typeof(this.mValue) == 'string'?
-				this.__base(rPattern) :
-				rPattern.test(this.mValue.toString())
-				;
+			return !isNaN(this.mValue) && rPattern.test(this.mValue.toString());
+
+		},
+
+		isEmpty : function() {
+
+			return isNaN(this.mValue);
 
 		},
 		
 		isEqual : function(mValue) {
 
-			if(!(mValue instanceof this.__self || mValue instanceof ZForms.Value || typeof(mValue) == 'number')) {
+			if(!this.checkForCompareTypes(mValue)) {
 				return false;
 			} 												 
 
@@ -42,7 +40,7 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 
 		isGreater : function(mValue) {			
 	
-			if(!(mValue instanceof this.__self || mValue instanceof ZForms.Value || typeof(mValue) == 'number')) {
+			if(!this.checkForCompareTypes(mValue)) {
 				return false;
 			} 
 
@@ -57,7 +55,19 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 		
 			return this.get() > oValue.get();
 
-		}
+		},
 
+		checkForCompareTypes : function(mValue) {
+
+			return mValue instanceof this.__self || (mValue instanceof ZForms.Value && !isNaN(parseFloat(mValue.get()))) || typeof(mValue) == 'number' || (typeof(mValue) == 'string' && !isNaN(parseFloat(mValue.toString())));
+
+		},
+
+		toStr : function() {
+
+			return isNaN(this.mValue)? '' : this.mValue.toString();
+
+		}
+		
 	}
 	);

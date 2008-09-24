@@ -8,8 +8,8 @@ ZForms.Value.Multiple = ZForms.Value.inheritTo(
 		},
 		
 		set : function(mValue) {
-		
-			this.mValue = mValue;
+
+			this.mValue = mValue instanceof Array? mValue : [mValue];
 		
 		},
 
@@ -44,7 +44,7 @@ ZForms.Value.Multiple = ZForms.Value.inheritTo(
 		isEqual : function(mValue) {
 	
 			if(!(mValue instanceof this.__self || mValue instanceof Array)) {
-				return false;
+				return this.mValue.length == 1 && this.mValue[0] === (mValue instanceof ZForms.Value? mValue.get() : mValue);
 			} 
 	
 			var oValue = mValue instanceof this.__self? mValue : new this.__self(mValue);
@@ -69,9 +69,13 @@ ZForms.Value.Multiple = ZForms.Value.inheritTo(
 				return false;
 			} 
 	
-			var oValue = mValue instanceof this.__self? mValue : new this.__self(mValue);
-	
-			return this.get().length > oValue.get().length;
+			return this.get().length > (mValue instanceof this.__self? mValue : new this.__self(mValue)).get().length;
+
+		},
+
+		checkForCompareTypes : function(mValue) {
+
+			return mValue instanceof this.__self || mValue instanceof Array;
 
 		},
 	

@@ -54,49 +54,78 @@ ZForms.Value.Date = ZForms.Value.inheritTo(
 	
 		},
 	
-		isEqual : function(oValue) {
+		isEqual : function(mValue) {
 
-			if(oValue instanceof this.__self.Time) {
-				return this.get() + ' 0:0:0' == oValue.get();
+			if(mValue instanceof this.__self.Time) {
+				return this.get() + ' 0:0:0' == mValue.get();
 			}
 
-			return oValue instanceof this.__self &&				   
-				this.get() == oValue.get()
-				;				   
+			if(mValue instanceof this.__self) {
+				return this.get() == mValue.get();
+			}
+
+			if(mValue instanceof ZForms.Value) {
+				return this.get() == mValue.get();
+			}
+
+			if(mValue instanceof Date) {
+				return this.get() == new this.__self(mValue).get();
+			}
+
+			return this.get() === mValue;				   
 
 		},
 		
 		isGreater : function(mValue) {
 
-			var oValue = (mValue instanceof this.__self)?
+			var oValue = (mValue instanceof ZForms.Value.Date)?
 				mValue :
-				new this.__self(
+				new ZForms.Value.Date(
 					(mValue instanceof ZForms.Value)?
-						Value.get() :
+						mValue.get() :
 						mValue
 					)
 				;
 	
 			if(this.isEmpty() || oValue.isEmpty()) {
-				return true;
+				return false;
 			}
+
 			if(this.getYear() > oValue.getYear()) {	
 				return true;	
 			}
-			else if(this.getYear() == oValue.getYear()) {
+
+			if(this.getYear() == oValue.getYear()) {
 	
 				if(this.getMonth() > oValue.getMonth()) {
 					return true;
 				}
-				else {
-					return this.getMonth() == oValue.getMonth() && this.getDay() > oValue.getDay();
-				}
+
+				return this.getMonth() == oValue.getMonth() && this.getDay() > oValue.getDay();
 	
 			}
 	
 			return false;
 
-		},		
+		},
+
+		checkForCompareTypes : function(mValue) {
+
+			if(mValue instanceof this.__self || mValue instanceof this.__self.Time) {
+				return !mValue.isEmpty();
+			}
+
+			if(mValue instanceof ZForms.Value) {
+				return !(new ZForms.Value.Date(mValue.get()).isEmpty());
+			}
+
+			if(typeof(mValue) == 'string') {
+				return !(new ZForms.Value.Date(mValue).isEmpty());
+			}
+
+			return mValue instanceof Date;				
+
+		},
 	
 		isEmpty : function() {
 	
@@ -108,7 +137,7 @@ ZForms.Value.Date = ZForms.Value.inheritTo(
 	
 		},
 
-		getYear : function() {
+		getYear : function() {                                 
 	
 			return this.mValue[this.__self.PART_YEAR];
 	
