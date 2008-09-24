@@ -1,0 +1,24 @@
+<html>
+	<head>
+		<script type="text/javascript" src="/jsunit/app/jsUnitCore.js"></script>		
+	</head>
+	<script type="text/javascript">
+
+	function suite() {
+
+		var oSuite = new top.jsUnitTestSuite();
+
+		oSuite.addTestPage('/sources/tests/Value/Value.html');
+		oSuite.addTestPage('/sources/tests/Value/Value.Number.html');
+		oSuite.addTestPage('/sources/tests/Value/Value.Multiple.html');
+		oSuite.addTestPage('/sources/tests/Value/Value.Date.html');
+		oSuite.addTestPage('/sources/tests/Value/Value.Date.Time.html');
+
+		return oSuite;
+
+	}
+
+	</script>
+	<body>
+	</body>
+</html>

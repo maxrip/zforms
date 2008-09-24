@@ -1,0 +1,176 @@
+<html>
+	<title>ZForms.Value.Date.Time</title>
+	<head>
+		<script type="text/javascript" src="/jsunit/app/jsUnitCore.js"></script>
+		<script type="text/javascript" src="/js/Common.js"></script>
+		<script type="text/javascript" src="/sources/ZForms.js"></script>
+		<script type="text/javascript" src="/sources/ZForms/Value.js"></script>
+		<script type="text/javascript" src="/sources/ZForms/Value/Date.js"></script>
+		<script type="text/javascript" src="/sources/ZForms/Value/Date/Time.js"></script>
+	</head>
+	<body>
+		<h1>ZForms.Value.Date.Time</h1>
+	</body>
+	<script type="text/javascript">
+
+	function testGet() {
+
+		var oValue = new ZForms.Value.Date.Time('test');
+		assertEquals('get 1', oValue.get(), '');
+
+		oValue = new ZForms.Value.Date.Time('2008-12-14');
+		assertNotEquals('get 2', oValue.get(), '2008-12-14');
+
+		oValue = new ZForms.Value.Date.Time('2008-12-14');
+		assertEquals('get 3', oValue.get(), '2008-12-14 0:0:0');
+
+		oValue = new ZForms.Value.Date.Time('2008-12-14 00:0:02');
+		assertEquals('get 4', oValue.get(), '2008-12-14 0:0:2');		
+
+	}
+
+	function testSet() {
+
+		var oValue = new ZForms.Value.Date.Time();
+		oValue.set('test');
+		assertTrue('set 1', oValue.get() == '');
+		oValue.set('2008-12-14');
+		assertFalse('set 2', oValue.get() == '2008-12-14');
+		oValue.set(new Date(2008, 11, 12));
+		assertTrue('set 3', oValue.get() == '2008-12-12 0:0:0');
+		oValue.set('2008-12-33 0:12:12');
+		assertFalse('set 4', oValue.get() == '2008-12-33 0:12:12');
+		assertTrue('set 5', oValue.get() == '2009-1-2 0:12:12');
+
+	}
+
+	function testReset() {
+
+		var oValue = new ZForms.Value.Date('2008-12-23 1:1:1');
+		oValue.reset();
+		assertEquals('reset', oValue.get(), '');
+
+	}
+
+	function testIsEmpty() {
+
+		var oValue = new ZForms.Value.Date.Time();
+		assertTrue('is empty 1', oValue.isEmpty());
+		oValue.set('22222-2-23');
+		assertTrue('is empty 2', oValue.isEmpty());
+		oValue.set(new Date());
+		assertFalse('is empty 3', oValue.isEmpty());
+		oValue.set('2008-12-12');
+		assertFalse('is empty 4', oValue.isEmpty());
+		oValue.set('2008-12-12 00:00:02');
+		assertFalse('is empty 5', oValue.isEmpty());
+		oValue.set('dfsf');
+		assertTrue('is empty 6', oValue.isEmpty());
+
+	}
+
+	function testIsEqual() {
+
+		var oValue = new ZForms.Value.Date.Time('2009-01-01 00:02:02');
+		assertTrue('is equal 1', oValue.isEqual(new ZForms.Value.Date.Time('2008-12-32 00:02:02')));
+		assertFalse('is equal 2', oValue.isEqual(new ZForms.Value.Date('2008-01-02')));
+		assertTrue('is equal 3', oValue.isEqual(new ZForms.Value.Date.Time('2009-01-01 0:2:2')));
+		assertFalse('is equal 4', oValue.isEqual(new ZForms.Value.Date.Time('2009-01-01 0:0:1')));
+		assertFalse('is equal 5', oValue.isEqual(new Date(2009, 0, 1)));
+		assertTrue('is equal 6', oValue.isEqual(new Date(2009, 0, 1, 0, 2, 2)));
+		assertTrue('is equal 7', oValue.isEqual(new ZForms.Value('2009-1-1 0:2:2')));
+		assertFalse('is equal 8', oValue.isEqual(new ZForms.Value('2009-1-1')));
+
+		oValue.set('2009-01-01 00:00:00');
+		assertTrue('is equal 9', oValue.isEqual('2009-1-1'));
+		assertTrue('is equal 10', oValue.isEqual(new ZForms.Value('2009-1-1')));
+
+	}
+
+	function testIsGreater() {
+
+		var oValue = new ZForms.Value.Date.Time('2009-02-03 2:0:2');
+		assertTrue('is greater 1', oValue.isGreater(new ZForms.Value.Date.Time('2009-02-03 2:0:1')));
+		assertFalse('is greater 2', oValue.isGreater(new ZForms.Value.Date.Time('2009-02-03 2:0:2')));
+		assertTrue('is greater 3', oValue.isGreater('2009-02-01 23:23:23'));
+		assertTrue('is greater 4', oValue.isGreater('2009-01-04'));
+		assertTrue('is greater 5', oValue.isGreater('2008-11-29 12:12:12'));
+		assertFalse('is greater 6', oValue.isGreater(''));
+		assertFalse('is greater 7', oValue.isGreater(new ZForms.Value('test')));
+		assertTrue('is greater 8', oValue.isGreater(new ZForms.Value('2008-12-12 23:23:2')));
+		assertFalse('is greater 9', oValue.isGreater(new ZForms.Value('2009-12-12 23:23:2')));
+		assertFalse('is greater 10', oValue.isGreater(null));
+		assertTrue('is greater 11', oValue.isGreater(new ZForms.Value.Date('2009-02-03')));
+		assertFalse('is greater 12', oValue.isGreater(new ZForms.Value.Date('2009-02-04')));
+
+	}
+
+	function testIsGreaterOrEqual() {
+
+		var oValue = new ZForms.Value.Date.Time('2009-02-03 12:12:13');
+		assertTrue('is greater or equal 1', oValue.isGreaterOrEqual(new ZForms.Value.Date.Time('2009-02-03 12:12:13')));
+		assertFalse('is greater or equal 2', oValue.isGreaterOrEqual(new ZForms.Value.Date.Time('2009-02-03 12:12:14')));
+		assertTrue('is greater or equal 3', oValue.isGreaterOrEqual('2009-02-02'));
+		assertTrue('is greater or equal 4', oValue.isGreaterOrEqual('2009-01-04 12:23:43'));
+		assertTrue('is greater or equal 5', oValue.isGreaterOrEqual('2008-11-29 23:21:23'));
+		assertFalse('is greater or equal 6', oValue.isGreaterOrEqual(''));
+		assertFalse('is greater or equal 7', oValue.isGreaterOrEqual(new ZForms.Value('test')));
+		assertTrue('is greater or equal 8', oValue.isGreaterOrEqual(new ZForms.Value('2008-02-03 12:12:12')));
+		assertFalse('is greater or equal 9', oValue.isGreaterOrEqual(null));
+		assertTrue('is greater 10', oValue.isGreater(new ZForms.Value.Date('2009-02-03')));
+		assertFalse('is greater 11', oValue.isGreater(new ZForms.Value.Date('2009-02-04')));
+
+	}
+
+	function testIsLess() {
+
+		var oValue = new ZForms.Value.Date.Time('2009-02-03 12:23:12');
+		assertTrue('is less 1', oValue.isLess(new ZForms.Value.Date.Time('2009-02-03 12:24:12')));
+		assertFalse('is less 2', oValue.isLess(new ZForms.Value.Date.Time('2009-02-03 12:22:12')));
+		assertTrue('is less 3', oValue.isLess('2009-02-05 0:0:0'));
+		assertTrue('is less 4', oValue.isLess('2009-03-01 12:12:12'));
+		assertTrue('is less 5', oValue.isLess('2010-01-1 12:12:12'));
+		assertFalse('is less 6', oValue.isLess(''));
+		assertFalse('is less 7', oValue.isLess(new ZForms.Value('test')));
+		assertTrue('is less 8', oValue.isLess(new ZForms.Value('2018-12-12 10:10:10')));
+		assertFalse('is less 9', oValue.isLess(null));
+		assertFalse('is less 10', oValue.isLess(new ZForms.Value.Date()));
+		assertTrue('is less 11', oValue.isLess(new ZForms.Value.Date('2009-02-04')));
+		assertFalse('is less 12', oValue.isLess(new ZForms.Value.Date('2009-02-03')));
+
+	}
+
+	function testIsLessOrEqual() {
+
+		var oValue = new ZForms.Value.Date.Time('2009-02-03 10:10:1');
+		assertTrue('is less or equal 1', oValue.isLessOrEqual(new ZForms.Value.Date.Time('2009-02-03 10:10:1')));
+		assertTrue('is less or equal 2', oValue.isLessOrEqual(new ZForms.Value.Date.Time('2009-02-03 10:10:2')));
+		assertFalse('is less or equal 3', oValue.isLessOrEqual(new ZForms.Value.Date.Time('2009-02-03 10:10:0')));
+		assertTrue('is less or equal 5', oValue.isLessOrEqual('2009-02-05 1:1:1'));
+		assertTrue('is less or equal 6', oValue.isLessOrEqual('2009-03-01 2:3:4'));
+		assertFalse('is less or equal 7', oValue.isLessOrEqual('2009-01-1 2:2:2'));
+		assertFalse('is less or equal 7', oValue.isLessOrEqual(''));
+		assertFalse('is less or equal 8', oValue.isLessOrEqual(new ZForms.Value('test')));
+		assertTrue('is less or equal 9', oValue.isLessOrEqual(new Date(2009, 2, 3, 10, 10, 1)));
+		assertFalse('is less or equal 10', oValue.isLessOrEqual(null));
+		assertFalse('is less or equal 11', oValue.isLessOrEqual(new ZForms.Value.Date()));
+		assertTrue('is less or equal 12', oValue.isLessOrEqual(new ZForms.Value.Date('2009-2-4')));
+		assertFalse('is less or equal 13', oValue.isLessOrEqual(new ZForms.Value.Date('2009-2-1')));
+
+	}
+
+	function testToStr() {
+
+		var oValue = new ZForms.Value.Date.Time('2009-02-03 10:0:1');
+		assertEquals('to str 1', oValue.toStr(), '2009-02-03 10:00:01');
+
+		oValue.set('test');
+		assertEquals('to str 2', oValue.toStr(), '');
+
+		oValue.set('2009-2-2');
+		assertEquals('to str 3', oValue.toStr(), '2009-02-02 00:00:00');
+
+	}
+
+	</script>
+</html>

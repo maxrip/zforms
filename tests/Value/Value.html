@@ -1,0 +1,132 @@
+<html>
+	<title>ZForms.Value</title>
+	<head>
+		<script type="text/javascript" src="/jsunit/app/jsUnitCore.js"></script>
+		<script type="text/javascript" src="/js/Common.js"></script>
+		<script type="text/javascript" src="/sources/ZForms.js"></script>
+		<script type="text/javascript" src="/sources/ZForms/Value.js"></script>
+	</head>
+	<body>
+		<h1>ZForms.Value</h1>
+	</body>
+	<script type="text/javascript">
+
+	function testGet() {
+
+		var oValue = new ZForms.Value('test');
+		assertEquals('get 1', oValue.get(), 'test');
+
+		oValue = new ZForms.Value();
+		assertEquals('get 2', oValue.get(), '');
+
+	}
+
+	function testReset() {
+
+		var oValue = new ZForms.Value('test');
+		oValue.reset();
+		assertEquals('reset', oValue.get(), '');
+	}
+
+	function testSet() {
+
+		var oValue = new ZForms.Value();
+		oValue.set('test');
+		assertTrue('set 1', oValue.get() == 'test');
+		oValue.set(5);
+		assertTrue('set 2', oValue.get() == '5');
+
+	}
+
+	function testMatch() {
+
+		var oValue = new ZForms.Value('test');
+		assertTrue('match 1', oValue.match(/t?est/));
+		assertFalse('match 2', oValue.match(/trest/));
+
+	}
+
+	function testIsEmpty() {
+
+		var oValue = new ZForms.Value('');
+		assertTrue('is empty 1', oValue.isEmpty());
+
+		oValue = new ZForms.Value('test');
+		assertFalse('is empty 2', oValue.isEmpty());
+
+	}
+
+	function testIsEqual() {
+
+		var oValue = new ZForms.Value('test');
+		assertTrue('is equal 1', oValue.isEqual(new ZForms.Value('test')));
+		assertTrue('is equal 2', oValue.isEqual('test'));
+		assertFalse('is equal 3', oValue.isEqual(new ZForms.Value()));
+		assertFalse('is equal 3', oValue.isEqual(4));
+
+	}
+
+	function testIsGreater() {
+
+		var oValue = new ZForms.Value('test');
+		assertTrue('is greater 1', oValue.isGreater(new ZForms.Value('te')));
+		assertTrue('is greater 2', oValue.isGreater('tes'));
+		assertFalse('is greater 3', oValue.isGreater('test'));
+		assertFalse('is greater 4', oValue.isGreater(new ZForms.Value('teste')));
+		assertFalse('is greater 5', oValue.isGreater('tester'));
+		assertFalse('is greater 6', oValue.isGreater(3));
+		assertFalse('is greater 7', oValue.isGreater(null));
+
+	}
+
+	function testIsGreaterOrEqual() {
+
+		var oValue = new ZForms.Value('test');
+		assertTrue('is greater or equal 1', oValue.isGreaterOrEqual(new ZForms.Value('te')));
+		assertTrue('is greater or equal 2', oValue.isGreaterOrEqual('tes'));
+		assertTrue('is greater or equal 3', oValue.isGreaterOrEqual('test'));
+		assertFalse('is greater or equal 4', oValue.isGreaterOrEqual(new ZForms.Value('teste')));
+		assertFalse('is greater or equal 5', oValue.isGreaterOrEqual('tester'));
+		assertFalse('is greater or equal 6', oValue.isGreaterOrEqual(7));
+		assertFalse('is greater or equal 7', oValue.isGreaterOrEqual(null));
+
+	}
+
+	function testIsLess() {
+
+		var oValue = new ZForms.Value('test');
+		assertFalse('is less 1', oValue.isLess(new ZForms.Value('te')));
+		assertFalse('is less 2', oValue.isLess('tes'));
+		assertFalse('is less 3', oValue.isLess('test'));
+		assertTrue('is less 4', oValue.isLess(new ZForms.Value('teste')));
+		assertTrue('is less 5', oValue.isLess('tester'));
+		assertFalse('is less 6', oValue.isLess(323));
+		assertFalse('is less 7', oValue.isLess(null));
+
+	}
+
+	function testIsLessOrEqual() {
+
+		var oValue = new ZForms.Value('test');
+		assertFalse('is less or equal 1', oValue.isLessOrEqual(new ZForms.Value('te')));
+		assertFalse('is less or equal 2', oValue.isLessOrEqual('tes'));
+		assertTrue('is less or equal 3', oValue.isLessOrEqual('test'));
+		assertTrue('is less or equal 4', oValue.isLessOrEqual(new ZForms.Value('teste')));
+		assertTrue('is less or equal 5', oValue.isLessOrEqual('tester'));
+		assertFalse('is less or equal 6', oValue.isLessOrEqual(323));
+		assertFalse('is less or equal 7', oValue.isLessOrEqual(null));
+
+	}
+
+	function testToStr() {
+
+		var oValue = new ZForms.Value();
+		assertEquals('to str', oValue.toStr(), '');
+
+		oValue.set('test');
+		assertEquals('to str', oValue.toStr(), 'test');
+
+	}
+
+	</script>
+</html>

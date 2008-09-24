@@ -1,0 +1,135 @@
+<html>
+	<title>ZForms.Value.Number</title>
+	<head>
+		<script type="text/javascript" src="/jsunit/app/jsUnitCore.js"></script>
+		<script type="text/javascript" src="/js/Common.js"></script>
+		<script type="text/javascript" src="/sources/ZForms.js"></script>
+		<script type="text/javascript" src="/sources/ZForms/Value.js"></script>
+		<script type="text/javascript" src="/sources/ZForms/Value/Number.js"></script>
+	</head>
+	<body>
+		<h1>ZForms.Value.Number</h1>
+	</body>
+	<script type="text/javascript">
+
+	function testGet() {
+
+		var oValue = new ZForms.Value.Number('test');
+		assertTrue('get 1', isNaN(oValue.get()));
+		
+		oValue = new ZForms.Value.Number(5);
+		assertEquals('get 2', oValue.get(), 5);
+
+	}
+
+	function testSet() {
+
+		var oValue = new ZForms.Value.Number();
+		oValue.set('test');
+		assertTrue('set 1', isNaN(oValue.get()));
+		oValue.set(5);
+		assertTrue('set 2', oValue.get() == 5);
+		oValue.set('5,43');
+		assertTrue('set 3', oValue.get() == 5.43);
+
+	}
+
+	function testMatch() {
+
+		var oValue = new ZForms.Value.Number(53);
+		assertTrue('match 1', oValue.match(/\d+/));
+		assertFalse('match 2', oValue.match(/\d{3,}/));
+
+	}
+
+	function testIsEmpty() {
+
+		var oValue = new ZForms.Value.Number('');
+		assertTrue('is empty 1', oValue.isEmpty());
+
+		oValue = new ZForms.Value.Number('test');
+		assertTrue('is empty 2', oValue.isEmpty());
+		
+		oValue = new ZForms.Value.Number(0);
+		assertFalse('is empty 3', oValue.isEmpty());
+		
+		oValue = new ZForms.Value.Number(56.2);
+		assertFalse('is empty 4', oValue.isEmpty());
+
+	}
+
+	function testIsEqual() {
+
+		var oValue = new ZForms.Value.Number(5);
+		assertTrue('is equal 1', oValue.isEqual(new ZForms.Value.Number(5)));
+		assertTrue('is equal 2', oValue.isEqual(new ZForms.Value('5')));
+		assertTrue('is equal 3', oValue.isEqual('5'));
+		assertTrue('is equal 4', oValue.isEqual(5));
+		assertFalse('is equal 5', oValue.isEqual(new ZForms.Value.Number()));
+
+	}
+
+	function testIsGreater() {
+
+		var oValue = new ZForms.Value.Number('5,44');
+		assertTrue('is greater 1', oValue.isGreater(new ZForms.Value('5.4')));
+		assertTrue('is greater 2', oValue.isGreater('5'));
+		assertFalse('is greater 3', oValue.isGreater('test'));
+		assertFalse('is greater 4', oValue.isGreater(new ZForms.Value('teste')));
+		assertTrue('is greater 6', oValue.isGreater(3));
+		assertFalse('is greater 7', oValue.isGreater(null));
+
+	}
+
+	function testIsGreaterOrEqual() {
+
+		var oValue = new ZForms.Value.Number(10);
+		assertTrue('is greater or equal 1', oValue.isGreaterOrEqual(new ZForms.Value('10')));
+		assertTrue('is greater or equal 2', oValue.isGreaterOrEqual('9'));
+		assertTrue('is greater or equal 3', oValue.isGreaterOrEqual(5.3));
+		assertFalse('is greater or equal 4', oValue.isGreaterOrEqual(new ZForms.Value('teste')));
+		assertFalse('is greater or equal 5', oValue.isGreaterOrEqual('tester'));
+		assertFalse('is greater or equal 6', oValue.isGreaterOrEqual(17.3));
+		assertFalse('is greater or equal 7', oValue.isGreaterOrEqual(null));
+		assertTrue('is greater or equal 8', oValue.isGreaterOrEqual(new ZForms.Value.Number(9)));
+
+	}
+
+	function testIsLess() {
+
+		var oValue = new ZForms.Value.Number(12.4);
+		assertFalse('is less 1', oValue.isLess(new ZForms.Value('te')));
+		assertFalse('is less 2', oValue.isLess('ts'));
+		assertFalse('is less 3', oValue.isLess(''));
+		assertTrue('is less 4', oValue.isLess(new ZForms.Value.Number('13')));
+		assertFalse('is less 5', oValue.isLess('tester'));
+		assertTrue('is less 6', oValue.isLess(32));
+		assertFalse('is less 7', oValue.isLess(null));
+
+	}
+
+	function testIsLessOrEqual() {
+
+		var oValue = new ZForms.Value.Number(222.2);
+		assertFalse('is less or equal 1', oValue.isLessOrEqual(new ZForms.Value('te')));
+		assertFalse('is less or equal 2', oValue.isLessOrEqual('tes'));
+		assertTrue('is less or equal 3', oValue.isLessOrEqual('250'));
+		assertTrue('is less or equal 4', oValue.isLessOrEqual(new ZForms.Value.Number('222.2')));
+		assertFalse('is less or equal 5', oValue.isLessOrEqual('tester'));
+		assertTrue('is less or equal 6', oValue.isLessOrEqual(323));
+		assertFalse('is less or equal 7', oValue.isLessOrEqual(null));
+
+	}
+
+	function testToStr() {
+
+		var oValue = new ZForms.Value.Number(3);
+		assertEquals('to str 1', oValue.toStr(), '3');
+
+		oValue.set('test');
+		assertEquals('to str 2', oValue.toStr(), '');
+
+	}
+
+	</script>
+</html>
