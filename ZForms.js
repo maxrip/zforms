@@ -328,6 +328,14 @@ var ZForms = {
 			
 	},
 	
+	// creation builder method
+	
+	createBuilder : function(aForm) {
+	
+		return new this.Builder(aForm);
+	
+	},
+	
 	// forms store
 	
 	aForms : [],

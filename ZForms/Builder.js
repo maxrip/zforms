@@ -83,6 +83,7 @@ ZForms.Builder = Abstract.inheritTo(
 				break;
 	
 				case 'fieldset':
+				case 'sheet':
 	
 					if(oObject.oSheet) {
 						return this.makeSheet(oObject, bTemplate);
@@ -200,8 +201,17 @@ ZForms.Builder = Abstract.inheritTo(
 	
 		makeSheetContainer : function(oObject) {
 	
+			var oElement;
+	
+			try {
+				oElement = this.$(oObject.oSheet.sParent_ID);
+			}
+			catch(oException) {
+				oElement = Common.Dom.createElement('div', { id : oObject.oSheet.sParent_ID });
+			}			
+	
 			this.addChild(
-				ZForms.createSheetContainer(this.$(oObject.oSheet.sParent_ID)),
+				ZForms.createSheetContainer(oElement),
 				oObject
 				);
 	
@@ -211,7 +221,7 @@ ZForms.Builder = Abstract.inheritTo(
 	
 			if(!this.getElementById(oObject.oSheet.sParent_ID)) {
 				this.makeSheetContainer(oObject);
-			}
+			}			
 	
 			if(oObject.oSheet.sLegend_ID &&
 				oObject.oSheet.sParent_ID) {
