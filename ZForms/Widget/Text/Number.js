@@ -29,9 +29,9 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				Common.Dom.createElement(
 					'input',
 					{
-						'type'  : 'hidden',
-						'id'    : 'value-' + oElement.getAttribute('id'),
-						'name'  : oElement.getAttribute('name')
+						'type' : 'hidden',
+						'id'   : 'value-' + oElement.getAttribute('id'),
+						'name' : oElement.getAttribute('name')
 					}
 					),
 				oElement
@@ -39,6 +39,12 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				
 			oElement.name = 'to-str-' + oElement.name;			
 		
+		},
+		
+		getName : function() {
+	
+			return this.oHiddenElement.name;
+	
 		},
 		
 		getDefaultOptions : function() {

@@ -191,7 +191,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			
 			oNewChild.disable();
 			oNewChild.enable();
-			oNewChild.addClass(oNewChild.getInitedClassName());
+			this.addInitedClassName(oNewChild);
 			oNewChild.show();
 			
 			this.updateMultipliers();
@@ -204,6 +204,18 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			
 			this.processChildrenHashChanged();
 
+		},
+		
+		addInitedClassName : function(oNewChild) {
+		
+			if(oNewChild instanceof ZForms.Widget.Container) {
+				for(var i = 0; i < oNewChild.aChildren.length; i++) {
+					this.addInitedClassName(oNewChild.aChildren[i]);
+				}
+			}
+		
+			oNewChild.addClass(oNewChild.getInitedClassName());
+		
 		},
 
 		addTemplateDependencies : function(
@@ -237,7 +249,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 				oDependenceCloned = aDependencies[i].clone(oFrom);
 
-				// change mArgument if Dependence is compare dependence
+				// change mArgument if dependence is compare dependence
 
 				if(oDependenceCloned instanceof ZForms.Dependence.Function && aDependencies[i].getFunction().mArgument instanceof ZForms.Widget) {					
 					
@@ -245,9 +257,14 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 						this.findCorrespondingWidgetByTemplate(aDependencies[i].getFunction().mArgument, this.oTemplate, oClonedWidget) ||
 						aDependencies[i].getFunction().mArgument
 						;
-											
-					oDependenceCloned.getFunction().oWidget = oFrom;
-					oDependenceCloned.getFunction().sFunctionName = aDependencies[i].getFunction().sFunctionName;										
+					
+					oDependenceCloned.getFunction().oWidget =
+						this.findCorrespondingWidgetByTemplate(aDependencies[i].getFunction().oWidget, this.oTemplate, oClonedWidget) ||
+						aDependencies[i].getFunction().oWidget
+						;
+
+					oDependenceCloned.getFunction().sType = aDependencies[i].getFunction().sType;
+					oDependenceCloned.getFunction().sFunctionName = aDependencies[i].getFunction().sFunctionName;
 					
 				}
 
@@ -453,7 +470,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 			if(oNode.name) {
 
-				oNode.name = oNode.name.replace(this.__self.REG_EXP_REPLACE, '$1' + (iPostfix > 0? '_' + iPostfix : ''));
+				oNode.name = oNode.name.replace(this.__self.REG_EXP_REPLACE, '$1' + (iPostfix > 0? '_' + iPostfix : '') + '$2');
 
 				this.fixNode(oNode);
 
@@ -474,7 +491,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 		removePostfixFromNode : function(oNode) {
 
 			if(oNode.name) {
-				oNode.name = oNode.name.replace(this.__self.REG_EXP_REPLACE, '$1');
+				oNode.name = oNode.name.replace(this.__self.REG_EXP_REPLACE, '$1$2');
 			}
 
 			if(oNode.id) {
@@ -509,7 +526,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 			if(oNode.name) {
 
-				oNode.name += '_' + iPostfix;
+				oNode.name = oNode.name.replace(/^([^\[]+)(\[\])?$/, '$1_' + iPostfix + '$2');
 				this.fixNode(oNode);
 
 			}
@@ -528,22 +545,24 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				) {
 				return;
 			}
+			
+			var oAttributes = {
+				'type'      : oNode.type,
+				'name'      : oNode.name,
+				'id'        : oNode.id,
+				'class'     : oNode.className,
+				'size'      : oNode.size,
+				'maxlength' : oNode.maxLength,
+				'value'     : oNode.value,				
+				'style'     : oNode.style.cssText
+				};
+				
+			if(oNode.checked) {
+				oAttributes.checked = 'checked';
+			}
 
 			oNode.parentNode.insertBefore(
-				Common.Dom.createElement(
-					'input',
-					{
-						'type'      : oNode.type,
-						'name'      : oNode.name,
-						'id'        : oNode.id,
-						'class'     : oNode.className,
-						'size'      : oNode.size,
-						'maxlength' : oNode.maxLength,
-						'value'     : oNode.value,
-						'checked'   : oNode.checked,
-						'style'     : oNode.style.cssText
-					}
-					),			
+				Common.Dom.createElement('input', oAttributes),			
 				oNode
 				);
 
@@ -578,7 +597,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 	
 		POSTFIX_ID : '_multiplicator',
 		
-		REG_EXP_REPLACE : new RegExp('^(.+)_.+$'),
+		REG_EXP_REPLACE : new RegExp('^(.+)_\\d+(\\[\\])?$'),
 
 		CHILD_INDEX_CLASS_NAME_PREFIX : 'child_'
 		

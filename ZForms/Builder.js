@@ -3,7 +3,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 		__constructor : function(aForm) {
 	
-			this.bFakedSafari = Common.Browser.isSafari() && !navigator.appVersion.match(/Version\/3/)? true : false;
+			this.bFakedSafari = Common.Browser.isSafari() && !navigator.appVersion.match(/Version\/3/);
 			this.aLabels = this.fillLabels();
 			this.aElementsByName = [];
 			this.aTemplates = [];
@@ -597,7 +597,7 @@ ZForms.Builder = Abstract.inheritTo(
 	
 			var oElement = oElement || this.oForm;
 	
-			if(oElement.oElement.name) {
+			if(oElement.getName()) {
 				this.aElementsByName[oElement.getName()] = oElement;
 			}
 	
@@ -683,7 +683,7 @@ ZForms.Builder = Abstract.inheritTo(
 				iLogic = (oRequired.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND)
 				;
 	
-			oElement.addDependence(ZForms.createRequiredDependence(oElement, iLogic, oRequired.iMin? oRequired.iMin : 1));
+			oElement.addDependence(ZForms.createRequiredDependence(oElement, iLogic, oRequired.iMin));
 	
 			if(oRequired.aFrom) {
 				for(var i = 0, oWidgetFrom; i < oRequired.aFrom.length; i++) {
@@ -723,6 +723,9 @@ ZForms.Builder = Abstract.inheritTo(
 	
 				if(oValid.aFrom[i].mData instanceof Function) {
 					oElement.addDependence(ZForms.createFunctionDependence(ZForms.Dependence.TYPE_VALID, oWidgetFrom, oValid.aFrom[i].mData, iLogic, oValid.aFrom[i].bInverse));
+				}
+				else if(oValid.aFrom[i].oCompare) {
+					oElement.addDependence(ZForms.createValidCompareDependence(oWidgetFrom, oValid.aFrom[i].oCompare.sCondition, oValid.aFrom[i].oCompare.sName? this.getElementByName(oValid.aFrom[i].oCompare.sName) : oValid.aFrom[i].oCompare.sValue, iLogic, oValid.aFrom[i].bInverse));
 				}
 				else {
 					oElement.addDependence(
@@ -769,6 +772,9 @@ ZForms.Builder = Abstract.inheritTo(
 	
 				if(oDepended.aFrom[i].mData instanceof Function) {
 					oElement.addDependence(Dependence.createFunctionDependence(ZForms.Dependence.TYPE_ENABLE, oWidgetFrom, oDepended.aFrom[i].mData, iLogic, oDepended.aFrom[i].bInverse));
+				}
+				else if(oDepended.aFrom[i].oCompare) {
+					oElement.addDependence(ZForms.createEnableCompareDependence(oWidgetFrom, oDepended.aFrom[i].oCompare.sCondition, oDepended.aFrom[i].oCompare.sName? this.getElementByName(oDepended.aFrom[i].oCompare.sName) : oDepended.aFrom[i].oCompare.sValue, iLogic, oDepended.aFrom[i].bInverse));
 				}
 				else {
 					oElement.addDependence(

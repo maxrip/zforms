@@ -161,7 +161,7 @@ var ZForms = {
 		
 		return new this.Dependence.Required(
 			oWidget,
-			iMin? new RegExp('.{' + iMin + ',}') : /.+/,
+			iMin? new RegExp('\\S{' + iMin + ',}') : /\S+/,
 			iLogic,
 			false,
 			iMin
@@ -251,14 +251,17 @@ var ZForms = {
 		) {
 
 		var		
-			fFunction = function() {			
-				
-				return arguments.callee.oWidget.getValue().isEmpty() || arguments.callee.oWidget.getValue()[arguments.callee.sFunctionName](
+			fFunction = function() {
+
+				return (arguments.callee.sType == ZForms.Dependence.TYPE_VALID &&
+					(arguments.callee.oWidget.getValue().isEmpty() || (arguments.callee.mArgument instanceof ZForms.Widget && arguments.callee.mArgument.getValue().isEmpty()))
+					) ||
+					arguments.callee.oWidget.getValue()[arguments.callee.sFunctionName](
 					arguments.callee.mArgument instanceof ZForms.Widget?
 						arguments.callee.mArgument.getValue() :
 						arguments.callee.mArgument
 					);
-			
+
 			},
 			mResult = new this.Dependence.Function(
 				sType,
@@ -268,7 +271,8 @@ var ZForms = {
 				bInverse
 				)
 			;
-			
+		
+		fFunction.sType = sType;
 		fFunction.oWidget = oWidget;
 		fFunction.mArgument = mArgument;
 		fFunction.sFunctionName = this.Dependence.COMPARE_FUNCTIONS[sCondition || '='];
@@ -276,7 +280,7 @@ var ZForms = {
 		if(!(mArgument instanceof ZForms.Widget)) {
 			return mResult;
 		}
-		
+				
 		return [
 			mResult,
 			new this.Dependence.Function(

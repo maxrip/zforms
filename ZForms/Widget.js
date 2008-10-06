@@ -216,7 +216,7 @@ ZForms.Widget = Abstract.inheritTo(
 	
 			return this.sId;
 	
-		},
+		},				
 	
 		setId : function(sId) {
 	

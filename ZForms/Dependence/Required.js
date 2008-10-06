@@ -102,7 +102,7 @@ ZForms.Dependence.Required = ZForms.Dependence.inheritTo(
 					else if(this.oFrom.aChildren[i].isRequired()) {				
 						bHasRequiredChild = true;
 					}
-					else if(this.oFrom.aChildren[i].getValue().match(/.+/)) {
+					else if(this.oFrom.aChildren[i].getValue().match(/\S+/)) {
 						iCountMatched++;
 					}
 			
