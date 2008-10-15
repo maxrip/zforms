@@ -31,6 +31,8 @@
 		assertTrue('set 2', oValue.get() == 5);
 		oValue.set('5,43');
 		assertTrue('set 3', oValue.get() == 5.43);
+		oValue.set(0);
+		assertTrue('set 4', oValue.get() === 0);
 
 	}
 
