@@ -73,7 +73,23 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				return;
 			}			
 			
-			var oThis = this;
+			var
+				oThis = this,
+				iKeyDownCode = -1
+				;
+			
+			// opera 9.5 is really fucking browser
+			if(Common.Browser.isOpera() && this.oElement.isSameNode) {
+				Common.Event.add(
+					this.oElement,
+					this.__self.DOM_EVENT_TYPE_KEYDOWN,
+					function(oEvent) {					
+											
+						iKeyDownCode = oEvent.keyCode;
+						
+					}
+					);
+			}
 
 			Common.Event.add(
 				this.oElement,
@@ -81,17 +97,19 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				function(oEvent) {					
 
 					var oEvent = Common.Event.normalize(oEvent);														
-					
+
 					if(
 						oEvent.ctrlKey ||
 						oEvent.charCode == 0 ||
+						oEvent.which == 0 ||
+						(iKeyDownCode == oEvent.keyCode && (oEvent.keyCode == 46 || oEvent.keyCode == 45 || oEvent.keyCode == 36 || oEvent.keyCode == 35 || oEvent.keyCode == 9 || oEvent.keyCode == 8)) ||
 						(oEvent.iKeyCode >= 48 && oEvent.iKeyCode <= 57) ||
 						(oThis.oOptions.bFloat && (oEvent.iKeyCode == 44 || oEvent.iKeyCode == 46)) ||
 							(oThis.oOptions.bNegative && oEvent.iKeyCode == 45)
 							) {
 							return;
 					}
-					
+									
 					Common.Event.cancel(oEvent);								
 
 				}
