@@ -333,21 +333,27 @@ var ZForms = {
 	},
 	
 	// creation builder method
-	
+
+	/**
+	 * @param {Array} aForm
+	 * @returns {ZForms.Builder}
+	 */
 	createBuilder : function(aForm) {
 	
 		return new this.Builder(aForm);
 	
 	},
 	
-	// forms store
-	
 	aForms : [],
 
+	/**
+	 * @param {String} sId
+	 * @returns {ZForms.Widget.Container.Form}
+	 */
 	getFormById : function(sId) {
 
 		return this.aForms[sId];
 			
 	}
-
+	
 };

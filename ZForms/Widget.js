@@ -1,6 +1,16 @@
+/**
+ * @class base class of widgets
+ */
 ZForms.Widget = Abstract.inheritTo(
+	/** @lends ZForms.Widget.prototype */
 	{
 
+		/**
+		* @constructs
+		* @param {Element} oElement
+		* @param {Element} oClassElement
+		* @param {Object} oOptions
+		*/
 		__constructor : function(
 			oElement,
 			oClassElement,
@@ -723,6 +733,7 @@ ZForms.Widget = Abstract.inheritTo(
 		}
 		
 	},
+	/** @lends ZForms.Widget */
 	{
 		
 		CLASS_NAME_REQUIRED         : 'required',

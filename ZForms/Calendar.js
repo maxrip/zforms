@@ -6,7 +6,7 @@ ZForms.Calendar = Abstract.inheritTo(
 			this.oWidget = oWidget;
 
 			this.oPickerButton = ZForms.createButton(oWidget.oOptions.oPickerOpenerElement);
-			this.oElement             = Common.Dom.createElement('table', { 'class' : this.__self.CLASS_NAME_CALENDAR + ' ' + this.__self.CLASS_NAME_INVISIBLE }).appendChild(Common.Dom.createElement('tbody'));
+			this.oElement             = Common.Dom.createElement('table', { 'class' : this.__self.CLASS_NAME_CALENDAR + ' ' + this.__self.CLASS_NAME_HIDDEN }).appendChild(Common.Dom.createElement('tbody'));
 			this.oYearTitleElement    = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });		
 			this.oMonthTitleElement   = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });
 
@@ -163,7 +163,7 @@ ZForms.Calendar = Abstract.inheritTo(
 
 			this.oWidget.addClass(this.__self.CLASS_NAME_PICKER_ACTIVE);
 
-			Common.Class.remove(this.oElement.parentNode, this.__self.CLASS_NAME_INVISIBLE);
+			Common.Class.remove(this.oElement.parentNode, this.__self.CLASS_NAME_HIDDEN);
 
 			this.bShowed = true;				
 
@@ -175,7 +175,7 @@ ZForms.Calendar = Abstract.inheritTo(
 				return;
 			}
 
-			Common.Class.add(this.oElement.parentNode, this.__self.CLASS_NAME_INVISIBLE);
+			Common.Class.add(this.oElement.parentNode, this.__self.CLASS_NAME_HIDDEN);
 
 			this.oWidget.removeClass(this.__self.CLASS_NAME_PICKER_ACTIVE);
 
@@ -354,7 +354,7 @@ ZForms.Calendar = Abstract.inheritTo(
 	{
 
 		CLASS_NAME_CALENDAR      : 'calendar',
-		CLASS_NAME_INVISIBLE     : ZForms.Widget.CLASS_NAME_INVISIBLE,
+		CLASS_NAME_HIDDEN        : ZForms.Widget.CLASS_NAME_HIDDEN,
 		CLASS_NAME_ARROW_PREV    : 'arrow-prev',
 		CLASS_NAME_ARROW_NEXT    : 'arrow-next',
 		CLASS_NAME_TITLE         : 'title',

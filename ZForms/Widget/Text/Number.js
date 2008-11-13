@@ -44,7 +44,10 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 		
 		getName : function() {
 	
-			return this.oHiddenElement.name;
+			return this.oHiddenElement?
+				this.oHiddenElement.name :
+				this.oElement.name
+				;
 	
 		},
 		

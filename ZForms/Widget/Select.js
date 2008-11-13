@@ -91,7 +91,11 @@ ZForms.Widget.Select = ZForms.Widget.inheritTo(
 				}
 
 				if(bEnable) {
-					this.oElement.options[this.oElement.options.length] = new Option(oOption.sLabel, oOption.sValue);
+					this.oElement.options[this.oElement.options.length] = new Option(
+						oOption.sLabel,
+						oOption.sValue,
+						this.getValue().isEqual(oOption.sValue)
+						);
 				}
 
 			}
