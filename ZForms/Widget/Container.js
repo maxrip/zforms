@@ -14,8 +14,8 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 				oClassElement,
 				oOptions
 				);
-		
-		
+
+
 		},
 
 		addChild : function(
@@ -83,7 +83,7 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 
 			this.__base(oForm);
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				this.aChildren[i].setForm(oForm);
 			}
 
@@ -95,7 +95,7 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 				return false;
 			}
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				this.aChildren[i].disable(true);
 			}
 
@@ -111,7 +111,7 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 
 			this.bEnabled = true;
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 
 				this.aChildren[i].enable(true);
 				this.aChildren[i].updateByObservable(true);
@@ -132,7 +132,7 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 				return false;
 			}
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				if(!this.aChildren[i].isValid() && this.aChildren[i].isEnabled()) {
 					return false;
 				}
@@ -167,15 +167,15 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 			}
 
 		},
-		
+
 		afterClone : function() {
-		
+
 			this.__base();
 
 			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				this.aChildren[i].afterClone();
 			}
-		
+
 		},
 
 		hasValue : function() {
@@ -202,13 +202,13 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 
 			var iResult = 0;
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 
 				if(!this.aChildren[i].isEnabled()) {
 					continue;
 				}
 
-				if(this.aChildren[i] instanceof FieldContainer) {
+				if(this.aChildren[i] instanceof ZForms.Widget.Container) {
 					if(this.aChildren[i].getCountChildrenByPattern(sPattern) > 0) {
 						iResult++;
 					}
@@ -227,7 +227,7 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 
 			this.__base(iIndex);
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				this.aChildren[i].updateElements(iIndex);
 			}
 
@@ -238,7 +238,7 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 			oClassElement,
 			iIndex
 			) {
-		
+
 			var oResult = this.__base(
 				oElement,
 				oClassElement,
@@ -259,7 +259,7 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 			iIndex
 			) {
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				oParent.addChild(
 					this.aChildren[i].clone(
 						document.getElementById(this.aChildren[i].oElement.id.match(ZForms.Widget.Container.Multiplicator.REG_EXP_REPLACE)[1] + '_' + iIndex),
@@ -273,22 +273,22 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 
 		destruct : function() {
 
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				this.aChildren[i].destruct();
 			}
 
 			this.__base();
 
 		},
-		
+
 		prepareForSubmit : function() {
-		
-			for(var i = 0, iLength = this.aChildren.length; i < iLength ; i++) {
+
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				this.aChildren[i].prepareForSubmit();
 			}
 
 			this.__base();
-		
+
 		}
 
 	}
