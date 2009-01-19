@@ -1,26 +1,26 @@
 ZForms.Calendar = Abstract.inheritTo(
 	{
-		
+
 		__constructor : function(oWidget) {
 
 			this.oWidget = oWidget;
 
 			this.oPickerButton = ZForms.createButton(oWidget.oOptions.oPickerOpenerElement);
 			this.oElement             = Common.Dom.createElement('table', { 'class' : this.__self.CLASS_NAME_CALENDAR + ' ' + this.__self.CLASS_NAME_HIDDEN }).appendChild(Common.Dom.createElement('tbody'));
-			this.oYearTitleElement    = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });		
+			this.oYearTitleElement    = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });
 			this.oMonthTitleElement   = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });
 
 			this.oDate = new Date();
 			this.oDateNow = new Date();
 			this.bShowed = false;
 
-			this.init();		
-			
+			this.init();
+
 		},
 
 		init : function() {
 
-			var			
+			var
 				oHeadElement = this.oElement.parentNode.insertBefore(document.createElement('thead'), this.oElement),
 				oYearRowElement = oHeadElement.appendChild(document.createElement('tr')).appendChild(Common.Dom.createElement('th',  { 'colspan' : 7 } )),
 				oYearArrowPrevElement = oYearRowElement.appendChild(Common.Dom.createElement('input', { 'type' : 'button', 'value' : '←', 'class' : this.__self.CLASS_NAME_ARROW_PREV + ' ' + ZForms.Widget.Button.CLASS_NAME_BUTTON })),
@@ -30,7 +30,7 @@ ZForms.Calendar = Abstract.inheritTo(
 				oMonthArrowNextElement = oMonthRowElement.appendChild(Common.Dom.createElement('input', { 'type' : 'button', 'value' :  '→', 'class' : this.__self.CLASS_NAME_ARROW_NEXT + ' ' + ZForms.Widget.Button.CLASS_NAME_BUTTON })),
 				oDaysOfWeekRowElement = oHeadElement.appendChild(document.createElement('tr'))
 				;
-				
+
 			oYearRowElement.appendChild(this.oYearTitleElement);
 			oMonthRowElement.appendChild(this.oMonthTitleElement);
 
@@ -45,10 +45,10 @@ ZForms.Calendar = Abstract.inheritTo(
 			}
 
 			var oThis = this;
-			
+
 			this.oPickerButton.setHandler(
 				function() {
-					
+
 					if(oThis.isShowed()) {
 						oThis.hide();
 					}
@@ -73,10 +73,10 @@ ZForms.Calendar = Abstract.inheritTo(
 			Common.Event.add(
 				this.oElement.parentNode,
 				'click',
-				function(oEvent) {		
+				function(oEvent) {
 
 					Common.Event.cancel(oEvent);
-				
+
 				}
 				);
 
@@ -87,8 +87,8 @@ ZForms.Calendar = Abstract.inheritTo(
 
 					if(Common.Event.normalize(oEvent).target != oThis.oPickerButton.oElement) {
 						oThis.hide();
-					}		
-				
+					}
+
 				}
 				);
 
@@ -100,7 +100,7 @@ ZForms.Calendar = Abstract.inheritTo(
 					oThis.setPrevYear();
 
 				}
-				);		
+				);
 
 			Common.Event.add(
 				oYearArrowNextElement,
@@ -121,7 +121,7 @@ ZForms.Calendar = Abstract.inheritTo(
 					oThis.setPrevMonth();
 
 				}
-				);		
+				);
 
 			Common.Event.add(
 				oMonthArrowNextElement,
@@ -131,7 +131,7 @@ ZForms.Calendar = Abstract.inheritTo(
 					oThis.setNextMonth();
 
 				}
-				);			
+				);
 
 			this.oPickerButton.oElement.parentNode.appendChild(this.oElement.parentNode);
 
@@ -165,7 +165,7 @@ ZForms.Calendar = Abstract.inheritTo(
 
 			Common.Class.remove(this.oElement.parentNode, this.__self.CLASS_NAME_HIDDEN);
 
-			this.bShowed = true;				
+			this.bShowed = true;
 
 		},
 
@@ -179,7 +179,7 @@ ZForms.Calendar = Abstract.inheritTo(
 
 			this.oWidget.removeClass(this.__self.CLASS_NAME_PICKER_ACTIVE);
 
-			this.bShowed = false;				
+			this.bShowed = false;
 
 		},
 
@@ -213,9 +213,8 @@ ZForms.Calendar = Abstract.inheritTo(
 					sHtml += '</tr><tr>';
 				}
 
-
 				sClassName = '';
-					
+
 				if(iDay == this.oDateNow.getDate() && this.oDate.getMonth() == this.oDateNow.getMonth() && this.oDate.getYear() == this.oDateNow.getYear()) {
 					sClassName = 'now';
 				}
@@ -225,7 +224,6 @@ ZForms.Calendar = Abstract.inheritTo(
 				}
 
 				sHtml += '<td' + (sClassName.length > 0? ' class="' + sClassName + '"' : '') + '>' + iDay++ + '</td>';
-
 
 			}
 
@@ -242,24 +240,24 @@ ZForms.Calendar = Abstract.inheritTo(
 			sHtml += '</tr></table>';
 
 			// fucking ie
-			
+
 			var oBodyElement = document.createElement('div');
 			oBodyElement.innerHTML = sHtml;
 			oBodyElement = oBodyElement.getElementsByTagName('tbody')[0];
-			
+
 			this.oElement.parentNode.replaceChild(oBodyElement, this.oElement);
 
 			this.oElement = oBodyElement;
 
-			var oThis = this;		
+			var oThis = this;
 
 			Common.Event.add(
 				this.oElement,
 				'click',
 				function(oEvent) {
 
-					oThis.hide();				
-					oThis.setDate(new Date(oThis.oDate.getFullYear(), oThis.oDate.getMonth(), Common.Event.normalize(oEvent).target.innerHTML));				
+					oThis.hide();
+					oThis.setDate(new Date(oThis.oDate.getFullYear(), oThis.oDate.getMonth(), Common.Event.normalize(oEvent).target.innerHTML));
 
 					if(oThis.oWidget.oOptions.bWithTime) {
 
@@ -295,7 +293,7 @@ ZForms.Calendar = Abstract.inheritTo(
 
 						}
 
-		
+
 					}
 					);
 			}
@@ -303,53 +301,53 @@ ZForms.Calendar = Abstract.inheritTo(
 		},
 
 		setPrevMonth : function() {
-					
+
 			this.setDate(new Date(this.oDate.getFullYear(), this.oDate.getMonth(), -0.5));
-		
+
 		},
 
 		setNextMonth : function() {
-						
+
 			this.setDate(new Date(this.oDate.getFullYear(), this.oDate.getMonth(), 32));
-		
+
 		},
 
 		setPrevYear : function() {
-					
+
 			this.setDate(new Date(this.oDate.getFullYear() - 1, this.oDate.getMonth(), 1));
-		
+
 		},
 
 		setNextYear : function() {
-						
+
 			this.setDate(new Date(this.oDate.getFullYear() + 1, this.oDate.getMonth(), 1));
-		
+
 		},
 
 		enable : function() {
 
 			this.oPickerButton.enable();
-		
+
 		},
 
 		disable : function() {
 
 			this.hide();
 			this.oPickerButton.disable();
-		
+
 		},
 
 		destruct : function() {
 
 			this.oWidget = null;
-			this.oElement             = null;	
-			this.oYearTitleElement    = null;		
+			this.oElement             = null;
+			this.oYearTitleElement    = null;
 			this.oMonthTitleElement   = null;
 
 			this.oPickerButton.destruct();
 
 		}
-		
+
 	},
 	{
 
@@ -362,6 +360,6 @@ ZForms.Calendar = Abstract.inheritTo(
 		CLASS_NAME_NOW           : 'now',
 		CLASS_NAME_PICKER_ACTIVE : 'picker-active',
 		CLASS_NAME_HOVERED       : 'hovered'
-		
+
 	}
 	);
