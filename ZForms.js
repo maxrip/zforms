@@ -6,143 +6,143 @@ var ZForms = {
 
 	// static widget creation methods
 
-	createWidget : function() {		
-		
+	createWidget : function() {
+
 		return new arguments[0](
 			arguments[1][0],
 			arguments[1][1],
 			arguments[1][2]
 			);
-		
-	},	
+
+	},
 
 	createTextInput : function() {
-	
-		return this.createWidget(ZForms.Widget.Text, arguments);			
-	
+
+		return this.createWidget(ZForms.Widget.Text, arguments);
+
 	},
-	
-	createNumberInput : function() {		
-	
-		return this.createWidget(ZForms.Widget.Text.Number, arguments);			
-	
+
+	createNumberInput : function() {
+
+		return this.createWidget(ZForms.Widget.Text.Number, arguments);
+
 	},
-	
-	createSelectInput : function() {		
-	
-		return this.createWidget(ZForms.Widget.Select, arguments);			
-	
+
+	createSelectInput : function() {
+
+		return this.createWidget(ZForms.Widget.Select, arguments);
+
 	},
-	
-	createComboInput : function() {		
-	
-		return this.createWidget(ZForms.Widget.Text.Combo, arguments);			
-	
+
+	createComboInput : function() {
+
+		return this.createWidget(ZForms.Widget.Text.Combo, arguments);
+
 	},
-	
-	createContainer : function() {		
-	
-		return this.createWidget(ZForms.Widget.Container, arguments);		
-		
+
+	createContainer : function() {
+
+		return this.createWidget(ZForms.Widget.Container, arguments);
+
 	},
-	
-	createDateInput : function() {		
-	
-		return this.createWidget(ZForms.Widget.Container.Date, arguments);		
-		
+
+	createDateInput : function() {
+
+		return this.createWidget(ZForms.Widget.Container.Date, arguments);
+
 	},
-	
+
 	createInputGroup : function() {
-		
+
 		var oResult = this.createWidget(arguments[0], arguments[1]);
-		
-		if(arguments[1][3]) {			
+
+		if(arguments[1][3]) {
 			for(var i = 0; i < arguments[1][3].length; i++) {
 				oResult.addChild(
 					this.createStateInput(arguments[1][3][i][0], arguments[1][3][i][1], arguments[1][2])
 					);
 			}
 		}
-		
+
 		return oResult;
-		
+
 	},
-	
+
 	createStateInput : function() {
-	
+
 		return this.createWidget(ZForms.Widget.Text.State, arguments);
-	
+
 	},
-	
+
 	createCheckBoxGroup : function() {
-	
-		return this.createInputGroup(ZForms.Widget.Container.Group.CheckBox, arguments);			
-						
+
+		return this.createInputGroup(ZForms.Widget.Container.Group.CheckBox, arguments);
+
 	},
-				
+
 	createRadioButtonGroup : function() {
-	
+
 		return this.createInputGroup(ZForms.Widget.Container.Group.RadioButton, arguments);
-		
+
 	},
-	
-	createSlider : function() {		
-	
-		return this.createWidget(ZForms.Widget.Container.Slider, arguments);		
-		
+
+	createSlider : function() {
+
+		return this.createWidget(ZForms.Widget.Container.Slider, arguments);
+
 	},
-	
-	createSliderVertical : function() {		
-	
+
+	createSliderVertical : function() {
+
 		return this.createWidget(ZForms.Widget.Container.Slider.Vertical, arguments);
-		
+
 	},
-	
-	createButton : function() {		
-	
-		return this.createWidget(ZForms.Widget.Button, arguments);		
-		
+
+	createButton : function() {
+
+		return this.createWidget(ZForms.Widget.Button, arguments);
+
 	},
-	
+
 	createSubmitButton : function() {
-	
-		return this.createWidget(ZForms.Widget.Button.Submit, arguments);	
-		
+
+		return this.createWidget(ZForms.Widget.Button.Submit, arguments);
+
 	},
-	
+
 	createSheet : function() {
-			
+
 		return this.createWidget(ZForms.Widget.Container.Sheet, arguments);
-		
+
 	},
-	
+
 	createSheetContainer : function() {
-			
+
 		return this.createWidget(ZForms.Widget.Container.SheetContainer, arguments);
-		
+
 	},
-	
+
 	createMultiplicator : function() {
-			
+
 		return this.createWidget(ZForms.Widget.Container.Multiplicator, arguments);
-		
+
 	},
-	
+
 	createForm : function() {
-	
+
 		return this.createWidget(ZForms.Widget.Container.Form, arguments);
-	
+
 	},
-	
+
 	// static dependence creation methods
-	
+
 	createEnableDependence : function(
 		oWidget,
 		rPattern,
 		iLogic,
 		bInverse
 		) {
-		
+
 		return new this.Dependence(
 			this.Dependence.TYPE_ENABLE,
 			oWidget,
@@ -150,15 +150,15 @@ var ZForms = {
 			iLogic,
 			bInverse
 			);
-		
+
 	},
-	
+
 	createRequiredDependence : function(
 		oWidget,
 		iLogic,
 		iMin
 		) {
-		
+
 		return new this.Dependence.Required(
 			oWidget,
 			iMin? new RegExp('\\S{' + iMin + ',}') : /\S+/,
@@ -166,34 +166,43 @@ var ZForms = {
 			false,
 			iMin
 			);
-	
-	},		
-	
+
+	},
+
 	createValidDependence : function(
 		oWidget,
 		rPattern,
 		iLogic,
-		bInverse
+		bInverse,
+		sClassName
 		) {
-	
+
 		return new this.Dependence.Valid(
 			oWidget,
 			rPattern,
 			iLogic,
-			bInverse
+			bInverse,
+			sClassName
 			);
-			
+
 	},
-	
-	createValidEmailDependence : function(oWidget) {
+
+	createValidEmailDependence : function(
+		oWidget,
+		iLogic,
+		sClassName
+		) {
 
 		return this.createValidDependence(
 			oWidget,
-			/^[a-zA-Z0-9][a-zA-Z0-9\.\-\_\~]*\@[a-zA-Z0-9\.\-\_]+\.[a-zA-Z]{2,4}$/
+			/^[a-zA-Z0-9][a-zA-Z0-9\.\-\_\~]*\@[a-zA-Z0-9\.\-\_]+\.[a-zA-Z]{2,4}$/,
+			iLogic,
+			null,
+			sClassName
 			);
-			
+
 	},
-	
+
 	createOptionsDependence : function(
 		oWidget,
 		aPatterns,
@@ -208,7 +217,7 @@ var ZForms = {
 			);
 
 	},
-	
+
 	createClassDependence : function(
 		oWidget,
 		aPatternToClasses,
@@ -222,7 +231,7 @@ var ZForms = {
 			);
 
 	},
-	
+
 	createFunctionDependence : function(
 		iType,
 		oWidget,
@@ -240,7 +249,7 @@ var ZForms = {
 			);
 
 	},
-	
+
 	createCompareDependence : function(
 		sType,
 		oWidget,
@@ -250,7 +259,7 @@ var ZForms = {
 		bInverse
 		) {
 
-		var		
+		var
 			fFunction = function() {
 
 				return (arguments.callee.sType == ZForms.Dependence.TYPE_VALID &&
@@ -271,16 +280,16 @@ var ZForms = {
 				bInverse
 				)
 			;
-		
+
 		fFunction.sType = sType;
 		fFunction.oWidget = oWidget;
 		fFunction.mArgument = mArgument;
 		fFunction.sFunctionName = this.Dependence.COMPARE_FUNCTIONS[sCondition || '='];
-			
+
 		if(!(mArgument instanceof ZForms.Widget)) {
 			return mResult;
 		}
-				
+
 		return [
 			mResult,
 			new this.Dependence.Function(
@@ -291,10 +300,10 @@ var ZForms = {
 				bInverse
 				)
 			];
-	
+
 	},
-	
-	createValidCompareDependence : function(	
+
+	createValidCompareDependence : function(
 		oWidget,
 		sCondition,
 		mArgument,
@@ -312,8 +321,8 @@ var ZForms = {
 			);
 
 	},
-	
-	createEnableCompareDependence : function(	
+
+	createEnableCompareDependence : function(
 		oWidget,
 		sCondition,
 		mArgument,
@@ -329,9 +338,9 @@ var ZForms = {
 			iLogic,
 			bInverse
 			);
-			
+
 	},
-	
+
 	// creation builder method
 
 	/**
@@ -339,11 +348,11 @@ var ZForms = {
 	 * @returns {ZForms.Builder}
 	 */
 	createBuilder : function(aForm) {
-	
+
 		return new this.Builder(aForm);
-	
+
 	},
-	
+
 	aForms : [],
 
 	/**
@@ -353,7 +362,7 @@ var ZForms = {
 	getFormById : function(sId) {
 
 		return this.aForms[sId];
-			
+
 	}
-	
+
 };

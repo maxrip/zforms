@@ -1,14 +1,14 @@
 ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 	{
-	
+
 		__constructor : function(
 			oElement,
 			oClassElement,
-			oOptions	
+			oOptions
 			) {
 
 			if(!oOptions.bTemplate && Common.Browser.isOpera()) {
-						
+
 				var oNewOptionsElement = Common.Dom.createElement(
 					'select',
 					{
@@ -16,28 +16,28 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 						'id'    : oOptions.oOptionsElement.id,
 						'class' : oOptions.oOptionsElement.className
 					}
-					);		
-								
+					);
+
 				for(var i = 0, aOptions = oOptions.oOptionsElement.options; i < aOptions.length; i++) {
 					oNewOptionsElement.options[oNewOptionsElement.options.length] = new Option(aOptions[i].innerHTML, aOptions[i].value);
 				}
-				
-				oOptions.oOptionsElement.parentNode.replaceChild(oNewOptionsElement, oOptions.oOptionsElement);		
+
+				oOptions.oOptionsElement.parentNode.replaceChild(oNewOptionsElement, oOptions.oOptionsElement);
 				oOptions.oOptionsElement = oNewOptionsElement;
 				oOptions.oOptionsElement.size = this.__self.DEFAULT_PAGE_SIZE;
-						
+
 			}
-			
+
 			this.oShowOptionsButton = null;
-			
+
 			if(!oOptions.bTemplate && oOptions.oShowOptionsElement) {
-			
+
 				oOptions.oShowOptionsElement.tabIndex = -1;
-			
+
 				this.oShowOptionsButton = ZForms.createButton(
 					oOptions.oShowOptionsElement
 					);
-					
+
 			}
 
 			this.__base(
@@ -48,13 +48,13 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 			this.oOptions.oOptionsElement = oOptions.oOptionsElement;
 			this.oOptions.oOptionsElement.tabIndex = -1;
-			
+
 			if(this.isTemplate()) {
 				return;
-			}		
-			
+			}
+
 			this.iPageSize = this.oOptions.oOptionsElement.size || this.__self.DEFAULT_PAGE_SIZE;
-			
+
 			Common.Class.add(
 				this.oOptions.oOptionsElement,
 				this.__self.CLASS_NAME_COMBO_LIST
@@ -65,17 +65,17 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			this.aOptionsCurrent = [];
 
 			this.oElement.setAttribute('autocomplete', 'off');
-			this.oOptions.oOptionsElement.setAttribute('size', this.iPageSize);		
-			
+			this.oOptions.oOptionsElement.setAttribute('size', this.iPageSize);
+
 			this.iSelectedIndex = 0;
 			this.sLastSearchValue = null;
 
 			this.initOptions();
-			this.hideOptions();		
+			this.hideOptions();
 
 			this.oOptions.oOptionsElement.options.length = 0;
 
-		},	
+		},
 
 		addExtendedHandlers : function() {
 
@@ -90,17 +90,17 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 					this.oElement,
 					this.__self.DOM_EVENT_TYPE_FOCUS,
 					function() {
-					
+
 						oThis.disablePlaceHolder();
-					
+
 					}
 					);
-			}			
+			}
 
 			Common.Event.add(
 				this.oElement,
 				this.__self.DOM_EVENT_TYPE_KEYUP,
-				function(oEvent) {					
+				function(oEvent) {
 
 					oThis.dispatchKeyEvent(Common.Event.normalize(oEvent).iKeyCode);
 
@@ -111,18 +111,18 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				this.oElement,
 				this.__self.DOM_EVENT_TYPE_FOCUS,
 				function() {
-					
+
 					if(!bProcessFocus) {
-						
-						bProcessFocus = true;															
+
+						bProcessFocus = true;
 						return;
-												
-					}										
+
+					}
 
 					if(oThis.bPlaceHolderEnabled) {
 						oThis.disablePlaceHolder();
 					}
-					
+
 					oThis.updateOptions(true);
 
 				}
@@ -134,10 +134,10 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				function(oEvent) {
 
 					var oEvent = Common.Event.normalize(oEvent);
-					
+
 					if(oEvent.iKeyCode == oThis.__self.KEY_CODE_ENTER) {
 						Common.Event.cancel(oEvent);
-					}					
+					}
 
 				}
 				);
@@ -146,13 +146,13 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				document,
 				this.__self.DOM_EVENT_TYPE_CLICK,
 				function(oEvent) {
-					
-					if(Common.Event.normalize(oEvent).target == oThis.oElement) {						
+
+					if(Common.Event.normalize(oEvent).target == oThis.oElement) {
 						return;
-					}					
-					
+					}
+
 					oThis.hideOptions();
-					
+
 					if(!oThis.bPlaceHolderEnabled) {
 						oThis.enablePlaceHolder();
 					}
@@ -164,16 +164,16 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				[this.oOptions.oOptionsElement, this.oElement],
 				this.__self.DOM_EVENT_TYPE_BLUR,
 				function() {
-					
-					if(bProcessBlur && oThis.hasPlaceHolder()) {											
+
+					if(bProcessBlur && oThis.hasPlaceHolder()) {
 						oThis.enablePlaceHolder();
 					}
-					
+
 					if(bProcessBlur) {
 						oThis.hideOptions();
 					}
-					
-					bProcessBlur = true;					
+
+					bProcessBlur = true;
 
 				}
 				);
@@ -182,7 +182,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				this.oOptions.oOptionsElement,
 				this.__self.DOM_EVENT_TYPE_FOCUS,
 				function() {
-					
+
 					oThis.showOptions();
 
 				}
@@ -190,53 +190,53 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 			Common.Event.add(
 				this.oOptions.oOptionsElement,
-				this.__self.DOM_EVENT_TYPE_CHANGE,	
-				function() {					
+				this.__self.DOM_EVENT_TYPE_CHANGE,
+				function() {
 
 					oThis.selectFromOptions();
-					
+
 					bProcessFocus = false;
-					
+
 					oThis.oElement.focus();
 
 				}
 				);
-				
+
 			Common.Event.add(
 				[this.oOptions.oOptionsElement].concat(this.oOptions.oShowOptionsElement? [this.oOptions.oShowOptionsElement] : []),
 				this.__self.DOM_EVENT_TYPE_MOUSEDOWN,
-				function() {					
-					
-					bProcessBlur = false;					
+				function() {
+
+					bProcessBlur = false;
 
 				}
-				);					
-				
-			if(this.oShowOptionsButton) {				
-			
+				);
+
+			if(this.oShowOptionsButton) {
+
 				Common.Event.add(
 					this.oOptions.oShowOptionsElement,
 					this.__self.DOM_EVENT_TYPE_MOUSEUP,
 					function() {
-					
-						bProcessBlur = true;	
-					
+
+						bProcessBlur = true;
+
 					}
 					);
-			
+
 				this.oShowOptionsButton.setHandler(
 					function(oEvent) {
-						
-						Common.Event.cancel(oEvent);												
-						
+
+						Common.Event.cancel(oEvent);
+
 						oThis.updateOptions(true, '');
-						
+
 						bProcessFocus = false;
-						
-						oThis.oElement.focus();						
-					
+
+						oThis.oElement.focus();
+
 					}
-					);				
+					);
 			}
 
 		},
@@ -258,9 +258,9 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 		},
 
 		dispatchKeyEvent : function(iKeyCode) {
-			
+
 			switch(iKeyCode) {
-				
+
 				case this.__self.KEY_CODE_ARROW_UP:
 					this.selectPrevOption();
 				break;
@@ -285,14 +285,14 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 					this.selectLastOption();
 				break;
 
-				case this.__self.KEY_CODE_ENTER:				
+				case this.__self.KEY_CODE_ENTER:
 					if(this.bOptionsShowed) {
 						this.selectFromOptions();
-					}					
+					}
 				break;
-				
-				case this.__self.KEY_CODE_TAB:				
-					return;					
+
+				case this.__self.KEY_CODE_TAB:
+					return;
 				break;
 
 				default:
@@ -370,30 +370,30 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 		},
 
 		selectFromOptions : function() {
-			
+
 			if(this.oOptions.oOptionsElement.options.length > 0 && this.oOptions.oOptionsElement.selectedIndex > -1) {
-				
+
 				if(this.hasPlaceHolder()) {
 					this.disablePlaceHolder();
 				}
 
-				this.iSelectedIndex = this.oOptions.oOptionsElement.selectedIndex;							
-				this.sLastSearchValue = this.oElement.value.toLowerCase();					
-				this.setValue(new ZForms.Value(this.oOptions.oOptionsElement.options[this.iSelectedIndex].innerHTML));										
+				this.iSelectedIndex = this.oOptions.oOptionsElement.selectedIndex;
+				this.sLastSearchValue = this.oElement.value.toLowerCase();
+				this.setValue(new ZForms.Value(this.oOptions.oOptionsElement.options[this.iSelectedIndex].innerHTML));
 
 			}
-			
+
 			var oThis = this;
-			
+
 			setTimeout(
 				function() {
-				
+
 					oThis.hideOptions()
-					
+
 				},
 				0
 				);
-			
+
 
 		},
 
@@ -406,19 +406,18 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 		},
 
 		updateOptions : function(bAlways, sValue) {
-			
+
 			var
 				sSearchedValue = this.oElement.value.toLowerCase(),
 				sNewValue = typeof(sValue) == 'undefined'? sSearchedValue : sValue
 				;
-			
+
 			if(!bAlways && this.sLastSearchValue == sNewValue) {
 				return;
 			}
-			
+
 			var
-				i = 0,
-				
+				i = 0,				
 				iLength = this.aOptionsCurrent.length,
 				iOptionsCount = 0,
 				bFound = false,
@@ -429,7 +428,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 			this.oOptions.oOptionsElement.options.length = 0;
 			this.oOptions.oOptionsElement.innerHTML = '';
-			
+
 			while(i < iLength) {
 
 				if(this.aOptionsCurrent[i].sSearchValue.indexOf(sNewValue) > -1) {
@@ -447,15 +446,15 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 				i++;
 
-			}			
-			
+			}
+
 			if(!bFound) {
 				this.iSelectedIndex = -1;
 			}
 
 			if(iOptionsCount > 0) {
 
-				this.updateSelectedIndex();				
+				this.updateSelectedIndex();
 				this.showOptions();
 
 			}
@@ -466,25 +465,25 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 		},
 
 		showOptions : function() {
-		
+
 			if(this.bOptionsShowed) {
 				return;
 			}
-					
+
 			this.addClass(this.__self.CLASS_NAME_COMBO_LIST_ACTIVE);
-								
+
 			this.bOptionsShowed = true;
 
 		},
 
 		hideOptions : function() {
-			
+
 			if(!this.bOptionsShowed) {
 				return;
 			}
-					
-			this.removeClass(this.__self.CLASS_NAME_COMBO_LIST_ACTIVE);			
-						
+
+			this.removeClass(this.__self.CLASS_NAME_COMBO_LIST_ACTIVE);
+
 			this.bOptionsShowed = false;
 
 		},
@@ -539,7 +538,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			}
 
 			this.oOptions.oOptionsElement.disabled = true;
-			
+
 			if(this.oShowOptionsButton) {
 				this.oShowOptionsButton.disable();
 			}
@@ -589,7 +588,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				},
 				this.oOptions
 				);
-							
+
 			return new this.__self(
 				oElement,
 				oClassElement,
@@ -601,7 +600,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 		destruct : function() {
 
 			this.oOptions.oOptionsElement = null;
-			
+
 			if(this.oShowOptionsButton) {
 				this.oShowOptionsButton.destruct();
 			}
@@ -612,11 +611,11 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 	},
 	{
-	
+
 		DEFAULT_PAGE_SIZE : 5,
 
 		CLASS_NAME_COMBO_LIST        : 'combo-list',
 		CLASS_NAME_COMBO_LIST_ACTIVE : 'combo-field-active'
-		
+
 	}
 	);
