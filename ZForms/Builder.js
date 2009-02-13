@@ -680,28 +680,57 @@ ZForms.Builder = Abstract.inheritTo(
 
 			var
 				oElement = this.getElementById(sId),
-				iLogic = (oRequired.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND)
+				iLogic = this.getLogic(oRequired)
 				;
 
-			oElement.addDependence(ZForms.createRequiredDependence(oElement, iLogic, oRequired.iMin));
-
-			if(oRequired.aFrom) {
-				for(var i = 0, oWidgetFrom; i < oRequired.aFrom.length; i++) {
-
-					oWidgetFrom = this.getElementByName(oRequired.aFrom[i].sName);
-
-					if(!oWidgetFrom) {
-						this.throwDependenceException(oRequired.aFrom[i].sName, oElement.getName() || oElement.getId());
+			oElement.addDependence(
+				ZForms.createRequiredDependence(
+					oElement,
+					{
+						iLogic : iLogic,
+						iMin   : oRequired.iMin
 					}
+					)
+				);
 
-					if(oRequired.aFrom[i].mData && oRequired.aFrom[i].mData instanceof Function) {
-						oElement.addDependence(ZForms.createFunctionDependence(ZForms.Dependence.TYPE_REQUIRE, oWidgetFrom, oRequired.aFrom[i].mData, iLogic, oRequired.aFrom[i].bInverse));
-					}
-					else {
-						oElement.addDependence(new ZForms.Dependence.Required(oWidgetFrom, oRequired.aFrom[i].mData || /.+/, iLogic, oRequired.aFrom[i].bInverse, oRequired.iMin? oRequired.iMin : 1));
-					}
+			if(!oRequired.aFrom) {
+				return;
+			}
 
+			for(var i = 0, oWidgetFrom, oFrom; i < oRequired.aFrom.length; i++) {
+
+				oFrom = oRequired.aFrom[i];
+				oWidgetFrom = this.getElementByName(oFrom.sName);
+
+				if(!oWidgetFrom) {
+					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
 				}
+
+				if(oFrom.mData && oFrom.mData instanceof Function) {
+					oElement.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_REQUIRE,
+								fFunction : oFrom.mData,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
+				}
+				else {
+					oElement.addDependence(
+						new ZForms.Dependence.Required(
+							oWidgetFrom,
+							{
+								iLogic : iLogic,
+								iMin   : oRequired.iMin? oRequired.iMin : 1
+							}
+							)
+						);
+				}
+
 			}
 
 		},
@@ -710,35 +739,61 @@ ZForms.Builder = Abstract.inheritTo(
 
 			var
 				oElement = this.getElementById(sId),
-				iLogic = (oValid.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND)
+				iLogic = this.getLogic(oValid)
 				;
 
-			for(var i = 0, oWidgetFrom; i < oValid.aFrom.length; i++) {
+			for(var i = 0, oWidgetFrom, oFrom; i < oValid.aFrom.length; i++) {
 
-				oWidgetFrom = oValid.aFrom[i].sName? this.getElementByName(oValid.aFrom[i].sName) : oElement;
+				oFrom = oValid.aFrom[i];
+				oWidgetFrom = oFrom.sName? this.getElementByName(oFrom.sName) : oElement;
 
 				if(!oWidgetFrom) {
-					this.throwDependenceException(oValid.aFrom[i].sName, oElement.getName() || oElement.getId());
+					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
 				}
 
-				if(oValid.aFrom[i].mData instanceof Function) {
-					oElement.addDependence(ZForms.createFunctionDependence(ZForms.Dependence.TYPE_VALID, oWidgetFrom, oValid.aFrom[i].mData, iLogic, oValid.aFrom[i].bInverse));
+				if(oFrom.mData instanceof Function) {
+					oElement.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_VALID,
+								fFunction : oFrom.mData,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
 				}
-				else if(oValid.aFrom[i].oCompare) {
-					oElement.addDependence(ZForms.createValidCompareDependence(oWidgetFrom, oValid.aFrom[i].oCompare.sCondition, oValid.aFrom[i].oCompare.sName? this.getElementByName(oValid.aFrom[i].oCompare.sName) : oValid.aFrom[i].oCompare.sValue, iLogic, oValid.aFrom[i].bInverse));
+				else if(oFrom.oCompare) {
+					oElement.addDependence(
+						ZForms.createValidCompareDependence(
+							oWidgetFrom,
+							{
+								sCondition : oFrom.oCompare.sCondition,
+								mArgument  : oFrom.oCompare.sName?
+									this.getElementByName(oFrom.oCompare.sName) :
+									oFrom.oCompare.sValue,
+								iLogic     : iLogic,
+								bInverse   : oFrom.bInverse
+							}
+							)
+						);
 				}
 				else {
 					oElement.addDependence(
 						ZForms.createValidDependence(
 							oWidgetFrom,
-							typeof oValid.aFrom[i].mData == 'undefined'?
-								/.+/ :
-								(oValid.aFrom[i].mData instanceof RegExp?
-									oValid.aFrom[i].mData :
-									new RegExp('^' + oValid.aFrom[i].mData + '$')
-									),
-							iLogic,
-							oValid.aFrom[i].bInverse
+							{
+								rPattern   : typeof oFrom.mData == 'undefined'?
+									/.+/ :
+									(oFrom.mData instanceof RegExp?
+										oFrom.mData :
+										new RegExp('^' + oFrom.mData + '$')
+										),
+								iLogic     : iLogic,
+								bInverse   : oFrom.bInverse,
+								sClassName : oFrom.sClassName
+							}
 							)
 						);
 				}
@@ -751,7 +806,11 @@ ZForms.Builder = Abstract.inheritTo(
 
 			var oElement = this.getElementById(sId);
 
-			oElement.addDependence(ZForms.createValidEmailDependence(oElement));
+			oElement.addDependence(
+				ZForms.createValidEmailDependence(
+					oElement
+					)
+				);
 
 		},
 
@@ -759,35 +818,60 @@ ZForms.Builder = Abstract.inheritTo(
 
 			var
 				oElement = this.getElementById(sId),
-				iLogic = (oDepended.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND)
+				iLogic = this.getLogic(oDepended)
 				;
 
-			for(var i = 0, oWidgetFrom; i < oDepended.aFrom.length; i++) {
+			for(var i = 0, oWidgetFrom, oFrom; i < oDepended.aFrom.length; i++) {
 
-				oWidgetFrom = this.getElementByName(oDepended.aFrom[i].sName);
+				oFrom = oDepended.aFrom[i];
+				oWidgetFrom = this.getElementByName(oFrom.sName);
 
 				if(!oWidgetFrom) {
-					this.throwDependenceException(oDepended.aFrom[i].sName, oElement.getName() || oElement.getId());
+					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
 				}
 
-				if(oDepended.aFrom[i].mData instanceof Function) {
-					oElement.addDependence(Dependence.createFunctionDependence(ZForms.Dependence.TYPE_ENABLE, oWidgetFrom, oDepended.aFrom[i].mData, iLogic, oDepended.aFrom[i].bInverse));
+				if(oFrom.mData instanceof Function) {
+					oElement.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_ENABLE,
+								fFunction : oFrom.mData,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
 				}
-				else if(oDepended.aFrom[i].oCompare) {
-					oElement.addDependence(ZForms.createEnableCompareDependence(oWidgetFrom, oDepended.aFrom[i].oCompare.sCondition, oDepended.aFrom[i].oCompare.sName? this.getElementByName(oDepended.aFrom[i].oCompare.sName) : oDepended.aFrom[i].oCompare.sValue, iLogic, oDepended.aFrom[i].bInverse));
+				else if(oFrom.oCompare) {
+					oElement.addDependence(
+						ZForms.createEnableCompareDependence(
+							oWidgetFrom,
+							{
+								sCondition : oFrom.oCompare.sCondition,
+								mArgument  : oFrom.oCompare.sName?
+									this.getElementByName(oFrom.oCompare.sName) :
+									oFrom.oCompare.sValue,
+								iLogic     : iLogic,
+								bInverse   : oDepended.aFrom[i].bInverse
+							}
+							)
+						);
 				}
 				else {
 					oElement.addDependence(
 						ZForms.createEnableDependence(
 							oWidgetFrom,
-							typeof oDepended.aFrom[i].mData == 'undefined'?
-								/.+/ :
-								(oDepended.aFrom[i].mData instanceof RegExp?
-									oDepended.aFrom[i].mData :
-									new RegExp('^' + oDepended.aFrom[i].mData + '$')
-									),
-							iLogic,
-							oDepended.aFrom[i].bInverse? true : false
+							{
+								rPattern : typeof oDepended.aFrom[i].mData == 'undefined'?
+									/.+/ :
+									(oDepended.aFrom[i].mData instanceof RegExp?
+										oDepended.aFrom[i].mData :
+										new RegExp('^' + oDepended.aFrom[i].mData + '$')
+										),
+								iLogic   : iLogic,
+								bInverse : oDepended.aFrom[i].bInverse
+							}
 							)
 						);
 				}
@@ -800,32 +884,57 @@ ZForms.Builder = Abstract.inheritTo(
 
 			var
 				oElement = this.getElementById(sId),
-				iLogic = (oDepended.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND)
+				iLogic = this.getLogic(oDepended)
 				;
 
-			for(var i = 0, oWidgetFrom, aPatterns; i < oDepended.aFrom.length; i++) {
+			for(var i = 0, oWidgetFrom, oFrom, aPatterns; i < oDepended.aFrom.length; i++) {
 
-				oWidgetFrom = this.getElementByName(oDepended.aFrom[i].sName);
+				oFrom = oDepended.aFrom[i];
+				oWidgetFrom = this.getElementByName(oFrom.sName);
 
 				if(!oWidgetFrom) {
-					this.throwDependenceException(oDepended.aFrom[i].sName, oElement.getName() || oElement.getId());
+					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
 				}
 
-				if(oDepended.aFrom[i].mData instanceof Function) {
-					oElement.addDependence(ZForms.createFunctionDependence(ZForms.Dependence.TYPE_OPTIONS, oWidgetFrom, oDepended.aFrom[i].mData, iLogic, oDepended.aFrom[i].bInverse));
+				if(oFrom.mData instanceof Function) {
+					oElement.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_OPTIONS,
+								fFunction : oFrom.mData,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
 				}
 				else {
 
 					aPatterns = [];
 
-					for(var j = 0; j < oDepended.aFrom[i].mData.length; j++) {
-						aPatterns.push({
-							rSource      : oDepended.aFrom[i].mData[j][0] instanceof RegExp? oDepended.aFrom[i].mData[j][0] : new RegExp('^' + oDepended.aFrom[i].mData[j][0] + '$'),
-							rDestination : oDepended.aFrom[i].mData[j][1] instanceof RegExp? oDepended.aFrom[i].mData[j][1] : new RegExp('^' + oDepended.aFrom[i].mData[j][1] + '$')
-							});
+					for(var j = 0; j < oFrom.mData.length; j++) {
+						aPatterns.push(
+							{
+								rSource      : oFrom.mData[j][0] instanceof RegExp?
+									oFrom.mData[j][0] :
+									new RegExp('^' + oFrom.mData[j][0] + '$'),
+								rDestination : oFrom.mData[j][1] instanceof RegExp?
+									oFrom.mData[j][1] :
+									new RegExp('^' + oFrom.mData[j][1] + '$')
+							}
+							);
 					}
 
-					oElement.addDependence(ZForms.createOptionsDependence(oWidgetFrom, aPatterns, iLogic));
+					oElement.addDependence(
+						ZForms.createOptionsDependence(
+							oWidgetFrom,
+							{
+								aPatterns : aPatterns,
+								iLogic    : iLogic
+							}
+							)
+						);
 
 				}
 
@@ -837,36 +946,65 @@ ZForms.Builder = Abstract.inheritTo(
 
 			var
 				oElement = this.getElementById(sId),
-				iLogic = (oClass.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND)
+				iLogic = this.getLogic(oClass)
 				;
 
-			for(var i = 0, oWidgetFrom, aPatternToClasses; i < oClass.aFrom.length; i++) {
+			for(var i = 0, oWidgetFrom, oFrom, aPatternToClasses; i < oClass.aFrom.length; i++) {
 
-				oWidgetFrom = this.getElementByName(oClass.aFrom[i].sName);
+				oFrom = oClass.aFrom[i];
+				oWidgetFrom = this.getElementByName(oFrom.sName);
 
 				if(!oWidgetFrom) {
-					this.throwDependenceException(oClass.aFrom[i].sName, oElement.getName() || oElement.getId());
+					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
 				}
 
-				if(oClass.aFrom[i].mData instanceof Function) {
-					oElement.addDependence(ZForms.createFunctionDependence(ZForms.Dependence.TYPE_CLASS, oWidgetFrom, oClass.aFrom[i].mData, iLogic, oClass.aFrom[i].bInverse));
+				if(oFrom.mData instanceof Function) {
+					oElement.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_CLASS,
+								fFunction : oFrom.mData,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
 				}
 				else {
 
 					aPatternToClasses = [];
 
-					for(var j = 0; j < oClass.aFrom[i].mData.length; j++) {
-						aPatternToClasses.push({
-							rPattern   : oClass.aFrom[i].mData[j][0] instanceof RegExp? oClass.aFrom[i].mData[j][0] : new RegExp('^' + oClass.aFrom[i].mData[j][0] + '$'),
-							sClassName : oClass.aFrom[i].mData[j][1]
-							});
+					for(var j = 0; j < oFrom.mData.length; j++) {
+						aPatternToClasses.push(
+							{
+								rPattern   : oFrom.mData[j][0] instanceof RegExp?
+									oFrom.mData[j][0] :
+									new RegExp('^' + oFrom.mData[j][0] + '$'),
+								sClassName : oFrom.mData[j][1]
+							}
+							);
 					}
 
 				}
 
-				oElement.addDependence(ZForms.createClassDependence(oWidgetFrom, aPatternToClasses, iLogic));
+				oElement.addDependence(
+					ZForms.createClassDependence(
+						oWidgetFrom,
+						{
+							aPatternToClasses : aPatternToClasses,
+							iLogic            : iLogic
+						}
+						)
+					);
 
 			}
+
+		},
+
+		getLogic : function(oObject) {
+
+			return oObject.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND;
 
 		},
 

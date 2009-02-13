@@ -138,131 +138,129 @@ var ZForms = {
 
 	createEnableDependence : function(
 		oWidget,
-		rPattern,
-		iLogic,
-		bInverse
+		oOptions
 		) {
 
 		return new this.Dependence(
 			this.Dependence.TYPE_ENABLE,
 			oWidget,
-			rPattern,
-			iLogic,
-			bInverse
+			oOptions.rPattern,
+			oOptions.iLogic,
+			oOptions.bInverse
 			);
 
 	},
 
 	createRequiredDependence : function(
 		oWidget,
-		iLogic,
-		iMin
+		oOptions
 		) {
+
+		var oOptions = oOptions || {};
 
 		return new this.Dependence.Required(
 			oWidget,
-			iMin? new RegExp('\\S{' + iMin + ',}') : /\S+/,
-			iLogic,
+			oOptions.iMin? new RegExp('\\S{' + oOptions.iMin + ',}') : /\S+/,
+			oOptions.iLogic,
 			false,
-			iMin
+			oOptions.iMin
 			);
 
 	},
 
 	createValidDependence : function(
 		oWidget,
-		rPattern,
-		iLogic,
-		bInverse,
-		sClassName
+		oOptions
 		) {
+
+		var oOptions = oOptions || {};
 
 		return new this.Dependence.Valid(
 			oWidget,
-			rPattern,
-			iLogic,
-			bInverse,
-			sClassName
+			oOptions.rPattern,
+			oOptions.iLogic,
+			oOptions.bInverse,
+			oOptions.sClassName
 			);
 
 	},
 
 	createValidEmailDependence : function(
 		oWidget,
-		iLogic,
-		sClassName
+		oOptions
 		) {
+
+		var oOptions = oOptions || {};
 
 		return this.createValidDependence(
 			oWidget,
-			/^[a-zA-Z0-9][a-zA-Z0-9\.\-\_\~]*\@[a-zA-Z0-9\.\-\_]+\.[a-zA-Z]{2,4}$/,
-			iLogic,
-			null,
-			sClassName
+			{
+				rPattern   : /^[a-zA-Z0-9][a-zA-Z0-9\.\-\_\~]*\@[a-zA-Z0-9\.\-\_]+\.[a-zA-Z]{2,4}$/,
+				iLogic     : oOptions.iLogic,
+				sClassName : oOptions.sClassName
+			}
 			);
 
 	},
 
 	createOptionsDependence : function(
 		oWidget,
-		aPatterns,
-		iLogic
+		oOptions
 		) {
+
+		var oOptions = oOptions || {};
 
 		return new this.Dependence.Options(
 			this.Dependence.TYPE_OPTIONS,
 			oWidget,
-			aPatterns,
-			iLogic
+			oOptions.aPatterns || [],
+			oOptions.iLogic
 			);
 
 	},
 
 	createClassDependence : function(
 		oWidget,
-		aPatternToClasses,
-		iLogic
+		oOptions
 		) {
+
+		var oOptions = oOptions || {};
 
 		return new this.Dependence.Class(
 			oWidget,
-			aPatternToClasses,
-			iLogic
+			oOptions.aPatternToClasses || [],
+			oOptions.iLogic
 			);
 
 	},
 
 	createFunctionDependence : function(
-		iType,
 		oWidget,
-		fFunction,
-		iLogic,
-		bInverse
+		oOptions
 		) {
 
+		var oOptions = oOptions || {};
+
 		return new this.Dependence.Function(
-			iType,
+			oOptions.iType || ZForms.Dependence.TYPE_VALID,
 			oWidget,
-			fFunction,
-			iLogic,
-			bInverse
+			oOptions.fFunction || function() { return true; },
+			oOptions.iLogic,
+			oOptions.bInverse
 			);
 
 	},
 
 	createCompareDependence : function(
-		sType,
 		oWidget,
-		sCondition,
-		mArgument,
-		iLogic,
-		bInverse
+		oOptions
 		) {
 
 		var
+			oOptions = oOptions || {},
 			fFunction = function() {
 
-				return (arguments.callee.sType == ZForms.Dependence.TYPE_VALID &&
+				return (arguments.callee.iType == ZForms.Dependence.TYPE_VALID &&
 					(arguments.callee.oWidget.getValue().isEmpty() || (arguments.callee.mArgument instanceof ZForms.Widget && arguments.callee.mArgument.getValue().isEmpty()))
 					) ||
 					arguments.callee.oWidget.getValue()[arguments.callee.sFunctionName](
@@ -273,18 +271,18 @@ var ZForms = {
 
 			},
 			mResult = new this.Dependence.Function(
-				sType,
+				oOptions.iType,
 				oWidget,
 				fFunction,
-				iLogic,
-				bInverse
+				oOptions.iLogic,
+				oOptions.bInverse
 				)
 			;
 
-		fFunction.sType = sType;
+		fFunction.iType = oOptions.iType;
 		fFunction.oWidget = oWidget;
-		fFunction.mArgument = mArgument;
-		fFunction.sFunctionName = this.Dependence.COMPARE_FUNCTIONS[sCondition || '='];
+		fFunction.mArgument = oOptions.mArgument;
+		fFunction.sFunctionName = this.Dependence.COMPARE_FUNCTIONS[oOptions.sCondition || '='];
 
 		if(!(mArgument instanceof ZForms.Widget)) {
 			return mResult;
@@ -293,11 +291,11 @@ var ZForms = {
 		return [
 			mResult,
 			new this.Dependence.Function(
-				sType,
-				mArgument,
+				oOptions.iType,
+				oOptions.mArgument,
 				fFunction,
-				iLogic,
-				bInverse
+				oOptions.iLogic,
+				oOptions.bInverse
 				)
 			];
 
@@ -305,38 +303,38 @@ var ZForms = {
 
 	createValidCompareDependence : function(
 		oWidget,
-		sCondition,
-		mArgument,
-		iLogic,
-		bInverse
+		oOptions
 		) {
 
+		var oOptions = oOptions || {};
+
 		return this.createCompareDependence(
-			this.Dependence.TYPE_VALID,
 			oWidget,
-			sCondition,
-			mArgument,
-			iLogic,
-			bInverse
+			Common.Object.extend(
+				{
+					iType : this.Dependence.TYPE_VALID
+				},
+				oOptions
+				)
 			);
 
 	},
 
 	createEnableCompareDependence : function(
 		oWidget,
-		sCondition,
-		mArgument,
-		iLogic,
-		bInverse
+		oOptions
 		) {
 
+		var oOptions = oOptions || {};
+
 		return this.createCompareDependence(
-			this.Dependence.TYPE_ENABLE,
 			oWidget,
-			sCondition,
-			mArgument,
-			iLogic,
-			bInverse
+			Common.Object.extend(
+				{
+					iType : this.Dependence.TYPE_ENABLE
+				},
+				oOptions
+				)
 			);
 
 	},
