@@ -1,6 +1,6 @@
 ZForms.Value = Abstract.inheritTo(
 	{
-	
+
 		__constructor : function(mValue) {
 
 			this.mValue = null;
@@ -10,7 +10,7 @@ ZForms.Value = Abstract.inheritTo(
 			if(mValue != null) {
 				this.set(mValue);
 			}
-			
+
 		},
 
 		reset : function() {
@@ -50,18 +50,18 @@ ZForms.Value = Abstract.inheritTo(
 
 		},
 
-		isEqual : function(mValue) {		
+		isEqual : function(mValue) {
 
 			if(!this.checkForCompareTypes(mValue)) {
 				return false;
 			}
 
-			var oValue = (mValue instanceof this.__self)? mValue : new this.__self(mValue);		
+			var oValue = (mValue instanceof this.__self)? mValue : new this.__self(mValue);
 
 			return this.mValue === oValue.mValue;
 
 		},
-		
+
 		isGreater : function(mValue) {
 
 			if(!this.checkForCompareTypes(mValue)) {
@@ -69,14 +69,14 @@ ZForms.Value = Abstract.inheritTo(
 			}
 
 			var oValue = (mValue instanceof this.__self)? mValue : new this.__self(mValue);
-		
+
 			return this.get().length > oValue.get().length;
 
 		},
-		
+
 		isGreaterOrEqual : function(mValue) {
-		
-			return this.isGreater(mValue) || this.isEqual(mValue);	
+
+			return this.isGreater(mValue) || this.isEqual(mValue);
 
 		},
 
@@ -88,13 +88,13 @@ ZForms.Value = Abstract.inheritTo(
 
 		isLessOrEqual : function(mValue) {
 
-			return this.checkForCompareTypes(mValue) && !this.isGreater(mValue);				 
+			return this.checkForCompareTypes(mValue) && !this.isGreater(mValue);
 
 		},
 
 		checkForCompareTypes : function(mValue) {
 
-			return mValue instanceof this.__self || typeof(mValue) == 'string'; 
+			return mValue instanceof this.__self || typeof(mValue) == 'string';
 
 		},
 

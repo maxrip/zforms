@@ -1,6 +1,385 @@
 ZForms.Builder = Abstract.inheritTo(
 	{
 
+		__constructor : function(sFormElementId) {
+
+			this.oFormElement = this.$(sFormElementId)
+			this.oForm = null;
+			this.aDependencies = [];
+
+		},
+
+		$ : function(sId) {
+
+			var oResult = document.getElementById(sId);
+
+			if(!oResult) {
+				throw('Element with id "' + sId + '" no exists');
+			}
+
+			return oResult;
+
+		},
+
+		build : function() {
+
+			this.oForm = this.createWidgetByElement(this.oFormElement);
+
+			var
+				aElements = Common.Dom.getElementsByClassName(this.oFormElement, 'zforms'),
+				iLength = aElements.length,
+				i = 0
+				;
+
+			while(i < iLength) {
+
+				this.createWidgetByElement(aElements[i]);
+				i++;
+
+			}
+
+			this.buildDependencies();
+
+			if(this.oForm) {
+				this.oForm.init();
+			}
+
+			return this.oForm;
+
+		},
+
+		createWidgetByElement : function(oElement) {
+
+			var
+				oParams = oElement.onclick instanceof Function? oElement.onclick() : {},
+				oResult = ZForms[this.getCreateWidgetFunction(oParams.sType, oElement)](
+					oElement,
+					this.getClassElement(oParams.sCId, oElement),
+					oParams.oOptions
+					),
+				oParentWidget = this.getParentWidget(oParams.sPId, oElement)
+				;
+
+			if(oParams.oRequired || oParams.oValid || oParams.oValidEmail) {
+				this.aDependencies.push({ oWidget : oResult, oParams : oParams });
+			}
+
+			oElement.onclick = null;
+
+			if(oParentWidget) {
+				oParentWidget.addChild(oResult);
+			}
+
+			return oResult;
+
+		},
+
+		getClassElement : function(
+			sClassElementId,
+			oElement
+			) {
+
+			if(sClassElementId) {
+				return this.$(sClassElementId);
+			}
+
+			var sTagName = oElement.tagName.toLowerCase();
+
+			if(sTagName == 'form' || sTagName == 'fieldset') {
+				return;
+			}
+
+			if(sTagName == 'input') {
+
+				var sInputType = oElement.type.toLowerCase();
+
+				if(sInputType == 'radio' || sInputType == 'checkbox' || sInputType == 'submit') {
+					return oElement.parentNode;
+				}
+
+			}
+
+			return oElement.parentNode.parentNode;
+
+		},
+
+		getParentWidget : function(
+			sParentId,
+			oElement
+			) {
+
+			if(sParentId) {
+				return this.oForm.getWidgetById(sParentId);
+			}
+
+			if(oElement.tagName.toLowerCase() == 'form') {
+				return;
+			}
+
+			while(oElement = oElement.parentNode) {
+				if(oElement.tagName.toLowerCase() == 'form' ||
+					Common.Class.match(oElement, 'zforms')
+					) {
+					return this.oForm.getWidgetById(Common.Dom.getAttribute(oElement, 'id'));
+				}
+			}
+
+		},
+
+		getCreateWidgetFunction : function(
+			sType,
+			oElement
+			) {
+
+			if(!sType) {
+
+				var sTagName = oElement.tagName.toLowerCase();
+
+				if(sTagName == 'form' || sTagName == 'fieldset') {
+					sType = sTagName;
+				}
+				else if(sTagName == 'input') {
+
+					var sInputType = oElement.type.toLowerCase();
+
+					switch(sInputType) {
+
+						case 'search':
+							sType = 'text';
+						break;
+
+						default:
+							sType = sInputType;
+
+					}
+
+				}
+				else if(sTagName == 'textarea') {
+					sType = 'text';
+				}
+
+			}
+
+			if(!this.__self.aTypesToCreateWidgetFunction[sType]) {
+				throw('Unsupported widget type "' + sType + '"');
+			}
+			//console.log(this.__self.aTypesToCreateWidgetFunction[sType]);
+			return 'create' + this.__self.aTypesToCreateWidgetFunction[sType];
+
+		},
+
+		buildDependencies : function() {
+
+			var
+				aDependencies = this.aDependencies,
+				iLength = this.aDependencies.length,
+				i = 0,
+				oDependence,
+				oParams
+				;
+
+			while(i < iLength) {
+
+				oDependence = aDependencies[i];
+				oParams = oDependence.oParams;
+
+				if(oParams.oRequired) {
+					this.buildRequiredDependence(oDependence.oWidget, oParams.oRequired);
+				}
+
+				if(oParams.oValid) {
+					this.buildValidDependence(oDependence.oWidget, oParams.oValid);
+				}
+
+				i++;
+
+			}
+
+		},
+
+		buildRequiredDependence : function(oWidget, oRequired) {
+
+			var iLogic = this.getLogic(oRequired);
+
+			oWidget.addDependence(
+				ZForms.createRequiredDependence(
+					oWidget,
+					{
+						iLogic : iLogic,
+						iMin   : oRequired.iMin
+					}
+					)
+				);
+
+			if(!oRequired.aFrom) {
+				return;
+			}
+
+			for(var i = 0, oWidgetFrom, oFrom; i < oRequired.aFrom.length; i++) {
+
+				oFrom = oRequired.aFrom[i];
+				oWidgetFrom = this.oForm.getWidgetById(oFrom.sId);
+
+				/*if(!oWidgetFrom) {
+					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
+				}*/
+
+				if(oFrom.mData && oFrom.mData instanceof Function) {
+					oWidget.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_REQUIRE,
+								fFunction : oFrom.mData,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
+				}
+				else {
+					oWidget.addDependence(
+						new ZForms.Dependence.Required(
+							oWidgetFrom,
+							{
+								iLogic : iLogic,
+								iMin   : oRequired.iMin? oRequired.iMin : 1
+							}
+							)
+						);
+				}
+
+			}
+
+		},
+
+		buildValidDependence : function(oWidget, oValid) {
+
+			var iLogic = this.getLogic(oValid);
+
+			if(oValid.sType) {
+				oValid.aFrom = this.prependToArray({sType : oValid.sType}, oValid.aFrom);
+			}
+
+			if(oValid.rPattern) {
+				oValid.aFrom = this.prependToArray({rPattern : oValid.rPattern}, oValid.aFrom);
+			}
+
+			if(oValid.fFunction) {
+				oValid.aFrom = this.prependToArray({fFunction : oValid.fFunction}, oValid.aFrom);
+			}
+
+			if(oValid.oCompare) {
+				oValid.aFrom = this.prependToArray({oCompare : oValid.oCompare}, oValid.aFrom);
+			}
+
+			for(var i = 0, oWidgetFrom, oFrom; i < oValid.aFrom.length; i++) {
+
+				oFrom = oValid.aFrom[i];
+				oWidgetFrom = oFrom.sId? this.oForm.getWidgetById(oFrom.sId) : oWidget;
+
+				/*if(!oWidgetFrom) {
+					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
+				}*/
+
+				if(oFrom.fFunction) {
+					oWidget.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_VALID,
+								fFunction : oFrom.fFunction,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
+				}
+
+				if(oFrom.sCondition) {
+					oWidget.addDependence(
+						ZForms.createValidCompareDependence(
+							oWidget,
+							{
+								sCondition : oFrom.sCondition,
+								mArgument  : oFrom.sId?
+									oWidgetFrom :
+									oFrom.sValue,
+								iLogic     : iLogic,
+								bInverse   : oFrom.bInverse,
+								sClassName : oFrom.sClassName
+							}
+							)
+						);
+				}
+
+				if(oFrom.rPattern) {
+					oWidget.addDependence(
+						ZForms.createValidDependence(
+							oWidgetFrom,
+							{
+								rPattern   : oFrom.rPattern,
+								iLogic     : iLogic,
+								bInverse   : oFrom.bInverse,
+								sClassName : oFrom.sClassName
+							}
+							)
+						);
+				}
+
+				if(oFrom.sType && oFrom.sType == 'email') {
+					oWidget.addDependence(
+						ZForms.createValidEmailDependence(
+							oWidgetFrom,
+							{
+								iLogic     : iLogic,
+								bInverse   : oFrom.bInverse,
+								sClassName : oFrom.sClassName
+							}
+							)
+						);
+				}
+
+			}
+
+		},
+
+		getLogic : function(oObject) {
+
+			return oObject.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND;
+
+		},
+
+		prependToArray : function(oObject, aArray) {
+
+			if(!(oObject instanceof Array)) {
+				oObject = [oObject];
+			}
+
+			if(!(aArray instanceof Array)) {
+				aArray = [];
+			}
+
+			return oObject.concat(aArray);
+
+		}
+
+	},
+	{
+		aTypesToCreateWidgetFunction : {
+			'form'     : 'Form',
+			'text'     : 'TextInput',
+			'submit'   : 'SubmitButton',
+			'fieldset' : 'Container'
+		}
+	}
+	);
+
+/*
+ZForms.Builder = Abstract.inheritTo(
+
+	{
+
 		__constructor : function(aForm) {
 
 			this.bFakedSafari = Common.Browser.isSafari() && !navigator.appVersion.match(/Version\/3/);
@@ -1016,3 +1395,5 @@ ZForms.Builder = Abstract.inheritTo(
 
 	}
 	);
+
+*/

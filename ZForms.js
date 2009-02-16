@@ -190,15 +190,14 @@ var ZForms = {
 		oOptions
 		) {
 
-		var oOptions = oOptions || {};
-
 		return this.createValidDependence(
 			oWidget,
-			{
-				rPattern   : /^[a-zA-Z0-9][a-zA-Z0-9\.\-\_\~]*\@[a-zA-Z0-9\.\-\_]+\.[a-zA-Z]{2,4}$/,
-				iLogic     : oOptions.iLogic,
-				sClassName : oOptions.sClassName
-			}
+			Common.Object.extend(
+				{
+					rPattern : /^[a-zA-Z0-9][a-zA-Z0-9\.\-\_\~]*\@[a-zA-Z0-9\.\-\_]+\.[a-zA-Z]{2,4}$/,
+				},
+				oOptions
+				)
 			);
 
 	},
@@ -258,9 +257,9 @@ var ZForms = {
 
 		var
 			oOptions = oOptions || {},
-			fFunction = function() {
+			fFunction = function(oWidget, aResult) {
 
-				return (arguments.callee.iType == ZForms.Dependence.TYPE_VALID &&
+				var bResult = (arguments.callee.iType == ZForms.Dependence.TYPE_VALID &&
 					(arguments.callee.oWidget.getValue().isEmpty() || (arguments.callee.mArgument instanceof ZForms.Widget && arguments.callee.mArgument.getValue().isEmpty()))
 					) ||
 					arguments.callee.oWidget.getValue()[arguments.callee.sFunctionName](
@@ -268,6 +267,17 @@ var ZForms = {
 						arguments.callee.mArgument.getValue() :
 						arguments.callee.mArgument
 					);
+
+				if(arguments.callee.iType == ZForms.Dependence.TYPE_VALID && oOptions.sClassName) {
+					aResult.push(
+						{
+							bAdd       : !bResult,
+							sClassName : oOptions.sClassName
+						}
+						);					
+				}
+
+				return bResult;
 
 			},
 			mResult = new this.Dependence.Function(
@@ -284,7 +294,7 @@ var ZForms = {
 		fFunction.mArgument = oOptions.mArgument;
 		fFunction.sFunctionName = this.Dependence.COMPARE_FUNCTIONS[oOptions.sCondition || '='];
 
-		if(!(mArgument instanceof ZForms.Widget)) {
+		if(!(oOptions.mArgument instanceof ZForms.Widget)) {
 			return mResult;
 		}
 
@@ -306,8 +316,6 @@ var ZForms = {
 		oOptions
 		) {
 
-		var oOptions = oOptions || {};
-
 		return this.createCompareDependence(
 			oWidget,
 			Common.Object.extend(
@@ -324,8 +332,6 @@ var ZForms = {
 		oWidget,
 		oOptions
 		) {
-
-		var oOptions = oOptions || {};
 
 		return this.createCompareDependence(
 			oWidget,

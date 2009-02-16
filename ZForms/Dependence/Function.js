@@ -1,31 +1,31 @@
 ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
 	{
-	
-		__constructor : function(	
-			iType,	
+
+		__constructor : function(
+			iType,
 			oFrom,
-			fFunction,	
+			fFunction,
 			iLogic,
 			bInverse
 			) {
-			
+
 			this.__base(
-				iType,		
+				iType,
 				oFrom,
 				null,
 				iLogic,
 				bInverse
-				);	
-			
-			this.fFunction = fFunction;	
+				);
+
+			this.fFunction = fFunction;
 			this.aResult = [];
-			
+
 		},
 
 		getFunction : function() {
-	
+
 			return this.fFunction;
-	
+
 		},
 
 		check : function() {
@@ -33,15 +33,15 @@ ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
 			if(this.oFrom.isTemplate()) {
 				return true;
 			}
-			
+
 			this.aResult = [];
-	
-			var bMatched = this.fFunction(this.oFrom, this.aResult);		
-		
+
+			var bMatched = this.fFunction(this.oFrom, this.aResult);
+
 			return this.isInverse()? !bMatched : bMatched;
 
 		},
-				
+
 		getResult : function() {
 
 			return this.aResult;
@@ -49,9 +49,9 @@ ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
 		},
 
 		clone : function(oFrom) {
-		
+
 			eval('var fClonedFunction = ' + this.getFunction().toString());
-	
+
 			return new this.__self(
 				this.getType(),
 				oFrom,
@@ -59,7 +59,7 @@ ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
 				this.getLogic(),
 				this.isInverse()
 				);
-		
+
 		}
 
 	}
