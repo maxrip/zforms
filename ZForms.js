@@ -136,7 +136,7 @@ var ZForms = {
 
 	// static dependence creation methods
 
-	createEnableDependence : function(
+	createEnabledDependence : function(
 		oWidget,
 		oOptions
 		) {
@@ -257,7 +257,7 @@ var ZForms = {
 
 		var
 			oOptions = oOptions || {},
-			fFunction = function(oWidget, aResult) {
+			fFunction = function(oWidget, fFunction) {
 
 				var bResult = (arguments.callee.iType == ZForms.Dependence.TYPE_VALID &&
 					(arguments.callee.oWidget.getValue().isEmpty() || (arguments.callee.mArgument instanceof ZForms.Widget && arguments.callee.mArgument.getValue().isEmpty()))
@@ -269,12 +269,12 @@ var ZForms = {
 					);
 
 				if(arguments.callee.iType == ZForms.Dependence.TYPE_VALID && oOptions.sClassName) {
-					aResult.push(
+					fFunction.setResult(
 						{
 							bAdd       : !bResult,
 							sClassName : oOptions.sClassName
 						}
-						);					
+						);
 				}
 
 				return bResult;

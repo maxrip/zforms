@@ -18,7 +18,7 @@ ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
 				);
 
 			this.fFunction = fFunction;
-			this.aResult = [];
+			this.mResult = null;
 
 		},
 
@@ -34,17 +34,23 @@ ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
 				return true;
 			}
 
-			this.aResult = [];
+			this.mResult = null;
 
-			var bMatched = this.fFunction(this.oFrom, this.aResult);
+			var bMatched = this.fFunction(this.oFrom, this);
 
 			return this.isInverse()? !bMatched : bMatched;
 
 		},
 
+		setResult : function(mResult) {
+
+			this.mResult = mResult;
+
+		},
+
 		getResult : function() {
 
-			return this.aResult;
+			return this.mResult;
 
 		},
 

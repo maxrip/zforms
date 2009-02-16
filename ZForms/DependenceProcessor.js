@@ -54,9 +54,7 @@ ZForms.DependenceProcessor = Abstract.inheritTo(
 		hasDependenciesByType : function(iType) {
 
 			return this.aDependenceGroups[iType] &&
-				this.aDependenceGroups[iType].getDependencies().length > 0?
-				true :
-				false
+				this.aDependenceGroups[iType].getDependencies().length > 0
 				;
 
 		},
@@ -125,8 +123,7 @@ ZForms.DependenceProcessor = Abstract.inheritTo(
 			var
 				bCheckResult = this.aDependenceGroups[ZForms.Dependence.TYPE_VALID].check(),
 				aClasses = this.aDependenceGroups[ZForms.Dependence.TYPE_VALID].getResult(),
-				i = 0,
-				oClass
+				i = 0
 				;
 
 			if(bCheckResult) {
@@ -138,10 +135,8 @@ ZForms.DependenceProcessor = Abstract.inheritTo(
 
 			while(i < aClasses.length) {
 
-				oClass = aClasses[i] instanceof Array? aClasses[i][0] : aClasses[i];
-
-				if(oClass && oClass.sClassName) {
-					this.oWidget[(oClass.bAdd && !bCheckResult? 'add' : 'remove') +'Class'](oClass.sClassName);
+				if(aClasses[i] && aClasses[i].sClassName) {
+					this.oWidget[(aClasses[i].bAdd && !bCheckResult? 'add' : 'remove') +'Class'](aClasses[i].sClassName);
 				}
 
 				++i;

@@ -32,10 +32,7 @@ ZForms.Builder = Abstract.inheritTo(
 				;
 
 			while(i < iLength) {
-
-				this.createWidgetByElement(aElements[i]);
-				i++;
-
+				this.createWidgetByElement(aElements[i++]);
 			}
 
 			this.buildDependencies();
@@ -54,13 +51,13 @@ ZForms.Builder = Abstract.inheritTo(
 				oParams = oElement.onclick instanceof Function? oElement.onclick() : {},
 				oResult = ZForms[this.getCreateWidgetFunction(oParams.sType, oElement)](
 					oElement,
-					this.getClassElement(oParams.sCId, oElement),
+					this.getClassElement(oParams.sCId, oParams.sType, oElement),
 					oParams.oOptions
 					),
 				oParentWidget = this.getParentWidget(oParams.sPId, oElement)
 				;
 
-			if(oParams.oRequired || oParams.oValid || oParams.oValidEmail) {
+			if(oParams.oRequired || oParams.oValid || oParams.oEnabled) {
 				this.aDependencies.push({ oWidget : oResult, oParams : oParams });
 			}
 
@@ -76,11 +73,16 @@ ZForms.Builder = Abstract.inheritTo(
 
 		getClassElement : function(
 			sClassElementId,
+			sType,
 			oElement
 			) {
 
 			if(sClassElementId) {
 				return this.$(sClassElementId);
+			}
+
+			if(sType == 'checkboxgroup' || sType == 'radiobuttongroup') {
+				return;
 			}
 
 			var sTagName = oElement.tagName.toLowerCase();
@@ -148,6 +150,11 @@ ZForms.Builder = Abstract.inheritTo(
 							sType = 'text';
 						break;
 
+						case 'radio':
+						case 'checkbox':
+							sType = 'state';
+						break;
+
 						default:
 							sType = sInputType;
 
@@ -180,7 +187,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			while(i < iLength) {
 
-				oDependence = aDependencies[i];
+				oDependence = aDependencies[i++];
 				oParams = oDependence.oParams;
 
 				if(oParams.oRequired) {
@@ -188,10 +195,12 @@ ZForms.Builder = Abstract.inheritTo(
 				}
 
 				if(oParams.oValid) {
-					this.buildValidDependence(oDependence.oWidget, oParams.oValid);
+					this.buildValidOrEnabledDependence(oDependence.oWidget, oParams.oValid, ZForms.Dependence.TYPE_VALID);
 				}
 
-				i++;
+				if(oParams.oEnabled) {
+					this.buildValidOrEnabledDependence(oDependence.oWidget, oParams.oEnabled, ZForms.Dependence.TYPE_ENABLE);
+				}
 
 			}
 
@@ -215,22 +224,26 @@ ZForms.Builder = Abstract.inheritTo(
 				return;
 			}
 
-			for(var i = 0, oWidgetFrom, oFrom; i < oRequired.aFrom.length; i++) {
+			var
+				i = 0,
+				oFrom,
+				oWidgetFrom
+				;
+			while(oFrom = oRequired.aFrom[i++]) {
 
-				oFrom = oRequired.aFrom[i];
-				oWidgetFrom = this.oForm.getWidgetById(oFrom.sId);
+				oWidgetFrom = oFrom.sId? this.oForm.getWidgetById(oFrom.sId) : oWidget;
 
-				/*if(!oWidgetFrom) {
-					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
-				}*/
+				if(!oWidgetFrom) {
+					this.throwDependenceException(oFrom.sId);
+				}
 
-				if(oFrom.mData && oFrom.mData instanceof Function) {
+				if(oFrom.fFunction) {
 					oWidget.addDependence(
 						ZForms.createFunctionDependence(
 							oWidgetFrom,
 							{
 								iType     : ZForms.Dependence.TYPE_REQUIRE,
-								fFunction : oFrom.mData,
+								fFunction : oFrom.fFunction,
 								iLogic    : iLogic,
 								bInverse  : oFrom.bInverse
 							}
@@ -239,11 +252,11 @@ ZForms.Builder = Abstract.inheritTo(
 				}
 				else {
 					oWidget.addDependence(
-						new ZForms.Dependence.Required(
+						ZForms.createRequiredDependence(
 							oWidgetFrom,
 							{
 								iLogic : iLogic,
-								iMin   : oRequired.iMin? oRequired.iMin : 1
+								iMin   : oFrom.iMin? oFrom.iMin : 1
 							}
 							)
 						);
@@ -253,52 +266,69 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
-		buildValidDependence : function(oWidget, oValid) {
+		buildValidOrEnabledDependence : function(oWidget, oValid, iType) {
 
-			var iLogic = this.getLogic(oValid);
+			var
+				iLogic = this.getLogic(oValid),
+				oOptionsAdd
+				;
 
 			if(oValid.sType) {
-				oValid.aFrom = this.prependToArray({sType : oValid.sType}, oValid.aFrom);
+				oOptionsAdd = { sType : oValid.sType };
+			}
+			else if(oValid.rPattern) {
+				oOptionsAdd = { rPattern : oValid.rPattern };
+			}
+			else if(oValid.fFunction) {
+				oOptionsAdd = { fFunction : oValid.fFunction };
+			}
+			else if(oValid.sCondition) {
+				oOptionsAdd = { sCondition : oValid.oCondition, sValue : oValid.sValue };
 			}
 
-			if(oValid.rPattern) {
-				oValid.aFrom = this.prependToArray({rPattern : oValid.rPattern}, oValid.aFrom);
-			}
+			oValid.aFrom = this.prependToArray(oOptionsAdd, oValid.aFrom);
 
-			if(oValid.fFunction) {
-				oValid.aFrom = this.prependToArray({fFunction : oValid.fFunction}, oValid.aFrom);
-			}
+			var
+				i = 0,
+				oFrom,
+				oWidgetFrom
+				;
+			while(oFrom = oValid.aFrom[i++]) {
 
-			if(oValid.oCompare) {
-				oValid.aFrom = this.prependToArray({oCompare : oValid.oCompare}, oValid.aFrom);
-			}
-
-			for(var i = 0, oWidgetFrom, oFrom; i < oValid.aFrom.length; i++) {
-
-				oFrom = oValid.aFrom[i];
 				oWidgetFrom = oFrom.sId? this.oForm.getWidgetById(oFrom.sId) : oWidget;
 
-				/*if(!oWidgetFrom) {
-					this.throwDependenceException(oFrom.sName, oElement.getName() || oElement.getId());
-				}*/
+				if(!oWidgetFrom) {
+					this.throwDependenceException(oFrom.sId);
+				}
 
-				if(oFrom.fFunction) {
+				if(oFrom.sType && oFrom.sType == 'email' && iType == ZForms.Dependence.TYPE_VALID) {
 					oWidget.addDependence(
-						ZForms.createFunctionDependence(
+						ZForms.createValidEmailDependence(
 							oWidgetFrom,
 							{
-								iType     : ZForms.Dependence.TYPE_VALID,
-								fFunction : oFrom.fFunction,
-								iLogic    : iLogic,
-								bInverse  : oFrom.bInverse
+								iLogic     : iLogic,
+								bInverse   : oFrom.bInverse,
+								sClassName : oFrom.sClassName
 							}
 							)
 						);
 				}
-
-				if(oFrom.sCondition) {
+				else if(oFrom.rPattern) {
 					oWidget.addDependence(
-						ZForms.createValidCompareDependence(
+						ZForms['create' + (iType == ZForms.Dependence.TYPE_VALID? 'Valid' : 'Enabled') + 'Dependence'](
+							oWidgetFrom,
+							{
+								rPattern   : oFrom.rPattern,
+								iLogic     : iLogic,
+								bInverse   : oFrom.bInverse,
+								sClassName : oFrom.sClassName
+							}
+							)
+						);
+				}
+				else if(oFrom.sCondition) {
+					oWidget.addDependence(
+						ZForms['create' + (iType == ZForms.Dependence.TYPE_VALID? 'Valid' : 'Enabled') + 'Dependence'](
 							oWidget,
 							{
 								sCondition : oFrom.sCondition,
@@ -312,29 +342,15 @@ ZForms.Builder = Abstract.inheritTo(
 							)
 						);
 				}
-
-				if(oFrom.rPattern) {
+				else if(oFrom.fFunction) {
 					oWidget.addDependence(
-						ZForms.createValidDependence(
+						ZForms.createFunctionDependence(
 							oWidgetFrom,
 							{
-								rPattern   : oFrom.rPattern,
-								iLogic     : iLogic,
-								bInverse   : oFrom.bInverse,
-								sClassName : oFrom.sClassName
-							}
-							)
-						);
-				}
-
-				if(oFrom.sType && oFrom.sType == 'email') {
-					oWidget.addDependence(
-						ZForms.createValidEmailDependence(
-							oWidgetFrom,
-							{
-								iLogic     : iLogic,
-								bInverse   : oFrom.bInverse,
-								sClassName : oFrom.sClassName
+								iType     : iType,
+								fFunction : oFrom.fFunction,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
 							}
 							)
 						);
@@ -350,7 +366,17 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
+		throwDependenceException : function(sId) {
+
+			throw('Widget with id "' + sId + '" no exists');
+
+		},
+
 		prependToArray : function(oObject, aArray) {
+
+			if(typeof(oObject) == 'undefined') {
+				return aArray;
+			}
 
 			if(!(oObject instanceof Array)) {
 				oObject = [oObject];
@@ -367,10 +393,14 @@ ZForms.Builder = Abstract.inheritTo(
 	},
 	{
 		aTypesToCreateWidgetFunction : {
-			'form'     : 'Form',
-			'text'     : 'TextInput',
-			'submit'   : 'SubmitButton',
-			'fieldset' : 'Container'
+			'form'             : 'Form',
+			'text'             : 'TextInput',
+			'number'           : 'NumberInput',
+			'submit'           : 'SubmitButton',
+			'fieldset'         : 'Container',
+			'checkboxgroup'    : 'CheckBoxGroup',
+			'radiobuttongroup' : 'RadioButtonGroup',
+			'state'            : 'StateInput'
 		}
 	}
 	);
