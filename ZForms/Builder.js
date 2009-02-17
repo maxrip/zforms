@@ -54,12 +54,13 @@ ZForms.Builder = Abstract.inheritTo(
 
 			var
 				oParams = oElement.onclick instanceof Function? oElement.onclick() : {},
-				oResult = ZForms[this.getCreateWidgetFunction(oParams.sType, oElement)](
+				sType = oParams.sType || this.extractTypeFromElement(oElement),
+				oResult = ZForms[this.getCreateWidgetFunction(sType)](
 					oElement,
-					this.getClassElement(oParams.sCId, oParams.sType, oElement),
+					this.getClassElement(oParams.sCId, sType, oElement),
 					this.processOptions(oParams.oOptions)
 					),
-				oParentWidget = this.getParentWidget(oParams, oElement, oResult)
+				oParentWidget = this.getParentWidget(oParams, sType, oElement, oResult)
 				;
 
 			if(oParams.oRequired || oParams.oValid || oParams.oEnabled || oParams.oDependedOptions || oParams.oDependedClasses) {
@@ -103,33 +104,22 @@ ZForms.Builder = Abstract.inheritTo(
 			}
 
 			if(
+				sType == 'form' ||
 				sType == 'fieldset' ||
+				sType == 'sheet' ||
 				sType == 'slider' ||
+				sType == 'slidervertical' ||
 				sType == 'checkboxgroup' ||
 				sType == 'radiobuttongroup' ||
-			   	sType == 'prevbutton' ||
-			   	sType == 'nextbutton') {
+				sType == 'submit' ||
+				sType == 'button' ||
+			   	sType == 'buttonprev' ||
+			   	sType == 'buttonnext') {
 				return;
 			}
 
-			var sTagName = oElement.tagName.toLowerCase();
-
-			if(sTagName == 'form' || sTagName == 'fieldset') {
-				return;
-			}
-
-			if(sTagName == 'input') {
-
-				var sInputType = oElement.type.toLowerCase();
-
-				if(sInputType == 'submit') {
-					return;
-				}
-
-				if(sInputType == 'radio' || sInputType == 'checkbox') {
-					return oElement.parentNode;
-				}
-
+			if(sType == 'state') {
+				return oElement.parentNode;
 			}
 
 			return oElement.parentNode.parentNode;
@@ -138,31 +128,32 @@ ZForms.Builder = Abstract.inheritTo(
 
 		getParentWidget : function(
 			oParams,
+			sType,
 			oElement,
 			oWidget
 			) {
 
-			if(oParams.sType == 'sheet') {
+			if(sType == 'sheet') {
 				return this.getSheetContainer(oParams, oElement);
 			}
 
-			if(oParams.sType == 'prevbutton' || oParams.sType == 'nextbutton') {
-				return this.getSheet(oParams, oElement, oWidget);
+			if(sType == 'buttonprev' || sType == 'buttonnext') {
+				return this.getSheet(sType, oElement, oWidget);
+			}
+
+			if(sType == 'form') {
+				return;
 			}
 
 			if(oParams.sPId) {
 				return this.oForm.getWidgetById(oParams.sPId);
 			}
 
-			if(oElement.tagName.toLowerCase() == 'form') {
-				return;
-			}
-
 			while(oElement = oElement.parentNode) {
 				if(oElement.tagName.toLowerCase() == 'form' ||
 					Common.Class.match(oElement, 'zforms')
 					) {
-					return this.oForm.getWidgetById(Common.Dom.getAttribute(oElement, 'id'));
+					return this.oForm.getWidgetById(this.__self.getId(oElement));
 				}
 			}
 
@@ -175,7 +166,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			if(!oParams.sGroup) {
 				this.throwException('sheet widget with id "' +
-					Common.Dom.getAttribute(oElement, 'id') +
+					this.__self.getId(oElement) +
 					'" must contain sGroup attribute'
 					);
 			}
@@ -183,8 +174,9 @@ ZForms.Builder = Abstract.inheritTo(
 			if(!this.aSheetContainers[oParams.sGroup]) {
 
 				oParams.sType = null;
+
 				this.aSheetContainers[oParams.sGroup] = this
-					.getParentWidget(oParams, oElement)
+					.getParentWidget(oParams, null, oElement)
 					.addChild(ZForms.createSheetContainer())
 					;
 
@@ -196,7 +188,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 		// небольшой хак для добавления кнопок на страницу
 		getSheet : function(
-			oParams,
+			sType,
 			oElement,
 			oWidget
 			) {
@@ -206,10 +198,10 @@ ZForms.Builder = Abstract.inheritTo(
 					Common.Class.match(oElement, 'zforms')
 					) {
 
-					var oParentWidget = this.oForm.getWidgetById(Common.Dom.getAttribute(oElement, 'id'));
+					var oParentWidget = this.oForm.getWidgetById(this.__self.getId(oElement));
 					if(oParentWidget instanceof ZForms.Widget.Container.Sheet) {
 
-						oParentWidget['add' + (oParams.sType == 'prevbutton'? 'Prev' : 'Next') + 'Button'](oWidget);
+						oParentWidget['add' + (sType == 'buttonprev'? 'Prev' : 'Next') + 'Button'](oWidget);
 						return;
 
 					}
@@ -219,49 +211,65 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
-		getCreateWidgetFunction : function(
-			sType,
-			oElement
-			) {
+		extractTypeFromElement : function(oElement) {
 
-			if(!sType) {
+			var
+				sTagName = oElement.tagName.toLowerCase(),
+				sInputType
+				;
 
-				var sTagName = oElement.tagName.toLowerCase();
+			if(sTagName == 'input') {
 
-				if(sTagName == 'form' || sTagName == 'fieldset') {
-					sType = sTagName;
-				}
-				else if(sTagName == 'input') {
+				sInputType = oElement.type.toLowerCase();
 
-					var sInputType = oElement.type.toLowerCase();
-
-					switch(sInputType) {
-
-						case 'search':
-							sType = 'text';
-						break;
-
-						case 'radio':
-						case 'checkbox':
-							sType = 'state';
-						break;
-
-						default:
-							sType = sInputType;
-
-					}
-
-				}
-				else if(sTagName == 'textarea') {
-					sType = 'text';
+				if(sInputType == 'radio' || sInputType == 'checkbox') {
+					return 'state';
 				}
 
 			}
+
+			var aMatches = oElement.className.match(this.__self.rTypePattern);
+
+			if(aMatches) {
+				return aMatches[1];
+			}
+
+			switch(sTagName) {
+
+				case 'input':
+
+					if(sInputType == 'search') {
+						return 'text';
+					}
+
+					return sInputType;
+
+				break;
+
+				case 'form':
+				case 'fieldset':
+					return sTagName;
+				break;
+
+				case 'textarea':
+					return 'text';
+				break;
+
+			}
+
+			this.throwException('can\'t extract widget type from element with id "' +
+				this.__self.getId(oElement) +
+				'"'
+				);
+
+		},
+
+		getCreateWidgetFunction : function(sType) {
 
 			if(!this.__self.aTypesToCreateWidgetFunction[sType]) {
 				this.throwException('Unsupported widget type "' + sType + '"');
 			}
-			//console.log(this.__self.aTypesToCreateWidgetFunction[sType]);
+
 			return 'create' + this.__self.aTypesToCreateWidgetFunction[sType];
 
 		},
@@ -629,6 +637,12 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
+		getId : function(oElement) {
+
+			return Common.Dom.getAttribute(oElement, 'id') || Common.Dom.getUniqueId(oElement);
+
+		},
+
 		aTypesToCreateWidgetFunction : {
 			'form'             : 'Form',
 			'text'             : 'TextInput',
@@ -641,11 +655,14 @@ ZForms.Builder = Abstract.inheritTo(
 			'state'            : 'StateInput',
 			'sheet'            : 'Sheet',
 			'button'           : 'Button',
-			'prevbutton'       : 'Button',
-			'nextbutton'       : 'Button',
+			'buttonprev'       : 'Button',
+			'buttonnext'       : 'Button',
 			'slider'           : 'Slider',
 			'slidervertical'   : 'SliderVertical'
-		}
+		},
+
+		rTypePattern : /zforms-(form|text|number|date|submit|fieldset|checkboxgroup|radiobuttongroup|state|sheet|button|buttonprev|buttonnext|slider|slidervertical)(\s+|$)/
+
 	}
 	);
 

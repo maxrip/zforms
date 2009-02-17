@@ -110,7 +110,6 @@ ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 				function() {
 
 					oThis.oParent.next(oThis);
-
 					return false;
 
 				}
