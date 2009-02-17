@@ -194,23 +194,29 @@ ZForms.Calendar = Abstract.inheritTo(
 				iCountShowedDaysInPrevMonth = (oFirstDayInMonth.getDay() == 0? 7 : oFirstDayInMonth.getDay()) - 1,
 				oLastDayInMonth = new Date(this.oDate.getFullYear(), this.oDate.getMonth() + 1, -0.5),
 				iCountShowedDaysInNextMonth = 7 - (oLastDayInMonth.getDay() == 0? 7 : oLastDayInMonth.getDay()),
-				sHtml = '<table>'
+				oBuffer = new Common.Utils.StringBuffer('<table>')
 				;
 
 			for(var i = 1; i <= iCountShowedDaysInPrevMonth; i++) {
 
 				if(i % 7 == 1) {
-					sHtml += (i > 1? '</tr>' : '') + '<tr>';
+					oBuffer.append(i > 1? '</tr>' : '').append('<tr>');
 				}
 
-				sHtml += '<td class="add' + (i % 7 == 6 || i % 7 == 0? ' weekend' : '') + '">' + (iCountDaysInPrevMonth - iCountShowedDaysInPrevMonth + i) + '</td>';
+				oBuffer
+					.append('<td class="add')
+					.append(i % 7 == 6 || i % 7 == 0? ' weekend' : '')
+					.append('">')
+					.append(iCountDaysInPrevMonth - iCountShowedDaysInPrevMonth + i)
+					.append('</td>')
+					;
 
 			}
 
 			for(var i = iCountShowedDaysInPrevMonth + 1, iCountDays = oLastDayInMonth.getDate(), iDay = 1, sClassName; iDay <= iCountDays; i++) {
 
 				if(i % 7 == 1) {
-					sHtml += '</tr><tr>';
+					oBuffer.append('</tr><tr>');
 				}
 
 				sClassName = '';
@@ -223,26 +229,46 @@ ZForms.Calendar = Abstract.inheritTo(
 					sClassName += (sClassName.length > 0? ' ' : '') + 'weekend';
 				}
 
-				sHtml += '<td' + (sClassName.length > 0? ' class="' + sClassName + '"' : '') + '>' + iDay++ + '</td>';
+				oBuffer.append('<td');
+
+				if(sClassName.length > 0) {
+					oBuffer
+						.append(' class="')
+						.append(sClassName)
+						.append('"')
+						;
+				}
+
+				oBuffer
+					.append('>')
+					.append(iDay++)
+					.append('</td>')
+					;
 
 			}
 
 			for(var i = iCountShowedDaysInPrevMonth + iCountDays + 1, iDay = 1; iDay <= iCountShowedDaysInNextMonth; i++) {
 
 				if(i % 7 == 1) {
-					sHtml += '</tr><tr>';
+					oBuffer.append('</tr><tr>');
 				}
 
-				sHtml += '<td class="add' + (i % 7 == 6 || i % 7 == 0? ' weekend' : '') + '">' + iDay++ + '</td>';
+				oBuffer
+					.append('<td class="add')
+					.append(i % 7 == 6 || i % 7 == 0? ' weekend' : '')
+					.append('">')
+					.append(iDay++)
+					.append('</td>')
+					;
 
 			}
 
-			sHtml += '</tr></table>';
+			oBuffer.append('</tr></table>');
 
 			// fucking ie
 
 			var oBodyElement = document.createElement('div');
-			oBodyElement.innerHTML = sHtml;
+			oBodyElement.innerHTML = oBuffer.get();
 			oBodyElement = oBodyElement.getElementsByTagName('tbody')[0];
 
 			this.oElement.parentNode.replaceChild(oBodyElement, this.oElement);
@@ -257,7 +283,19 @@ ZForms.Calendar = Abstract.inheritTo(
 				function(oEvent) {
 
 					oThis.hide();
-					oThis.setDate(new Date(oThis.oDate.getFullYear(), oThis.oDate.getMonth(), Common.Event.normalize(oEvent).target.innerHTML));
+
+					var
+						oTarget = Common.Event.normalize(oEvent).target,
+						iDay = parseInt(oTarget.innerHTML, 10)
+						;
+
+					oThis.setDate(
+						new Date(
+							oThis.oDate.getFullYear(),
+							oThis.oDate.getMonth() + (Common.Class.match(oTarget, 'add')? (iDay > 15? -1 : 1) : 0),
+							oTarget.innerHTML
+							)
+						);
 
 					if(oThis.oWidget.oOptions.bWithTime) {
 

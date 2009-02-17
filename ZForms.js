@@ -328,7 +328,7 @@ var ZForms = {
 
 	},
 
-	createEnableCompareDependence : function(
+	createEnabledCompareDependence : function(
 		oWidget,
 		oOptions
 		) {

@@ -1,22 +1,22 @@
 ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 	{
-	
+
 		__constructor : function(
 			oElement,
 			oClassElement,
 			oOptions
 			) {
-	
+
 			this.__base(
 				oElement,
 				oClassElement,
 				oOptions
 				);
-	
+
 			this.oLegendButton = null;
 			this.oPrevButton = null;
 			this.oNextButton = null;
-				
+
 			if(this.oOptions.oElementLegend) {
 				this.addLegendButton(
 					new ZForms.Widget.Button(
@@ -28,7 +28,7 @@ ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 					)
 				);
 			}
-			
+
 			if(this.oOptions.oElementPrev) {
 				this.addPrevButton(
 					new ZForms.Widget.Button(
@@ -40,7 +40,7 @@ ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 					)
 				);
 			}
-			
+
 			if(this.oOptions.oElementNext) {
 				this.addNextButton(
 					new ZForms.Widget.Button(
@@ -52,80 +52,80 @@ ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 					)
 				);
 			}
-				
-			this.bSelected = Common.Class.match(this.oClassElement, this.__self.CLASS_NAME_SELECTED);			
-		
+
+			this.bSelected = Common.Class.match(this.oClassElement, this.__self.CLASS_NAME_SELECTED);
+
 		},
 
 		addLegendButton : function(oButton) {
-	
+
 			this.oLegendButton = oButton;
-	
+
 			this.addChild(oButton);
-	
+
 			var oThis = this;
-	
+
 			oButton.setHandler(
 				function() {
-	
+
 					oThis.oParent.select(oThis);
-					
+
 					return false;
-	
+
 				}
-				
-			)
-			
+
+			);
+
 		},
-	
+
 		addPrevButton : function(oButton) {
-	
+
 			this.oPrevButton = oButton;
-	
+
 			this.addChild(oButton);
-	
+
 			var oThis = this;
-	
+
 			oButton.setHandler(
 				function() {
-	
+
 					oThis.oParent.prev(oThis);
-					
+
 					return false;
-	
+
 				}
 			);
-			
+
 		},
 
 		addNextButton : function(oButton) {
-	
+
 			this.oNextButton = oButton;
-	
+
 			this.addChild(oButton);
-	
+
 			var oThis = this;
-	
+
 			oButton.setHandler(
 				function() {
-	
+
 					oThis.oParent.next(oThis);
-					
+
 					return false;
-	
+
 				}
 			);
 
 		},
-			
+
 		setParent : function(oParent) {
-	
+
 			this.__base(oParent);
-	
+
 			if(this.isSelected()) {
-				this.oParent.select(this);		
+				this.oParent.select(this);
 			}
-	
+
 		},
 
 		isSelected : function() {
@@ -137,44 +137,44 @@ ZForms.Widget.Container.Sheet = ZForms.Widget.Container.inheritTo(
 		select : function() {
 
 			this.bSelected = true;
-	
+
 			this.addClass(this.__self.CLASS_NAME_SELECTED);
-	
-			if(this.oLegendButton) {		
+
+			if(this.oLegendButton) {
 				this.oLegendButton.addClass(this.__self.CLASS_NAME_SELECTED);
 			}
-			
+
 		},
 
 		unselect : function() {
 
 			this.bSelected = false;
-	
-			this.removeClass(this.__self.CLASS_NAME_SELECTED);	
-	
+
+			this.removeClass(this.__self.CLASS_NAME_SELECTED);
+
 			if(this.oLegendButton) {
 				this.oLegendButton.removeClass(this.__self.CLASS_NAME_SELECTED);
 			}
-			
+
 		},
-		
+
 		destruct : function() {
-			
+
 			if(this.oLegendButton) {
 				this.oLegendButton.destruct();
 			}
-			
+
 			if(this.oPrevButton) {
 				this.oPrevButton.destruct();
 			}
-			
+
 			if(this.oNextButton) {
 				this.oNextButton.destruct();
 			}
-			
+
 			this.__base();
-			
+
 		}
-		
+
 	}
 	);

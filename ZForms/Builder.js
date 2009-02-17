@@ -3,8 +3,9 @@ ZForms.Builder = Abstract.inheritTo(
 
 		__constructor : function(sFormElementId) {
 
-			this.oFormElement = this.$(sFormElementId)
+			this.oFormElement = this.$(sFormElementId);
 			this.oForm = null;
+			this.aSheetContainers = [];
 			this.aDependencies = [];
 
 		},
@@ -14,7 +15,7 @@ ZForms.Builder = Abstract.inheritTo(
 			var oResult = document.getElementById(sId);
 
 			if(!oResult) {
-				throw('Element with id "' + sId + '" no exists');
+				this.throwException('Element with id "' + sId + '" no exists');
 			}
 
 			return oResult;
@@ -41,6 +42,10 @@ ZForms.Builder = Abstract.inheritTo(
 				this.oForm.init();
 			}
 
+			this.oFormElement = null;
+			this.aSheetContainers.length = 0;
+			this.aDependencies.length = 0;
+
 			return this.oForm;
 
 		},
@@ -52,12 +57,12 @@ ZForms.Builder = Abstract.inheritTo(
 				oResult = ZForms[this.getCreateWidgetFunction(oParams.sType, oElement)](
 					oElement,
 					this.getClassElement(oParams.sCId, oParams.sType, oElement),
-					oParams.oOptions
+					this.processOptions(oParams.oOptions)
 					),
-				oParentWidget = this.getParentWidget(oParams.sPId, oElement)
+				oParentWidget = this.getParentWidget(oParams, oElement, oResult)
 				;
 
-			if(oParams.oRequired || oParams.oValid || oParams.oEnabled) {
+			if(oParams.oRequired || oParams.oValid || oParams.oEnabled || oParams.oDependedOptions || oParams.oDependedClasses) {
 				this.aDependencies.push({ oWidget : oResult, oParams : oParams });
 			}
 
@@ -71,6 +76,22 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
+		processOptions : function(oOptions) {
+
+			if(!oOptions) {
+				return;
+			}
+
+			if(oOptions.sPickerId) {
+				oOptions.oPickerOpenerElement = this.$(oOptions.sPickerId);
+			}
+
+			delete oOptions.sPickerId;
+
+			return oOptions;
+
+		},
+
 		getClassElement : function(
 			sClassElementId,
 			sType,
@@ -81,7 +102,13 @@ ZForms.Builder = Abstract.inheritTo(
 				return this.$(sClassElementId);
 			}
 
-			if(sType == 'checkboxgroup' || sType == 'radiobuttongroup') {
+			if(
+				sType == 'fieldset' ||
+				sType == 'slider' ||
+				sType == 'checkboxgroup' ||
+				sType == 'radiobuttongroup' ||
+			   	sType == 'prevbutton' ||
+			   	sType == 'nextbutton') {
 				return;
 			}
 
@@ -95,7 +122,11 @@ ZForms.Builder = Abstract.inheritTo(
 
 				var sInputType = oElement.type.toLowerCase();
 
-				if(sInputType == 'radio' || sInputType == 'checkbox' || sInputType == 'submit') {
+				if(sInputType == 'submit') {
+					return;
+				}
+
+				if(sInputType == 'radio' || sInputType == 'checkbox') {
 					return oElement.parentNode;
 				}
 
@@ -106,12 +137,21 @@ ZForms.Builder = Abstract.inheritTo(
 		},
 
 		getParentWidget : function(
-			sParentId,
-			oElement
+			oParams,
+			oElement,
+			oWidget
 			) {
 
-			if(sParentId) {
-				return this.oForm.getWidgetById(sParentId);
+			if(oParams.sType == 'sheet') {
+				return this.getSheetContainer(oParams, oElement);
+			}
+
+			if(oParams.sType == 'prevbutton' || oParams.sType == 'nextbutton') {
+				return this.getSheet(oParams, oElement, oWidget);
+			}
+
+			if(oParams.sPId) {
+				return this.oForm.getWidgetById(oParams.sPId);
 			}
 
 			if(oElement.tagName.toLowerCase() == 'form') {
@@ -123,6 +163,57 @@ ZForms.Builder = Abstract.inheritTo(
 					Common.Class.match(oElement, 'zforms')
 					) {
 					return this.oForm.getWidgetById(Common.Dom.getAttribute(oElement, 'id'));
+				}
+			}
+
+		},
+
+		getSheetContainer : function(
+			oParams,
+			oElement
+			) {
+
+			if(!oParams.sGroup) {
+				this.throwException('sheet widget with id "' +
+					Common.Dom.getAttribute(oElement, 'id') +
+					'" must contain sGroup attribute'
+					);
+			}
+
+			if(!this.aSheetContainers[oParams.sGroup]) {
+
+				oParams.sType = null;
+				this.aSheetContainers[oParams.sGroup] = this
+					.getParentWidget(oParams, oElement)
+					.addChild(ZForms.createSheetContainer())
+					;
+
+			}
+
+			return this.aSheetContainers[oParams.sGroup];
+
+		},
+
+		// небольшой хак для добавления кнопок на страницу
+		getSheet : function(
+			oParams,
+			oElement,
+			oWidget
+			) {
+
+			while(oElement = oElement.parentNode) {
+				if(oElement.tagName.toLowerCase() == 'form' ||
+					Common.Class.match(oElement, 'zforms')
+					) {
+
+					var oParentWidget = this.oForm.getWidgetById(Common.Dom.getAttribute(oElement, 'id'));
+					if(oParentWidget instanceof ZForms.Widget.Container.Sheet) {
+
+						oParentWidget['add' + (oParams.sType == 'prevbutton'? 'Prev' : 'Next') + 'Button'](oWidget);
+						return;
+
+					}
+
 				}
 			}
 
@@ -168,7 +259,7 @@ ZForms.Builder = Abstract.inheritTo(
 			}
 
 			if(!this.__self.aTypesToCreateWidgetFunction[sType]) {
-				throw('Unsupported widget type "' + sType + '"');
+				this.throwException('Unsupported widget type "' + sType + '"');
 			}
 			//console.log(this.__self.aTypesToCreateWidgetFunction[sType]);
 			return 'create' + this.__self.aTypesToCreateWidgetFunction[sType];
@@ -202,6 +293,14 @@ ZForms.Builder = Abstract.inheritTo(
 					this.buildValidOrEnabledDependence(oDependence.oWidget, oParams.oEnabled, ZForms.Dependence.TYPE_ENABLE);
 				}
 
+				if(oParams.oDependedOptions) {
+					this.buildOptionsDependence(oDependence.oWidget, oParams.oDependedOptions);
+				}
+
+				if(oParams.oDependedClasses) {
+					this.buildClassesDependence(oDependence.oWidget, oParams.oDependedClasses);
+				}
+
 			}
 
 		},
@@ -210,19 +309,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			var iLogic = this.getLogic(oRequired);
 
-			oWidget.addDependence(
-				ZForms.createRequiredDependence(
-					oWidget,
-					{
-						iLogic : iLogic,
-						iMin   : oRequired.iMin
-					}
-					)
-				);
-
-			if(!oRequired.aFrom) {
-				return;
-			}
+			oRequired.aFrom = this.__self.prependToArray({ iMin : oRequired.iMin }, oRequired.aFrom);
 
 			var
 				i = 0,
@@ -282,11 +369,21 @@ ZForms.Builder = Abstract.inheritTo(
 			else if(oValid.fFunction) {
 				oOptionsAdd = { fFunction : oValid.fFunction };
 			}
-			else if(oValid.sCondition) {
-				oOptionsAdd = { sCondition : oValid.oCondition, sValue : oValid.sValue };
+			else if(oValid.oCompare) {
+				oOptionsAdd = { oCompare : oValid.oCompare };
 			}
 
-			oValid.aFrom = this.prependToArray(oOptionsAdd, oValid.aFrom);
+			if(oOptionsAdd) {
+				Common.Object.extend(
+					oOptionsAdd,
+					{
+						bInverse   : oValid.bInverse,
+						sClassName : oValid.sClassName
+					}
+					);
+			}
+
+			oValid.aFrom = this.__self.prependToArray(oOptionsAdd, oValid.aFrom);
 
 			var
 				i = 0,
@@ -326,15 +423,15 @@ ZForms.Builder = Abstract.inheritTo(
 							)
 						);
 				}
-				else if(oFrom.sCondition) {
+				else if(oFrom.oCompare) {
 					oWidget.addDependence(
-						ZForms['create' + (iType == ZForms.Dependence.TYPE_VALID? 'Valid' : 'Enabled') + 'Dependence'](
-							oWidget,
+						ZForms['create' + (iType == ZForms.Dependence.TYPE_VALID? 'Valid' : 'Enabled') + 'CompareDependence'](
+							oWidgetFrom,
 							{
-								sCondition : oFrom.sCondition,
-								mArgument  : oFrom.sId?
-									oWidgetFrom :
-									oFrom.sValue,
+								sCondition : oFrom.oCompare.sCondition,
+								mArgument  : oFrom.oCompare.sId?
+									this.oForm.getWidgetById(oFrom.oCompare.sId) :
+									oFrom.oCompare.sValue,
 								iLogic     : iLogic,
 								bInverse   : oFrom.bInverse,
 								sClassName : oFrom.sClassName
@@ -360,17 +457,150 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
+		buildOptionsDependence : function(oWidget, oDepended) {
+
+			var iLogic = this.getLogic(oDepended);
+
+			var
+				i = 0,
+				j,
+				oFrom,
+				oWidgetFrom,
+				aPatterns
+				;
+			while(oFrom = oDepended.aFrom[i++]) {
+
+				oWidgetFrom = oFrom.sId? this.oForm.getWidgetById(oFrom.sId) : oWidget;
+
+				if(!oWidgetFrom) {
+					this.throwDependenceException(oFrom.sId);
+				}
+
+				if(oFrom.aData) {
+
+					aPatterns = [];
+					j = 0;
+
+					while(j < oFrom.aData.length) {
+						aPatterns.push(
+							{
+								rSource      : this.__self.toPattern(oFrom.aData[j][0]),
+								rDestination : this.__self.toPattern(oFrom.aData[j++][1])
+							}
+							);
+					}
+
+					oWidget.addDependence(
+						ZForms.createOptionsDependence(
+							oWidgetFrom,
+							{
+								aPatterns : aPatterns,
+								iLogic    : iLogic
+							}
+							)
+						);
+
+				}
+				else if(oFrom.fFunction) {
+					oWidget.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_OPTIONS,
+								fFunction : oFrom.fFunction,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
+				}
+
+			}
+
+		},
+
+		buildClassesDependence : function(oWidget, oClass) {
+
+			var iLogic = this.getLogic(oClass);
+
+			var
+				i = 0,
+				j,
+				oFrom,
+				oWidgetFrom,
+				aPatternToClasses
+				;
+			while(oFrom = oClass.aFrom[i++]) {
+
+				oWidgetFrom = oFrom.sId? this.oForm.getWidgetById(oFrom.sId) : oWidget;
+
+				if(!oWidgetFrom) {
+					this.throwDependenceException(oFrom.sId);
+				}
+
+				if(oFrom.aData) {
+
+					aPatternToClasses = [];
+					j = 0;
+
+					while(j < oFrom.aData.length) {
+						aPatternToClasses.push(
+							{
+								rPattern   : this.__self.toPattern(oFrom.aData[j][0]),
+								sClassName : oFrom.aData[j++][1]
+							}
+							);
+					}
+
+					oWidget.addDependence(
+						ZForms.createClassDependence(
+							oWidgetFrom,
+							{
+								aPatternToClasses : aPatternToClasses,
+								iLogic            : iLogic
+							}
+							)
+						);
+
+				}
+				else if(oFrom.fFunction) {
+					oWidget.addDependence(
+						ZForms.createFunctionDependence(
+							oWidgetFrom,
+							{
+								iType     : ZForms.Dependence.TYPE_CLASS,
+								fFunction : oFrom.fFunction,
+								iLogic    : iLogic,
+								bInverse  : oFrom.bInverse
+							}
+							)
+						);
+				}
+
+			}
+
+		},
+
 		getLogic : function(oObject) {
 
 			return oObject.sLogic == 'or'? ZForms.Dependence.LOGIC_OR : ZForms.Dependence.LOGIC_AND;
 
 		},
 
-		throwDependenceException : function(sId) {
+		throwException : function(sMessage) {
 
-			throw('Widget with id "' + sId + '" no exists');
+			throw('ZForms: ' + sMessage);
 
 		},
+
+		throwDependenceException : function(sId) {
+
+			this.throwException('Widget with id "' + sId + '" no exists');
+
+		}
+
+	},
+	{
 
 		prependToArray : function(oObject, aArray) {
 
@@ -388,19 +618,33 @@ ZForms.Builder = Abstract.inheritTo(
 
 			return oObject.concat(aArray);
 
-		}
+		},
 
-	},
-	{
+		toPattern : function(mValue) {
+
+			return mValue instanceof RegExp?
+				mValue :
+				new RegExp('^' + mValue + '$')
+				;
+
+		},
+
 		aTypesToCreateWidgetFunction : {
 			'form'             : 'Form',
 			'text'             : 'TextInput',
 			'number'           : 'NumberInput',
+			'date'             : 'DateInput',
 			'submit'           : 'SubmitButton',
 			'fieldset'         : 'Container',
 			'checkboxgroup'    : 'CheckBoxGroup',
 			'radiobuttongroup' : 'RadioButtonGroup',
-			'state'            : 'StateInput'
+			'state'            : 'StateInput',
+			'sheet'            : 'Sheet',
+			'button'           : 'Button',
+			'prevbutton'       : 'Button',
+			'nextbutton'       : 'Button',
+			'slider'           : 'Slider',
+			'slidervertical'   : 'SliderVertical'
 		}
 	}
 	);
