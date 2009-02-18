@@ -1,6 +1,6 @@
 ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 	{
-	
+
 		__constructor : function(
 			oElement,
 			oClassElement,
@@ -8,59 +8,59 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			) {
 
 			oOptions = oOptions || {};
-		
-			this.aSlideRules = oOptions.aSlideRules || this.getDefaultOptions().aSlideRules;		
-		
+
+			this.aSlideRules = oOptions.aSlideRules || this.getDefaultOptions().aSlideRules;
+
 			this.dMin = this.aSlideRules[0].dValue;
 			this.dMax = this.aSlideRules[this.aSlideRules.length - 1].dValue;
-		
+
 			this.__base(
 				oElement,
 				oClassElement,
 				oOptions
 				);
-		
+
 			if(this.isTemplate()) {
 				return;
 			}
-			
+
 			this.aSlideRules[0].dPercent = 0;
 			this.aSlideRules[this.aSlideRules.length - 1].dPercent = 100;
-		
+
 			var oSliderElements = this.createElements(oElement);
-		
+
 			this.oContainer = oSliderElements.oContainer;
 			this.oScaleElement = oSliderElements.oScaleElement;
 			this.aControls = [];
-		
+
 			this.aMarks = this.createMarks(oSliderElements.oScaleElement);
-		
+
 			this.bEnabled = true;
-		
+
 			this.iLastControlPosition = 0;
 			this.iCurrentControlIndex = -1;
-			
+
 			this.iFocusedChildIndex = -1;
-		
+
 			this.oContainerOffset = null;
-		
+
 			this.fClickHandler = null;
 			this.fDragStartHandler = null;
 			this.fDragHandler = null;
 			this.fDragEndHandler = null;
 			this.fNullHandler = null;
 			this.fSyncHandler = null;
-		
+
 			this.addExtendedHandlers();
-		
+
 			this.iIndex = this.__self.add(this);
-		
+
 			this.oLastProcessedValue = null;
-			
+
 		},
-		
+
 		getDefaultOptions : function() {
-		
+
 			return Common.Object.extend(
 				this.__base(),
 				{
@@ -81,7 +81,7 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 				},
 				true
 				);
-		
+
 		},
 
 		createElements : function(oElement) {
@@ -92,10 +92,7 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 				aMarkElements   : []
 				};
 
-			oResult.oContainer.id = 'container-' + this.oElement.id;
-
-			Common.Class.add(oResult.oContainer, this.__self.CLASS_NAME_SLIDER_CONTAINER);
-			Common.Class.add(oResult.oContainer, this.__self.CLASS_NAME_SLIDER);			
+			Common.Class.add(oResult.oContainer, this.__self.CLASS_NAME_SLIDER);
 			Common.Class.add(oResult.oScaleElement, this.__self.CLASS_NAME_SLIDER_SCALE);
 
 			oResult.oContainer.appendChild(oResult.oScaleElement);
@@ -175,14 +172,14 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			Common.Event.add(
 				oResult.oElement,
 				this.__self.DOM_EVENT_TYPE_MOUSEDOWN,
-				function(oEvent) {					
+				function(oEvent) {
 
 					if(oThis.iFocusedChildIndex > -1) {
 						oThis.aChildren[oThis.iFocusedChildIndex].oElement.blur();
 					}
 
 					Common.Event.cancel(oEvent);
-					
+
 					oThis.__self.setActiveIndex(oThis.iIndex);
 					oThis.fDragStartHandler(iIndex);
 
@@ -259,15 +256,15 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 
 			var
 				oThis = this,
-				iIndex = this.getChildren().length - 1		
+				iIndex = this.getChildren().length - 1
 				;
 
 			Common.Event.add(
 				oChild.oElement,
 				this.__self.DOM_EVENT_TYPE_FOCUS,
 				function() {
-					
-					oThis.iFocusedChildIndex = iIndex;				
+
+					oThis.iFocusedChildIndex = iIndex;
 
 				}
 				);
@@ -276,28 +273,28 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 				oChild.oElement,
 				this.__self.DOM_EVENT_TYPE_BLUR,
 				function() {
-					
+
 					oThis.iFocusedChildIndex = -1;
-					oThis.fSyncHandler(iIndex);					
+					oThis.fSyncHandler(iIndex);
 
 				}
 				);
 
-			oChild.setValue = function(oValue, bForceSync) {							
-			
+			oChild.setValue = function(oValue, bForceSync) {
+
 				if(oValue.isGreater(oThis.getMax())) {
 					oValue.set(oThis.getMax());
 				}
 				else if(oValue.isLess(oThis.getMin())) {
 					oValue.set(oThis.getMin());
 				}
-			
+
 				ZForms.Widget.Text.Number.prototype.setValue.call(oChild, oValue);
-				
+
 				if(!bForceSync) {
 					oThis.fSyncHandler(iIndex);
 				}
-			
+
 			};
 
 			oChild.disable = function(bByParent) {
@@ -343,7 +340,7 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 					return iNearestControlIndex;
 				}
 
-				oThis.__self.setActiveIndex(oThis.iIndex);				
+				oThis.__self.setActiveIndex(oThis.iIndex);
 				oThis.setCurrentControlIndex(iNearestControlIndex);
 
 				oThis.drag(oEvent);
@@ -386,14 +383,14 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			Common.Event.add(
 				this.oContainer,
 				this.__self.DOM_EVENT_TYPE_MOUSEDOWN,
-				function(oEvent) {					
+				function(oEvent) {
 
 					Common.Event.cancel(oEvent);
-					
+
 					if(oThis.iFocusedChildIndex > -1) {
 						oThis.aChildren[oThis.iFocusedChildIndex].oElement.blur();
 					}
-			
+
 					var iNearestControlIndex = oThis.fClickHandler(oEvent);
 
 					if(iNearestControlIndex >= 0) {
@@ -554,7 +551,7 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			if(!this.getCurrentControl()) {
 				return;
 			}
-			
+
 			var
 				iSliderRuleIndex = this.findSlideRuleIndexByValue(oValue),
 				oSlideRule = this.getSlideRuleByIndex(iSliderRuleIndex),
@@ -572,45 +569,45 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			else if(oNextSlideRule && dNewValue > oNextSlideRule.dValue) {
 				dNewValue = oNextSlideRule.dValue;
 			}
-			
+
 			if(dNewValue < this.getMin()) {
 				dNewValue = this.getMin();
-			}			
+			}
 
 			if(oPrevControlWidget && oPrevControlWidget.getValue().get() > dNewValue) {
-			
+
 				if(bUpdateSiblings && this.getChildren()[this.getCurrentControlIndex() - 1].isEnabled()) {
-				
+
 					oChild = this.getChildren()[this.getCurrentControlIndex()];
-				
+
 					oChild.setValue(oChild.createValue(parseFloat(dNewValue)), true);
-				
-					this.iCurrentControlIndex--;										
-					this.setValue(oChild.createValue(parseFloat(dNewValue)), bUpdateSiblings);					
+
+					this.iCurrentControlIndex--;
+					this.setValue(oChild.createValue(parseFloat(dNewValue)), bUpdateSiblings);
 					this.iCurrentControlIndex++;
-					
+
 				}
-							
+
 				dNewValue = oPrevControlWidget.getValue().get();
-				
+
 			}
-			else if(oNextControlWidget && oNextControlWidget.getValue().get() < dNewValue) {							
-			
+			else if(oNextControlWidget && oNextControlWidget.getValue().get() < dNewValue) {
+
 				if(bUpdateSiblings && this.getChildren()[this.getCurrentControlIndex() + 1].isEnabled()) {
-								
+
 					oChild = this.getChildren()[this.getCurrentControlIndex()];
-									
+
 					oChild.setValue(oChild.createValue(parseFloat(dNewValue)), true);
-									
+
 					this.iCurrentControlIndex++;
 					this.setValue(oChild.createValue(parseFloat(dNewValue)), bUpdateSiblings);
 					this.iCurrentControlIndex--;
-					
+
 				}
-			
+
 				dNewValue = oNextControlWidget.getValue().get();
-				
-			}												 
+
+			}
 
 			oChild = this.getChildren()[this.getCurrentControlIndex()];
 
@@ -966,20 +963,19 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 	},
 	// static
 	{
-	
-		CLASS_NAME_SLIDER_CONTAINER         : 'slider',
-		CLASS_NAME_SLIDER                   : 'slider-horizontal',
-		CLASS_NAME_SLIDER_SCALE             : 'slider-scale',
-		CLASS_NAME_CONTROL_ELEMENT          : 'slider-control',
-		CLASS_NAME_CONTROL_ELEMENT_SELECTED : 'slider-control-selected',
-		CLASS_NAME_CONTROL_ELEMENT_DISABLED : 'slider-control-disabled',
-		CLASS_NAME_VALUE_ELEMENT            : 'slider-value',
-		CLASS_NAME_VALUE_ELEMENT_SELECTED   : 'slider-value-selected',
-		CLASS_NAME_VALUE_ELEMENT_DISABLED   : 'slider-value-disabled',
-		CLASS_NAME_MARK_ELEMENT             : 'slider-mark',
-		CLASS_NAME_MARK_ELEMENT_SELECTED    : 'slider-mark-selected',
-		CLASS_NAME_RANGE_ELEMENT            : 'slider-range',
-		CLASS_NAME_INITED                   : 'slider-inited',
+
+		CLASS_NAME_SLIDER                   : 'zf-slider-horizontal',
+		CLASS_NAME_SLIDER_SCALE             : 'zf-slider-scale',
+		CLASS_NAME_CONTROL_ELEMENT          : 'zf-slider-control',
+		CLASS_NAME_CONTROL_ELEMENT_SELECTED : 'zf-slider-control-selected',
+		CLASS_NAME_CONTROL_ELEMENT_DISABLED : 'zf-slider-control-disabled',
+		CLASS_NAME_VALUE_ELEMENT            : 'zf-slider-value',
+		CLASS_NAME_VALUE_ELEMENT_SELECTED   : 'zf-slider-value-selected',
+		CLASS_NAME_VALUE_ELEMENT_DISABLED   : 'zf-slider-value-disabled',
+		CLASS_NAME_MARK_ELEMENT             : 'zf-slider-mark',
+		CLASS_NAME_MARK_ELEMENT_SELECTED    : 'zf-slider-mark-selected',
+		CLASS_NAME_RANGE_ELEMENT            : 'zf-slider-range',
+		CLASS_NAME_INITED                   : 'zf-slider-inited',
 
 		aAll : [],
 		iActiveIndex : 0,
@@ -989,23 +985,23 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			if(!(oSliderInput instanceof this)) {
 				return;
 			}
-			
+
 			var oThis = this;
-			
+
 			if(this.aAll.isEmpty()) {
 				Common.Event.add(
 					document,
 					this.DOM_EVENT_TYPE_KEYUP,
 					function(oEvent) {
-						
+
 						oThis.processKeyPress(oEvent);
-						
+
 					}
 					);
-			}						
+			}
 
 			this.aAll.push(oSliderInput);
-			
+
 			return this.aAll.length - 1;
 
 		},
@@ -1043,6 +1039,6 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			}
 
 		}
-		
+
 	}
 	);

@@ -82,12 +82,28 @@ ZForms.Builder = Abstract.inheritTo(
 			if(!oOptions) {
 				return;
 			}
-
+			
 			if(oOptions.sPickerId) {
+
 				oOptions.oPickerOpenerElement = this.$(oOptions.sPickerId);
+				delete oOptions.sPickerId;
+
 			}
 
-			delete oOptions.sPickerId;
+			if(oOptions.sListId) {
+
+				oOptions.oOptionsElement = this.$(oOptions.sListId);
+				delete oOptions.sListId;
+
+			}
+
+			if(oOptions.sListShowId) {
+
+				oOptions.oShowOptionsElement = this.$(oOptions.sListShowId);
+				delete oOptions.sListShowId;
+
+			}
+
 
 			return oOptions;
 
@@ -649,6 +665,7 @@ ZForms.Builder = Abstract.inheritTo(
 			'file'             : 'TextInput',
 			'number'           : 'NumberInput',
 			'select'           : 'SelectInput',
+			'combo'            : 'ComboInput',
 			'date'             : 'DateInput',
 			'submit'           : 'SubmitButton',
 			'fieldset'         : 'Container',

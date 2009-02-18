@@ -417,7 +417,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			}
 
 			var
-				i = 0,				
+				i = 0,
 				iLength = this.aOptionsCurrent.length,
 				iOptionsCount = 0,
 				bFound = false,
@@ -614,8 +614,8 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 		DEFAULT_PAGE_SIZE : 5,
 
-		CLASS_NAME_COMBO_LIST        : 'combo-list',
-		CLASS_NAME_COMBO_LIST_ACTIVE : 'combo-field-active'
+		CLASS_NAME_COMBO_LIST        : 'zf-combolist',
+		CLASS_NAME_COMBO_LIST_ACTIVE : 'zf-combolist-active'
 
 	}
 	);
