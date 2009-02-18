@@ -194,7 +194,7 @@ var ZForms = {
 			oWidget,
 			Common.Object.extend(
 				{
-					rPattern : /^[a-zA-Z0-9][a-zA-Z0-9\.\-\_\~]*\@[a-zA-Z0-9\.\-\_]+\.[a-zA-Z]{2,4}$/,
+					rPattern : /^[a-zA-Z0-9][a-zA-Z0-9\.\-\_\~]*\@[a-zA-Z0-9\.\-\_]+\.[a-zA-Z]{2,4}$/
 				},
 				oOptions
 				)

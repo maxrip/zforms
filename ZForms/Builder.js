@@ -27,7 +27,7 @@ ZForms.Builder = Abstract.inheritTo(
 			this.oForm = this.createWidgetByElement(this.oFormElement);
 
 			var
-				aElements = Common.Dom.getElementsByClassName(this.oFormElement, 'zforms'),
+				aElements = Common.Dom.getElementsByClassName(this.oFormElement, this.__self.CLASS_NAME_WIDGET),
 				iLength = aElements.length,
 				i = 0
 				;
@@ -151,7 +151,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			while(oElement = oElement.parentNode) {
 				if(oElement.tagName.toLowerCase() == 'form' ||
-					Common.Class.match(oElement, 'zforms')
+					Common.Class.match(oElement, this.__self.CLASS_NAME_WIDGET)
 					) {
 					return this.oForm.getWidgetById(this.__self.getId(oElement));
 				}
@@ -195,7 +195,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			while(oElement = oElement.parentNode) {
 				if(oElement.tagName.toLowerCase() == 'form' ||
-					Common.Class.match(oElement, 'zforms')
+					Common.Class.match(oElement, this.__self.CLASS_NAME_WIDGET)
 					) {
 
 					var oParentWidget = this.oForm.getWidgetById(this.__self.getId(oElement));
@@ -646,7 +646,9 @@ ZForms.Builder = Abstract.inheritTo(
 		aTypesToCreateWidgetFunction : {
 			'form'             : 'Form',
 			'text'             : 'TextInput',
+			'file'             : 'TextInput',
 			'number'           : 'NumberInput',
+			'select'           : 'SelectInput',
 			'date'             : 'DateInput',
 			'submit'           : 'SubmitButton',
 			'fieldset'         : 'Container',
@@ -661,7 +663,9 @@ ZForms.Builder = Abstract.inheritTo(
 			'slidervertical'   : 'SliderVertical'
 		},
 
-		rTypePattern : /zforms-(form|text|number|date|submit|fieldset|checkboxgroup|radiobuttongroup|state|sheet|button|buttonprev|buttonnext|slider|slidervertical)(\s+|$)/
+		rTypePattern : /zf-(form|text|number|select|combo|date|submit|fieldset|checkboxgroup|radiobuttongroup|state|sheet|slider|slidervertical|buttonprev|buttonnext|button)(\s+|$)/,
+
+		CLASS_NAME_WIDGET : 'zf'
 
 	}
 	);

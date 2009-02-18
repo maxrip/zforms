@@ -204,8 +204,10 @@ ZForms.Calendar = Abstract.inheritTo(
 				}
 
 				oBuffer
-					.append('<td class="add')
-					.append(i % 7 == 6 || i % 7 == 0? ' weekend' : '')
+					.append('<td class="')
+					.append(this.__self.CLASS_NAME_ADD)
+					.append('"')
+					.append(i % 7 == 6 || i % 7 == 0? ' ' + this.__self.CLASS_NAME_WEEKEND : '')
 					.append('">')
 					.append(iCountDaysInPrevMonth - iCountShowedDaysInPrevMonth + i)
 					.append('</td>')
@@ -222,11 +224,11 @@ ZForms.Calendar = Abstract.inheritTo(
 				sClassName = '';
 
 				if(iDay == this.oDateNow.getDate() && this.oDate.getMonth() == this.oDateNow.getMonth() && this.oDate.getYear() == this.oDateNow.getYear()) {
-					sClassName = 'now';
+					sClassName = this.__self.CLASS_NAME_NOW;
 				}
 
 				if(i % 7 == 6 || i % 7 == 0) {
-					sClassName += (sClassName.length > 0? ' ' : '') + 'weekend';
+					sClassName += (sClassName.length > 0? ' ' : '') + this.__self.CLASS_NAME_WEEKEND;
 				}
 
 				oBuffer.append('<td');
@@ -254,8 +256,9 @@ ZForms.Calendar = Abstract.inheritTo(
 				}
 
 				oBuffer
-					.append('<td class="add')
-					.append(i % 7 == 6 || i % 7 == 0? ' weekend' : '')
+					.append('<td class="')
+					.append(this.__self.CLASS_NAME_ADD)
+					.append(i % 7 == 6 || i % 7 == 0? ' ' + this.__self.CLASS_NAME_WEEKEND : '')
 					.append('">')
 					.append(iDay++)
 					.append('</td>')
@@ -292,7 +295,7 @@ ZForms.Calendar = Abstract.inheritTo(
 					oThis.setDate(
 						new Date(
 							oThis.oDate.getFullYear(),
-							oThis.oDate.getMonth() + (Common.Class.match(oTarget, 'add')? (iDay > 15? -1 : 1) : 0),
+							oThis.oDate.getMonth() + (Common.Class.match(oTarget, oThis.__self.CLASS_NAME_ADD)? (iDay > 15? -1 : 1) : 0),
 							oTarget.innerHTML
 							)
 						);
@@ -389,15 +392,16 @@ ZForms.Calendar = Abstract.inheritTo(
 	},
 	{
 
-		CLASS_NAME_CALENDAR      : 'calendar',
+		CLASS_NAME_CALENDAR      : 'zf-calendar',
 		CLASS_NAME_HIDDEN        : ZForms.Widget.CLASS_NAME_HIDDEN,
-		CLASS_NAME_ARROW_PREV    : 'arrow-prev',
-		CLASS_NAME_ARROW_NEXT    : 'arrow-next',
-		CLASS_NAME_TITLE         : 'title',
-		CLASS_NAME_WEEKEND       : 'weekend',
-		CLASS_NAME_NOW           : 'now',
-		CLASS_NAME_PICKER_ACTIVE : 'picker-active',
-		CLASS_NAME_HOVERED       : 'hovered'
+		CLASS_NAME_ARROW_PREV    : 'zf-buttonprev',
+		CLASS_NAME_ARROW_NEXT    : 'zf-buttonnext',
+		CLASS_NAME_TITLE         : 'zf-title',
+		CLASS_NAME_WEEKEND       : 'zf-weekend',
+		CLASS_NAME_NOW           : 'zf-now',
+		CLASS_NAME_ADD           : 'zf-add',
+		CLASS_NAME_PICKER_ACTIVE : 'zf-picker-active',
+		CLASS_NAME_HOVERED       : 'zf-hovered'
 
 	}
 	);
