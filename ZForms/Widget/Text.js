@@ -198,7 +198,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 	},
 	{
 
-		CLASS_NAME_PLACE_HOLDER : 'placeholder'
+		CLASS_NAME_PLACE_HOLDER : 'zf-placeholder'
 
 	}
 	);

@@ -357,6 +357,12 @@ var ZForms = {
 
 	},
 
+	throwException : function(sMessage) {
+
+		throw('ZForms: ' + sMessage);
+
+	},	
+
 	aForms : [],
 
 	/**

@@ -6,6 +6,8 @@ ZForms.Builder = Abstract.inheritTo(
 			this.oFormElement = this.$(sFormElementId);
 			this.oForm = null;
 			this.aSheetContainers = [];
+			this.aRepeatContainers = [];
+			this.aRepeatRoots = [];
 			this.aDependencies = [];
 
 		},
@@ -15,7 +17,7 @@ ZForms.Builder = Abstract.inheritTo(
 			var oResult = document.getElementById(sId);
 
 			if(!oResult) {
-				this.throwException('Element with id "' + sId + '" no exists');
+				ZForms.throwException('Element with id "' + sId + '" no exists');
 			}
 
 			return oResult;
@@ -44,6 +46,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			this.oFormElement = null;
 			this.aSheetContainers.length = 0;
+			this.aRepeatContainers.length = 0;
 			this.aDependencies.length = 0;
 
 			return this.oForm;
@@ -55,13 +58,17 @@ ZForms.Builder = Abstract.inheritTo(
 			var
 				oParams = oElement.onclick instanceof Function? oElement.onclick() : {},
 				sType = oParams.sType || this.extractTypeFromElement(oElement),
+				oParentWidget = this.getParentWidget(oParams, sType, oElement),
 				oResult = ZForms[this.getCreateWidgetFunction(sType)](
 					oElement,
 					this.getClassElement(oParams.sCId, sType, oElement),
-					this.processOptions(oParams.oOptions)
-					),
-				oParentWidget = this.getParentWidget(oParams, sType, oElement, oResult)
+					this.processOptions(oParams.oOptions, oParentWidget)
+					)
 				;
+
+			if(oParams.sRepeatGroup) {
+				this.aRepeatRoots[oResult.getId()] = oResult;
+			}
 
 			if(oParams.oRequired || oParams.oValid || oParams.oEnabled || oParams.oDependedOptions || oParams.oDependedClasses) {
 				this.aDependencies.push({ oWidget : oResult, oParams : oParams });
@@ -70,19 +77,35 @@ ZForms.Builder = Abstract.inheritTo(
 			oElement.onclick = null;
 
 			if(oParentWidget) {
-				oParentWidget.addChild(oResult);
+
+				if(oParams.sRepeatGroup && oResult.isTemplate()) {
+					oParentWidget.addTemplate(oResult);
+				}
+				else if(sType == 'buttonprev' || sType == 'buttonnext') {
+					oParentWidget['add' + (sType == 'buttonprev'? 'Prev' : 'Next') + 'Button'](oResult);
+				}
+				else if((sType == 'buttonadd' || sType == 'buttonremove' || sType == 'buttonup' || sType == 'buttondown') && !oParentWidget.isTemplate()) {
+					oParentWidget.getMultiplier()['add' + (sType == 'buttonadd' ? 'Add' : 'Remove') + 'Button'](oResult);
+				}
+				else {
+					oParentWidget.addChild(oResult);
+				}
+
 			}
 
 			return oResult;
 
 		},
 
-		processOptions : function(oOptions) {
+		processOptions : function(
+			oOptions,
+			oParentWidget
+			) {
 
 			if(!oOptions) {
 				return;
 			}
-			
+
 			if(oOptions.sPickerId) {
 
 				oOptions.oPickerOpenerElement = this.$(oOptions.sPickerId);
@@ -104,6 +127,9 @@ ZForms.Builder = Abstract.inheritTo(
 
 			}
 
+			if(oParentWidget && oParentWidget.isTemplate()) {
+				oOptions.bTemplate = true;
+			}
 
 			return oOptions;
 
@@ -130,7 +156,11 @@ ZForms.Builder = Abstract.inheritTo(
 				sType == 'submit' ||
 				sType == 'button' ||
 			   	sType == 'buttonprev' ||
-			   	sType == 'buttonnext') {
+			   	sType == 'buttonnext' ||
+				sType == 'buttonadd' ||
+				sType == 'buttonremove' ||
+				sType == 'buttonup' ||
+				sType == 'buttondown') {
 				return;
 			}
 
@@ -145,16 +175,23 @@ ZForms.Builder = Abstract.inheritTo(
 		getParentWidget : function(
 			oParams,
 			sType,
-			oElement,
-			oWidget
+			oElement
 			) {
 
 			if(sType == 'sheet') {
 				return this.getSheetContainer(oParams, oElement);
 			}
 
+			if(oParams.sRepeatGroup) {
+				return this.getRepeatContainer(oParams, oElement);
+			}
+
 			if(sType == 'buttonprev' || sType == 'buttonnext') {
-				return this.getSheet(sType, oElement, oWidget);
+				return this.getSheet(oElement);
+			}
+
+			if(sType == 'buttonadd' || sType == 'buttonadd' || sType == 'buttonup' || sType == 'buttondown') {
+				return this.getRepeatRoot(oElement);
 			}
 
 			if(sType == 'form') {
@@ -175,39 +212,68 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
+		getRepeatContainer : function(
+			oParams,
+			oElement
+			) {
+
+			if(!this.aRepeatContainers[oParams.sRepeatGroup]) {
+				this.aRepeatContainers[oParams.sRepeatGroup] = this
+					.getParentWidget({}, null, oElement)
+					.addChild(ZForms.createMultiplicator())
+					;
+			}
+
+			return this.aRepeatContainers[oParams.sRepeatGroup];
+
+		},
+
+		getRepeatRoot : function(oElement) {
+
+			while(oElement = oElement.parentNode) {
+
+				if(oElement.tagName.toLowerCase() == 'form' ||
+					Common.Class.match(oElement, this.__self.CLASS_NAME_WIDGET)
+					) {
+
+					var oResult = this.aRepeatRoots[this.__self.getId(oElement)];
+					if(oResult) {
+						return oResult;
+					}
+
+				}
+			}
+
+		},
+
 		getSheetContainer : function(
 			oParams,
 			oElement
 			) {
 
-			if(!oParams.sGroup) {
-				this.throwException('sheet widget with id "' +
+			if(!oParams.sSheetGroup) {
+				ZForms.throwException('sheet widget with id "' +
 					this.__self.getId(oElement) +
 					'" must contain sGroup attribute'
 					);
 			}
 
-			if(!this.aSheetContainers[oParams.sGroup]) {
+			if(!this.aSheetContainers[oParams.sSheetGroup]) {
 
 				oParams.sType = null;
 
-				this.aSheetContainers[oParams.sGroup] = this
+				this.aSheetContainers[oParams.sSheetGroup] = this
 					.getParentWidget(oParams, null, oElement)
 					.addChild(ZForms.createSheetContainer())
 					;
 
 			}
 
-			return this.aSheetContainers[oParams.sGroup];
+			return this.aSheetContainers[oParams.sSheetGroup];
 
 		},
 
-		// небольшой хак для добавления кнопок на страницу
-		getSheet : function(
-			sType,
-			oElement,
-			oWidget
-			) {
+		getSheet : function(oElement) {
 
 			while(oElement = oElement.parentNode) {
 				if(oElement.tagName.toLowerCase() == 'form' ||
@@ -216,10 +282,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 					var oParentWidget = this.oForm.getWidgetById(this.__self.getId(oElement));
 					if(oParentWidget instanceof ZForms.Widget.Container.Sheet) {
-
-						oParentWidget['add' + (sType == 'buttonprev'? 'Prev' : 'Next') + 'Button'](oWidget);
-						return;
-
+						return oParentWidget;
 					}
 
 				}
@@ -264,6 +327,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 				case 'form':
 				case 'fieldset':
+				case 'select':
 					return sTagName;
 				break;
 
@@ -273,7 +337,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			}
 
-			this.throwException('can\'t extract widget type from element with id "' +
+			ZForms.throwException('can\'t extract widget type from element with id "' +
 				this.__self.getId(oElement) +
 				'"'
 				);
@@ -283,7 +347,7 @@ ZForms.Builder = Abstract.inheritTo(
 		getCreateWidgetFunction : function(sType) {
 
 			if(!this.__self.aTypesToCreateWidgetFunction[sType]) {
-				this.throwException('Unsupported widget type "' + sType + '"');
+				ZForms.throwException('Unsupported widget type "' + sType + '"');
 			}
 
 			return 'create' + this.__self.aTypesToCreateWidgetFunction[sType];
@@ -611,15 +675,9 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
-		throwException : function(sMessage) {
-
-			throw('ZForms: ' + sMessage);
-
-		},
-
 		throwDependenceException : function(sId) {
 
-			this.throwException('Widget with id "' + sId + '" no exists');
+			ZForms.throwException('Widget with id "' + sId + '" no exists');
 
 		}
 
@@ -676,11 +734,15 @@ ZForms.Builder = Abstract.inheritTo(
 			'button'           : 'Button',
 			'buttonprev'       : 'Button',
 			'buttonnext'       : 'Button',
+			'buttonadd'        : 'Button',
+			'buttonremove'     : 'Button',
+			'buttonup'         : 'Button',
+			'buttondown'       : 'Button',
 			'slider'           : 'Slider',
 			'slidervertical'   : 'SliderVertical'
 		},
 
-		rTypePattern : /zf-(form|text|number|select|combo|date|submit|fieldset|checkboxgroup|radiobuttongroup|state|sheet|slider|slidervertical|buttonprev|buttonnext|button)(\s+|$)/,
+		rTypePattern : /zf-(form|text|number|select|combo|date|submit|fieldset|checkboxgroup|radiobuttongroup|state|sheet|slider|slidervertical|buttonprev|buttonnext|buttonadd|buttonremove|buttonup|buttondown|button)(\s+|$)/,
 
 		CLASS_NAME_WIDGET : 'zf'
 

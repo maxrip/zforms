@@ -1,19 +1,19 @@
 ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 	{
-	
+
 		__constructor : function(
 			oElement,
 			oClassElement,
 			oOptions
 			) {
-	
+
 			var oElement = oElement || document.createElement('div');
 
 			this.oTemplate = null;
-			this.sButtonAddId = oOptions.sButtonAddId;
-			this.sButtonRemoveId = oOptions.sButtonRemoveId;
-			this.sButtonUpId = oOptions.sButtonUpId;
-			this.sButtonDownId = oOptions.sButtonDownId;
+			this.sButtonAddId = oOptions? oOptions.sButtonAddId : null;
+			this.sButtonRemoveId = oOptions? oOptions.sButtonRemoveId : null;
+			this.sButtonUpId = oOptions? oOptions.sButtonUpId : null;
+			this.sButtonDownId = oOptions? oOptions.sButtonDownId : null;
 			this.sInitialChildrenHash = null;
 			this.sLastProcessedChildrenHash = null;
 
@@ -21,21 +21,21 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				oElement,
 				oClassElement,
 				oOptions
-				);			
-				
+				);
+
 		},
-		
+
 		getDefaultOptions : function() {
-							
+
 			return Common.Object.extend(
 				this.__base(),
 				{
 					iMin : 1,
-					iMax : 10			
+					iMax : 10
 				},
 				true
-				);							
-		
+				);
+
 		},
 
 		addChild : function(
@@ -80,6 +80,10 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 			this.oTemplate = oTemplate;
 
+			if(this.oForm) {
+				oTemplate.setForm(this.oForm);
+			}
+
 			return oTemplate;
 
 		},
@@ -97,53 +101,57 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			oTemplate.setId(oTemplate.oElement.id);
 
 		},
-		
+
 		calculateCurrentChildrenHash : function() {
-			
+
 			var sResult = '';
-		
-			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {				
+
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				sResult += Common.Dom.getUniqueId(this.aChildren[i].oElement);
 			}
-			
+
 			return sResult;
-		
+
 		},
-		
+
 		processChildrenHashChanged : function() {
-		
-			var sCurrentChildrenHash = this.calculateCurrentChildrenHash();								
-		
+
+			var sCurrentChildrenHash = this.calculateCurrentChildrenHash();
+
 			if(this.sInitialChildrenHash == sCurrentChildrenHash) {
 				if(this.sLastProcessedChildrenHash != this.sInitialChildrenHash) {
-				
+
 					this.oForm.decreaseChangedCounter();
 					this.oForm.updateSubmit();
-					
+
 				}
 			}
-			else if(this.sLastProcessedChildrenHash == this.sInitialChildrenHash) {			
-							
-				this.oForm.increaseChangedCounter();				
+			else if(this.sLastProcessedChildrenHash == this.sInitialChildrenHash) {
+
+				this.oForm.increaseChangedCounter();
 				this.oForm.updateSubmit();
-				
-			}						
-			
+
+			}
+
 			this.sLastProcessedChildrenHash = sCurrentChildrenHash;
-		
+
 		},
 
 		init : function() {
 
-			this.__base();					
+			this.__base();
+
+			if(!this.oTemplate) {
+				ZForms.throwException('template not found');
+			}
 
 			this.oTemplate.hide();
-			this.oTemplate.disable();												
+			this.oTemplate.disable();
 
 			this.normalizeTemplateAttributes(this.oTemplate);
 
 			this.updateMultipliers();
-			
+
 			this.sInitialChildrenHash = this.calculateCurrentChildrenHash();
 			this.sLastProcessedChildrenHash = this.sInitialChildrenHash;
 
@@ -168,7 +176,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				iChildIndex = this.aChildren.indexOf(oChild) + 1,
 				oNewElement = this.oTemplate.oClassElement.cloneNode(true)
 				;
-			
+
 			this.increaseChildrenPostfix(iChildIndex);
 
 			this.removePostfixFromElement(oNewElement);
@@ -180,42 +188,60 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			else {
 				oChild.oClassElement.parentNode.appendChild(oNewElement);
 			}
-			
+
 			var oNewChild = this.oTemplate.clone(
 				document.getElementById(this.oTemplate.oElement.id.match(this.__self.REG_EXP_REPLACE)[1] + '_' + iChildIndex),
 				document.getElementById(this.oTemplate.oClassElement.id.match(this.__self.REG_EXP_REPLACE)[1]  + '_' + iChildIndex),
 				iChildIndex
 				);
-			
+
+			var oMultiplier = this.aChildren[0].getMultiplier();
+
+			if(!this.sButtonAddId && oMultiplier.oAddButton) {
+				this.sButtonAddId = oMultiplier.oAddButton.getId();
+			}
+
+			if(!this.sButtonRemoveId && oMultiplier.oRemoveButton) {
+				this.sButtonRemoveId = oMultiplier.oRemoveButton.getId();
+			}
+
+			if(!this.sButtonUpId && oMultiplier.oUpButton) {
+				this.sButtonUpId = oMultiplier.oUpButton.getId();
+			}
+
+			if(!this.sButtonDownId && oMultiplier.oDownButton) {
+				this.sButtonDownId = oMultiplier.oDownButton.getId();
+			}
+
 			this.addChild(oNewChild, iChildIndex);
-			
+
 			oNewChild.disable();
 			oNewChild.enable();
 			this.addInitedClassName(oNewChild);
 			oNewChild.show();
-			
+
 			this.updateMultipliers();
-			
-			this.addTemplateDependencies(this.oTemplate, oNewChild, oNewChild);			
-			
-			oNewChild.afterClone();			
-			
+
+			this.addTemplateDependencies(this.oTemplate, oNewChild, oNewChild);
+
+			oNewChild.afterClone();
+
 			this.repaintFix();
-			
+
 			this.processChildrenHashChanged();
 
 		},
-		
+
 		addInitedClassName : function(oNewChild) {
-		
+
 			if(oNewChild instanceof ZForms.Widget.Container) {
 				for(var i = 0; i < oNewChild.aChildren.length; i++) {
 					this.addInitedClassName(oNewChild.aChildren[i]);
 				}
 			}
-		
+
 			oNewChild.addClass(oNewChild.getInitedClassName());
-		
+
 		},
 
 		addTemplateDependencies : function(
@@ -251,13 +277,13 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 				// change mArgument if dependence is compare dependence
 
-				if(oDependenceCloned instanceof ZForms.Dependence.Function && aDependencies[i].getFunction().mArgument instanceof ZForms.Widget) {					
-					
+				if(oDependenceCloned instanceof ZForms.Dependence.Function && aDependencies[i].getFunction().mArgument instanceof ZForms.Widget) {
+
 					oDependenceCloned.getFunction().mArgument =
 						this.findCorrespondingWidgetByTemplate(aDependencies[i].getFunction().mArgument, this.oTemplate, oClonedWidget) ||
 						aDependencies[i].getFunction().mArgument
 						;
-					
+
 					oDependenceCloned.getFunction().oWidget =
 						this.findCorrespondingWidgetByTemplate(aDependencies[i].getFunction().oWidget, this.oTemplate, oClonedWidget) ||
 						aDependencies[i].getFunction().oWidget
@@ -265,7 +291,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 					oDependenceCloned.getFunction().sType = aDependencies[i].getFunction().sType;
 					oDependenceCloned.getFunction().sFunctionName = aDependencies[i].getFunction().sFunctionName;
-					
+
 				}
 
 				oCurrentWidget.addDependence(oDependenceCloned);
@@ -323,7 +349,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				}
 
 			}
-			
+
 		},
 
 		remove : function(oChild) {
@@ -339,9 +365,9 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.processEvents(true);
 
 			this.updateMultipliers();
-						
+
 			this.repaintFix();
-			
+
 			this.processChildrenHashChanged();
 
 		},
@@ -371,9 +397,9 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.aChildren[iChildIndex].updateElements(iChildIndex);
 
 			this.updateMultipliers();
-			
+
 			this.repaintFix();
-			
+
 			this.processChildrenHashChanged();
 
 		},
@@ -388,16 +414,16 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			else {
 				this.aChildren[iChildIndex + 1].oClassElement.parentNode.insertBefore(oChild.oClassElement.parentNode.removeChild(oChild.oClassElement), this.oTemplate.oClassElement);
 			}
-			
-			this.aChildren.remove(oChild);			
+
+			this.aChildren.remove(oChild);
 			this.aChildren.splice(iChildIndex + 1, 0, oChild);
-						
+
 			this.updateChildIndex(this.aChildren[iChildIndex], iChildIndex + 1, iChildIndex);
 			this.replacePostfixAtElement(this.aChildren[iChildIndex].oClassElement, iChildIndex);
 			this.aChildren[iChildIndex].updateElements(iChildIndex);
-			
+
 			this.updateChildIndex(this.aChildren[iChildIndex + 1], iChildIndex, iChildIndex + 1);
-			
+
 			if(iChildIndex > 0) {
 				this.replacePostfixAtElement(this.aChildren[iChildIndex + 1].oClassElement, iChildIndex + 1);
 			}
@@ -408,9 +434,9 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.aChildren[iChildIndex + 1].updateElements(iChildIndex + 1);
 
 			this.updateMultipliers();
-			
+
 			this.repaintFix();
-			
+
 			this.processChildrenHashChanged();
 
 		},
@@ -545,7 +571,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				) {
 				return;
 			}
-			
+
 			var oAttributes = {
 				'type'      : oNode.type,
 				'name'      : oNode.name,
@@ -553,22 +579,22 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				'class'     : oNode.className,
 				'size'      : oNode.size,
 				'maxlength' : oNode.maxLength,
-				'value'     : oNode.value,				
+				'value'     : oNode.value,
 				'style'     : oNode.style.cssText
 				};
-				
+
 			if(oNode.checked) {
 				oAttributes.checked = 'checked';
 			}
 
 			oNode.parentNode.insertBefore(
-				Common.Dom.createElement('input', oAttributes),			
+				Common.Dom.createElement('input', oAttributes),
 				oNode
 				);
 
 			oNode = oNode.parentNode.removeChild(oNode);
 
-			oNode.outerHTML = '';														
+			oNode.outerHTML = '';
 
 		},
 
@@ -581,25 +607,25 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.__base();
 
 		},
-		
+
 		repaintFix : function() {
-		
+
 			if(document.compatMode) {
 				return;
 			}
-			
+
 			document.body.className += '';
-		
+
 		}
 
-	},	
+	},
 	{
-	
+
 		POSTFIX_ID : '_multiplicator',
-		
+
 		REG_EXP_REPLACE : new RegExp('^(.+)_\\d+(\\[\\])?$'),
 
 		CHILD_INDEX_CLASS_NAME_PREFIX : 'child_'
-		
+
 	}
 	);

@@ -238,7 +238,7 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			var oControlElements =
 				this.createControl(
 					oChild.oElement.id,
-					this.oScaleElement
+					this.oContainer
 					);
 
 			this.aControls.push(
