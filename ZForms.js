@@ -1,8 +1,8 @@
 var ZForms = {
 
-	EVENT_TYPE_ON_INIT          : 'oninit',
-	EVENT_TYPE_ON_CHANGE        : 'onchange',
-	EVENT_TYPE_ON_BEFORE_SUBMIT : 'onbeforesubmit',
+	EVENT_TYPE_ON_INIT          : 'zf:oninit',
+	EVENT_TYPE_ON_CHANGE        : 'zf:onchange',
+	EVENT_TYPE_ON_BEFORE_SUBMIT : 'zf:onbeforesubmit',
 
 	// static widget creation methods
 
@@ -130,7 +130,9 @@ var ZForms = {
 
 	createForm : function() {
 
-		return this.createWidget(ZForms.Widget.Container.Form, arguments);
+		this.aForms.push(this.createWidget(ZForms.Widget.Container.Form, arguments));
+
+		return this.aForms[this.aForms.length - 1];
 
 	},
 
@@ -348,12 +350,12 @@ var ZForms = {
 	// creation builder method
 
 	/**
-	 * @param {Array} aForm
+	 * @param {Element} oFormElement
 	 * @returns {ZForms.Builder}
 	 */
-	createBuilder : function(aForm) {
+	createBuilder : function(oFormElement) {
 
-		return new this.Builder(aForm);
+		return new this.Builder(oFormElement);
 
 	},
 
@@ -361,7 +363,7 @@ var ZForms = {
 
 		throw('ZForms: ' + sMessage);
 
-	},	
+	},
 
 	aForms : [],
 
@@ -373,6 +375,70 @@ var ZForms = {
 
 		return this.aForms[sId];
 
+	},
+
+	attachObserver : function(
+		mEventType,
+		mObserver,
+		mObservable,
+		bNotifyAtOnce
+		) {
+
+		Common.Observable.attach(mEventType, mObserver, mObservable || this);
+
+		if(bNotifyAtOnce) {
+			mObserver(mEventType, mObservable);
+		}
+
+	},
+
+	detachObserver : function(
+		mEventType,
+		mObserver,
+		mObservable
+		) {
+
+		Common.Observable.detach(mEventType, mObserver, mObservable);
+
+	},
+
+	notifyObservers : function(sEventType, oObservable) {
+
+		Common.Observable.notify(sEventType, oObservable);
+
 	}
 
 };
+
+// default init
+Common.Event.add(
+	document,
+	Common.Event.TYPE_DOM_CONTENT_LOADED,
+	function() {
+
+		var
+			aFormElements = Common.Dom.getElementsByClassName(
+				document,
+				ZForms.Builder.CLASS_NAME_WIDGET,
+				'form'
+				),
+			oElement,
+			i = 0
+			;
+		while(oElement = aFormElements[i++]) {
+			if(!Common.Class.match(oElement, ZForms.Widget.Container.Form.CLASS_NAME_INITED)) {
+				ZForms.createBuilder(oElement).build();
+			}
+		}
+
+		setTimeout(
+			function() {
+
+				ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, ZForms);
+
+			},
+			1
+			);
+
+	}
+	);

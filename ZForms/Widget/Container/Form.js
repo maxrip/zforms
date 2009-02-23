@@ -1,6 +1,6 @@
 ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 	{
-	
+
 		__constructor : function(
 			oElement,
 			oClassElement,
@@ -17,30 +17,30 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 			this.aWidgets = [];
 			this.aWidgets[this.getId()] = this;
-			this.aSubmits = [];		
+			this.aSubmits = [];
 
 			this.iChangedCounter = 0;
 			this.bSubmitted = false;
-	
+
 			this.addExtendedHandlers();
-	
+
 			ZForms.aForms[this.getId()] = this;
 
 		},
-		
+
 		getDefaultOptions : function() {
-		
+
 			return Common.Object.extend(
 				this.__base(),
 				{
 					bUpdatableSubmit : true,
 					bCheckForValid   : true,
 					bCheckForChanged : false,
-					bPreventSubmit   : false			
+					bPreventSubmit   : false
 				},
 				true
 				);
-		
+
 		},
 
 		addExtendedHandlers : function() {
@@ -56,14 +56,14 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 						return Common.Event.cancel(oEvent);
 					}
 
-					oThis.notifyOuterObservers(ZForms.EVENT_TYPE_ON_BEFORE_SUBMIT);
+					ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_BEFORE_SUBMIT, oThis);
 
 					if(oThis.oOptions.bPreventSubmit) {
 						return Common.Event.cancel(oEvent);
 					}
-					
+
 					oThis.prepareForSubmit();
-					
+
 					oThis.bSubmitted = true;
 
 				}
@@ -101,10 +101,10 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 			setTimeout(
 				function() {
-				
+
 					ZForms.Widget.Container.prototype.init.call(oThis);
 					oThis.updateSubmit();
-					
+
 				},
 				0
 				);
@@ -254,19 +254,19 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 			}
 
 		},
-		
+
 		reset : function() {
-		
+
 			this.oElement.reset();
-		
+
 		}
 
 	},
-	{	
-	
-		CLASS_NAME_SUBMITTED : 'submitted',
+	{
+
+		CLASS_NAME_SUBMITTED : 'zf-submitted',
 
 		DOM_EVENT_TYPE_SUBMIT : 'submit'
-		
+
 	}
 	);

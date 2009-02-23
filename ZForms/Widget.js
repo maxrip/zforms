@@ -32,7 +32,6 @@ ZForms.Widget = Abstract.inheritTo(
 			this.sId = Common.Dom.getAttribute(oElement, 'id') || Common.Dom.getUniqueId(oElement);
 			this.oDependenceProcessor = new ZForms.DependenceProcessor(this);
 			this.aObservers = [];
-			this.aOuterObservers = [];
 			this.oParent = null;
 			this.oForm = null;
 			this.bEnabled = true;
@@ -118,7 +117,7 @@ ZForms.Widget = Abstract.inheritTo(
 
 			this.notifyObservers();
 
-			this.notifyOuterObservers(ZForms.EVENT_TYPE_ON_CHANGE);
+			ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_CHANGE, this);
 
 			if(!bByParent) {
 
@@ -192,7 +191,7 @@ ZForms.Widget = Abstract.inheritTo(
 
 			this.processEvents(false, true);
 
-			this.notifyOuterObservers(ZForms.EVENT_TYPE_ON_INIT);
+			ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, this);
 
 		},
 
@@ -619,98 +618,6 @@ ZForms.Widget = Abstract.inheritTo(
 
 		enableOptionsByValue : function(aPatternGroups, iLogic) {},
 
-		attachOuterObserver : function(
-			mEventType,
-			mObserver,
-			bNotifyAtOnce
-			) {
-
-			if(mEventType instanceof Array) {
-
-				for(var i = 0; i < mEventType.length; i++) {
-					this.attachOuterObserver(mEventType[i], mObserver, bNotifyAtOnce);
-				}
-
-				return;
-
-			}
-
-			if(mObserver instanceof Array) {
-
-				for(var i = 0; i < mObserver.length; i++) {
-					this.attachOuterObserver(mEventType, mObserver[i], bNotifyAtOnce);
-				}
-
-				return;
-
-			}
-
-			if(!this.aOuterObservers[mEventType]) {
-				this.aOuterObservers[mEventType] = [];
-			}
-
-			this.aOuterObservers[mEventType].push(mObserver);
-
-			if(bNotifyAtOnce) {
-				this.notifyOuterObserver(mEventType, mObserver);
-			}
-
-		},
-
-		detachOuterObserver : function(
-			mEventType,
-			mObserver
-			) {
-
-			if(mEventType instanceof Array) {
-
-				for(var i = 0; i < mEventType.length; i++) {
-					this.detachOuterObserver(mEventType[i], mObserver);
-				}
-
-				return;
-
-			}
-
-			if(mObserver instanceof Array) {
-
-				for(var i = 0; i < mObserver.length; i++) {
-					this.detachOuterObserver(mEventType, mObserver[i]);
-				}
-
-				return;
-
-			}
-
-			if(this.aOuterObservers[mEventType] && this.aOuterObservers[mEventType].contains(mObserver)) {
-				this.aOuterObservers[mEventType].remove(mObserver);
-			}
-
-		},
-
-		notifyOuterObservers : function(sEventType) {
-
-			if(!this.aOuterObservers[sEventType]) {
-				return;
-		        }
-
-			for(var i = 0; i < this.aOuterObservers[sEventType].length; i++) {
-				this.notifyOuterObserver(sEventType, this.aOuterObservers[sEventType][i]);
-			}
-
-		},
-
-		notifyOuterObserver : function(
-			sEventType,
-			mObserver
-			) {
-
-			if(mObserver instanceof Function) {
-				mObserver(sEventType, this);
-			}
-
-		},
-
 		clone : function(
 			oElement,
 			oClassElement,
@@ -770,9 +677,7 @@ ZForms.Widget = Abstract.inheritTo(
 		DOM_EVENT_TYPE_MOUSEMOVE    : 'mousemove',
 		DOM_EVENT_TYPE_SELECTSTART  : 'selectstart',
 		DOM_EVENT_TYPE_UNLOAD       : 'unload',
-		DOM_EVENT_TYPE_BEFOREUNLOAD : 'beforeunload',
-
-		EVENT_TYPE_ON_CHANGE  : 'onchange'
+		DOM_EVENT_TYPE_BEFOREUNLOAD : 'beforeunload'
 
 	}
 	);
