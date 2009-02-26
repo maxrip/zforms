@@ -182,7 +182,8 @@ var ZForms = {
 			oOptions.rPattern,
 			oOptions.iLogic,
 			oOptions.bInverse,
-			oOptions.sClassName
+			oOptions.sClassName,
+			oOptions.bCheckForEmpty
 			);
 
 	},
@@ -423,18 +424,19 @@ Common.Event.add(
 				'form'
 				),
 			oElement,
-			i = 0
+			i = 0,
+			aForms = []
 			;
 		while(oElement = aFormElements[i++]) {
 			if(!Common.Class.match(oElement, ZForms.Widget.Container.Form.CLASS_NAME_INITED)) {
-				ZForms.createBuilder(oElement).build();
+				aForms.push(ZForms.createBuilder(oElement).build());
 			}
 		}
 
 		setTimeout(
 			function() {
 
-				ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, ZForms);
+				ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, ZForms, aForms);
 
 			},
 			1

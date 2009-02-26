@@ -160,11 +160,11 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 
 		init : function() {
 
-			this.__base();
-
 			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
 				this.aChildren[i].init();
 			}
+
+			this.__base();
 
 		},
 

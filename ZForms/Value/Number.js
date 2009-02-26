@@ -3,7 +3,7 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 
 		set : function(mValue) {
 
-			this.mValue = parseFloat(mValue.toString().replace(/[^0-9\.\,\-]/g, '').replace(/\,/g, '.'));			
+			this.mValue = parseFloat(mValue.toString().replace(/[^0-9\.\,\-]/g, '').replace(/\,/g, '.'));
 
 		},
 
@@ -18,12 +18,12 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 			return isNaN(this.mValue);
 
 		},
-		
+
 		isEqual : function(mValue) {
 
 			if(!this.checkForCompareTypes(mValue)) {
 				return false;
-			} 												 
+			}
 
 			var oValue = (mValue instanceof this.__self)?
 				mValue :
@@ -33,16 +33,16 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 						mValue
 					)
 				;
-		
+
 			return this.get() === oValue.get();
 
 		},
 
-		isGreater : function(mValue) {			
-	
+		isGreater : function(mValue) {
+
 			if(!this.checkForCompareTypes(mValue)) {
 				return false;
-			} 
+			}
 
 			var oValue = (mValue instanceof this.__self)?
 				mValue :
@@ -51,8 +51,8 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 						mValue.get() :
 						mValue
 					)
-				;				
-		
+				;
+
 			return this.get() > oValue.get();
 
 		},
@@ -68,6 +68,6 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 			return isNaN(this.mValue)? '' : this.mValue.toString();
 
 		}
-		
+
 	}
 	);

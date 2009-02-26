@@ -67,7 +67,7 @@ ZForms.Builder = Abstract.inheritTo(
 		createWidgetByElement : function(oElement) {
 
 			var
-				oParams = oElement.onclick instanceof Function? oElement.onclick() : {},
+				oParams = oElement.onclick instanceof Function? oElement.onclick() || {} : {},
 				sType = oParams.sType || this.extractTypeFromElement(oElement),
 				oParentWidget = this.getParentWidget(oParams, sType, oElement),
 				oResult = ZForms[this.getCreateWidgetFunction(sType)](
@@ -86,9 +86,10 @@ ZForms.Builder = Abstract.inheritTo(
 			}
 
 			oElement.onclick = null;
+			oElement.removeAttribute('onclick');
 
 			if(oParentWidget) {
-
+				  
 				if(oParams.sRepeatGroup && oResult.isTemplate()) {
 					oParentWidget.addTemplate(oResult);
 				}
@@ -178,7 +179,7 @@ ZForms.Builder = Abstract.inheritTo(
 				return;
 			}
 
-			if(sType == 'state') {
+			if(sType == 'state' || sType == 'hidden') {
 				return oElement.parentNode;
 			}
 
@@ -518,10 +519,11 @@ ZForms.Builder = Abstract.inheritTo(
 						ZForms['create' + (iType == ZForms.Dependence.TYPE_VALID? 'Valid' : 'Enabled') + 'Dependence'](
 							oWidgetFrom,
 							{
-								rPattern   : oFrom.rPattern,
-								iLogic     : iLogic,
-								bInverse   : oFrom.bInverse,
-								sClassName : oFrom.sClassName
+								rPattern       : oFrom.rPattern,
+								iLogic         : iLogic,
+								bInverse       : oFrom.bInverse,
+								sClassName     : oFrom.sClassName,
+								bCheckForEmpty : oFrom.bCheckForEmpty
 							}
 							)
 						);
@@ -624,7 +626,19 @@ ZForms.Builder = Abstract.inheritTo(
 
 		buildClassesDependence : function(oWidget, oClass) {
 
-			var iLogic = this.getLogic(oClass);
+			var
+				iLogic = this.getLogic(oClass),
+				oOptionsAdd
+				;
+
+			if(oClass.fFunction) {
+				oOptionsAdd = { fFunction : oClass.fFunction };
+			}
+			else if(oClass.aData) {
+				oOptionsAdd = { aData : oClass.aData };
+			}
+
+			oClass.aFrom = this.__self.prependToArray(oOptionsAdd, oClass.aFrom);
 
 			var
 				i = 0,
@@ -650,7 +664,8 @@ ZForms.Builder = Abstract.inheritTo(
 						aPatternToClasses.push(
 							{
 								rPattern   : this.__self.toPattern(oFrom.aData[j][0]),
-								sClassName : oFrom.aData[j++][1]
+								sClassName : oFrom.aData[j][1],
+								bInverse   : oFrom.aData[j++][2]
 							}
 							);
 					}

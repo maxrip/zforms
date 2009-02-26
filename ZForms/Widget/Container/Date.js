@@ -17,15 +17,15 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 				return;
 			}
 
-			this.oDayInput = this.createNumberInput('day', 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sDay? this.oOptions.oPlaceHolders.sDay : null);
+			this.oDayInput = this.createNumberInput('day', 2, this.oOptions.oPlaceHolders.sDay);
 			this.oMonthInput = this.createMonthInput('month');
-			this.oYearInput = this.createNumberInput('year', 4, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sYear? this.oOptions.oPlaceHolders.sYear : null);
+			this.oYearInput = this.createNumberInput('year', 4, this.oOptions.oPlaceHolders.sYear);
 
 			if(this.oOptions.bWithTime) {
 
-				this.oHourInput = this.createNumberInput('hour', 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sHour? this.oOptions.oPlaceHolders.sHour : null);
-				this.oMinuteInput = this.createNumberInput('minute', 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sMinute? this.oOptions.oPlaceHolders.sMinute : null);
-				this.oSecondInput = this.createNumberInput('second', 2, this.oOptions.oPlaceHolders && this.oOptions.oPlaceHolders.sSecond? this.oOptions.oPlaceHolders.sSecond : null);
+				this.oHourInput = this.createNumberInput('hour', 2, this.oOptions.oPlaceHolders.sHour);
+				this.oMinuteInput = this.createNumberInput('minute', 2, this.oOptions.oPlaceHolders.sMinute);
+				this.oSecondInput = this.createNumberInput('second', 2, this.oOptions.oPlaceHolders.sSecond);
 
 			}
 
@@ -228,7 +228,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 
 		createNumberInput : function(sPrefix, iSize, sPlaceHolder) {
 
-			return ZForms.createNumberInput(
+			var oResult = ZForms.createNumberInput(
 				this.oElement.parentNode.insertBefore(
 					Common.Dom.createElement(
 						'input',
@@ -248,6 +248,14 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 					sPlaceHolder : sPlaceHolder
 				}
 				);
+
+			oResult.checkForInitialValueChanged = function() {
+
+				return false;
+
+			};
+
+			return oResult;
 
 		},
 
@@ -276,7 +284,15 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 				oElement.options[oElement.options.length] = new Option(aMonths[i], i + 1);
 			}
 
-			return ZForms.createSelectInput(this.oElement.parentNode.insertBefore(document.body.removeChild(oElement), this.oElement));
+			var oResult = ZForms.createSelectInput(this.oElement.parentNode.insertBefore(document.body.removeChild(oElement), this.oElement));
+
+			oResult.checkForInitialValueChanged = function() {
+
+				return false;
+
+			};
+
+			return oResult;
 
 		},
 
@@ -299,7 +315,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 			this.setValue(this.oInitialValue.clone());
 
 			this.oDayInput.oInitialValue = this.oDayInput.createValue(this.oValue.getDay());
-			this.oMonthInput.oInitialValue = this.oMonthInput.createValue(this.oValue.getMonth());
+			this.oMonthInput.oInitialValue = this.oMonthInput.createValue(this.oValue.getMonth() || 1);
 			this.oYearInput.oInitialValue = this.oYearInput.createValue(this.oValue.getYear());
 
 			if(this.oOptions.bWithTime) {

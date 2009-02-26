@@ -157,7 +157,7 @@ ZForms.Widget = Abstract.inheritTo(
 			}
 
 			if(!this.isInitialValueChanged() &&
-				!this.oValue.isEqual(this.oInitialValue)
+				!this.compareValueWithInitialValue()
 				) {
 
 				this.oForm.increaseChangedCounter();
@@ -177,9 +177,13 @@ ZForms.Widget = Abstract.inheritTo(
 
 		},
 
-		init : function() {
+		compareValueWithInitialValue : function() {
 
-			this.addClass(this.getInitedClassName());
+			return this.oValue.isEqual(this.oInitialValue);
+
+		},
+
+		init : function() {
 
 			if(this.isTemplate()) {
 				return;
@@ -190,6 +194,8 @@ ZForms.Widget = Abstract.inheritTo(
 			}
 
 			this.processEvents(false, true);
+
+			this.addClass(this.getInitedClassName());
 
 			ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, this);
 

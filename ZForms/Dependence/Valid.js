@@ -6,7 +6,8 @@ ZForms.Dependence.Valid = ZForms.Dependence.inheritTo(
 			sPattern,
 			iLogic,
 			bInverse,
-            sClassName
+            sClassName,
+			bCheckForEmpty
 			) {
 
 			this.__base(
@@ -19,12 +20,13 @@ ZForms.Dependence.Valid = ZForms.Dependence.inheritTo(
 
 			this.bCheckResult = false;
 			this.sClassName = sClassName;
+			this.bCheckForEmpty = bCheckForEmpty;
 
 		},
 
 		check : function() {
 
-			if(this.oFrom.isTemplate() || this.oFrom.getValue().isEmpty()) {
+			if(this.oFrom.isTemplate() || (!this.bCheckForEmpty && this.oFrom.getValue().isEmpty())) {
 				return true;
 			}
 

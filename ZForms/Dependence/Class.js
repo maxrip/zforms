@@ -1,12 +1,12 @@
 ZForms.Dependence.Class = ZForms.Dependence.inheritTo(
 	{
-	
+
 		__constructor : function(
 			oFrom,
 			aPatternToClasses,
 			iLogic
 			) {
-		
+
 			this.__base(
 				this.__self.TYPE_CLASS,
 				oFrom,
@@ -14,7 +14,7 @@ ZForms.Dependence.Class = ZForms.Dependence.inheritTo(
 				iLogic,
 				false
 				);
-		
+
 			this.aPatternToClasses = aPatternToClasses;
 			this.aResult = [];
 
@@ -34,13 +34,21 @@ ZForms.Dependence.Class = ZForms.Dependence.inheritTo(
 
 			this.aResult = [];
 
-			var mValue = this.oFrom.getValue();
+			var
+				mValue = this.oFrom.getValue(),
+				i = 0,
+				oPatternToClass
+				;
 
-			for(var i = 0; i < this.aPatternToClasses.length; i++) {
-				this.aResult.push({
-					sClassName : this.aPatternToClasses[i].sClassName,
-					bMatched   : mValue.match(this.aPatternToClasses[i].rPattern)
-					});
+			while(oPatternToClass = this.aPatternToClasses[i++]) {
+				this.aResult.push(
+					{
+						sClassName : oPatternToClass.sClassName,
+						bMatched   : mValue.match(oPatternToClass.rPattern)?
+							 !oPatternToClass.bInverse :
+							 oPatternToClass.bInverse
+					}
+					);
 			}
 
 			return this.aResult.length > 0;

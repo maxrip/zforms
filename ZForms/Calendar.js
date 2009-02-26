@@ -349,7 +349,7 @@ ZForms.Calendar = Abstract.inheritTo(
 
 		setNextMonth : function() {
 
-			this.setDate(new Date(this.oDate.getFullYear(), this.oDate.getMonth(), 32));
+			this.setDate(new Date(this.oDate.getFullYear(), this.oDate.getMonth(), 33));
 
 		},
 
