@@ -199,6 +199,8 @@ ZForms.Widget = Abstract.inheritTo(
 
 			ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, this);
 
+			this.addClass(this.getInitedClassName());
+
 		},
 
 		getValue : function() {
@@ -301,7 +303,7 @@ ZForms.Widget = Abstract.inheritTo(
 
 		enable : function(bByParent) {
 
-			if(!this.allowEnable()) {
+			if(!this.allowEnable()) {				
 				return false;
 			}
 

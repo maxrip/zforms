@@ -176,7 +176,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				iChildIndex = this.aChildren.indexOf(oChild) + 1,
 				oNewElement = this.oTemplate.oClassElement.cloneNode(true)
 				;
-
+			
 			this.increaseChildrenPostfix(iChildIndex);
 
 			this.removePostfixFromElement(oNewElement);

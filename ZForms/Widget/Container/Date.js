@@ -16,7 +16,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 			if(this.isTemplate()) {
 				return;
 			}
-
+			
 			this.oDayInput = this.createNumberInput('day', 2, this.oOptions.oPlaceHolders.sDay);
 			this.oMonthInput = this.createMonthInput('month');
 			this.oYearInput = this.createNumberInput('year', 4, this.oOptions.oPlaceHolders.sYear);
@@ -366,18 +366,16 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 			iIndex
 			) {
 
-			var oNewOptions = Common.Object.extend(
-				{
-					oPickerOpenerElement : this.oOptions.oPickerOpenerElement? document.getElementById(this.oOptions.oPickerOpenerElement.id.match(ZForms.Widget.Container.Multiplicator.REG_EXP_REPLACE)[1] + '_' + iIndex) : null,
-					bTemplate            : false
-				},
-				this.oOptions
-				);
-
 			return new this.__self(
 				oElement,
 				oClassElement,
-				oNewOptions
+				Common.Object.extend(
+					{
+						oPickerOpenerElement : this.oOptions.oPickerOpenerElement? document.getElementById(this.oOptions.oPickerOpenerElement.id.match(ZForms.Widget.Container.Multiplicator.REG_EXP_REPLACE)[1] + '_' + iIndex) : null,
+						bTemplate            : false
+					},
+					this.oOptions
+					)
 				);
 
 		},

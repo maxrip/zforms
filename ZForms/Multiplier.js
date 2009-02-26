@@ -1,6 +1,6 @@
 ZForms.Multiplier = Abstract.inheritTo(
 	{
-	
+
 		__constructor : function(
 			oMultiplicator,
 			oWidget
@@ -179,7 +179,7 @@ ZForms.Multiplier = Abstract.inheritTo(
 				return;
 			}
 
-			if(this.oUpButton) {
+			if(this.oUpButton) {				
 				this.oUpButton.enable();
 			}
 
@@ -275,6 +275,6 @@ ZForms.Multiplier = Abstract.inheritTo(
 			}
 
 		}
-		
+
 	}
 	);

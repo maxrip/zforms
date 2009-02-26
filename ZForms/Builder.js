@@ -11,6 +11,17 @@ ZForms.Builder = Abstract.inheritTo(
 			this.aRepeatRoots = [];
 			this.aDependencies = [];
 
+			var oThis = this;
+			Common.Event.add(
+				window,
+				ZForms.Widget[Common.Browser.isIE()? 'DOM_EVENT_TYPE_BEFOREUNLOAD' : 'DOM_EVENT_TYPE_UNLOAD'],
+				function() {
+
+					oThis.oFormElement = null;
+
+				}
+				);
+
 		},
 
 		$ : function(sId) {
@@ -89,7 +100,7 @@ ZForms.Builder = Abstract.inheritTo(
 			oElement.removeAttribute('onclick');
 
 			if(oParentWidget) {
-				  
+
 				if(oParams.sRepeatGroup && oResult.isTemplate()) {
 					oParentWidget.addTemplate(oResult);
 				}
@@ -481,8 +492,9 @@ ZForms.Builder = Abstract.inheritTo(
 				Common.Object.extend(
 					oOptionsAdd,
 					{
-						bInverse   : oValid.bInverse,
-						sClassName : oValid.sClassName
+						bInverse       : oValid.bInverse,
+						sClassName     : oValid.sClassName,
+						bCheckForEmpty : oValid.bCheckForEmpty
 					}
 					);
 			}

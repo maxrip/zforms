@@ -18,7 +18,7 @@ ZForms.Widget.Button = ZForms.Widget.inheritTo(
 
 				Common.Event.cancel(oEvent);
 
-			}
+			};
 
 		},
 
