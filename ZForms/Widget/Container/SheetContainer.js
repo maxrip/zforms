@@ -67,7 +67,7 @@ ZForms.Widget.Container.SheetContainer = ZForms.Widget.Container.inheritTo(
 	},
 	{
 
-		CLASS_NAME_INITED : 'sheet-container-inited'
+		CLASS_NAME_INITED : 'zf-sheetcontainer-inited'
 
 	}
 	);

@@ -166,7 +166,7 @@ ZForms.Widget = Abstract.inheritTo(
 
 			}
 			else if(this.isInitialValueChanged() &&
-				this.oValue.isEqual(this.oInitialValue)
+				this.compareValueWithInitialValue()
 				) {
 
 				this.oForm.decreaseChangedCounter();
@@ -303,7 +303,7 @@ ZForms.Widget = Abstract.inheritTo(
 
 		enable : function(bByParent) {
 
-			if(!this.allowEnable()) {				
+			if(!this.allowEnable()) {
 				return false;
 			}
 

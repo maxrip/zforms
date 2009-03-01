@@ -113,10 +113,6 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				return false;
 			}
 
-			if(!this.hasPlaceHolder()) {
-				return true;
-			}
-
 			var oThis = this;
 
 			Common.Event.add(
@@ -124,6 +120,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				this.__self.DOM_EVENT_TYPE_FOCUS,
 				function() {
 
+					oThis.addClass(oThis.__self.CLASS_NAME_FOCUSED);
 					oThis.disablePlaceHolder();
 
 				}
@@ -134,6 +131,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				this.__self.DOM_EVENT_TYPE_BLUR,
 				function() {
 
+					oThis.removeClass(oThis.__self.CLASS_NAME_FOCUSED);
 					oThis.enablePlaceHolder();
 
 				}
@@ -198,6 +196,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 	},
 	{
 
+		CLASS_NAME_FOCUSED      : 'zf-focused',
 		CLASS_NAME_PLACE_HOLDER : 'zf-placeholder'
 
 	}

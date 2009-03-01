@@ -161,7 +161,9 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 				iIndex = this.getChildren().length - 1
 				;
 
-			oResult.oElement.id = 'control-' + sPostfixId;
+			if(sPostfixId) {
+				oResult.oElement.id = 'control-' + sPostfixId;
+			}
 
 			Common.Class.add(oResult.oElement, this.__self.CLASS_NAME_CONTROL_ELEMENT + ' ' + this.__self.CLASS_NAME_CONTROL_ELEMENT + '-' + iIndex);
 			Common.Class.add(oResult.oValueElement, this.__self.CLASS_NAME_VALUE_ELEMENT);
@@ -198,7 +200,6 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 				;
 
 			this.aControls[iControlIndex].oRightRangeElement = this.createRangeElement(iControlIndex + 1);
-
 
 		},
 

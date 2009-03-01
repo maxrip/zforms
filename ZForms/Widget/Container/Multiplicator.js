@@ -176,7 +176,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				iChildIndex = this.aChildren.indexOf(oChild) + 1,
 				oNewElement = this.oTemplate.oClassElement.cloneNode(true)
 				;
-			
+
 			this.increaseChildrenPostfix(iChildIndex);
 
 			this.removePostfixFromElement(oNewElement);
@@ -277,7 +277,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 				// change mArgument if dependence is compare dependence
 
-				if(oDependenceCloned instanceof ZForms.Dependence.Function && aDependencies[i].getFunction().mArgument instanceof ZForms.Widget) {
+				if(oDependenceCloned instanceof ZForms.Dependence.Function/* && aDependencies[i].getFunction().mArgument instanceof ZForms.Widget*/) {
 
 					oDependenceCloned.getFunction().mArgument =
 						this.findCorrespondingWidgetByTemplate(aDependencies[i].getFunction().mArgument, this.oTemplate, oClonedWidget) ||
@@ -289,8 +289,9 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 						aDependencies[i].getFunction().oWidget
 						;
 
-					oDependenceCloned.getFunction().sType = aDependencies[i].getFunction().sType;
+					oDependenceCloned.getFunction().iType = aDependencies[i].getFunction().iType;
 					oDependenceCloned.getFunction().sFunctionName = aDependencies[i].getFunction().sFunctionName;
+					oDependenceCloned.getFunction().oOptions = aDependencies[i].getFunction().oOptions;
 
 				}
 
@@ -564,10 +565,10 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			var sNodeType = oNode.type.toLowerCase();
 
 			if(!Common.Browser.isIE() || !(
-					sNodeType == 'text' ||
-					sNodeType == 'radio' ||
-					sNodeType == 'checkbox'
-					)
+				sNodeType == 'text' ||
+				sNodeType == 'radio' ||
+				sNodeType == 'checkbox'
+				)
 				) {
 				return;
 			}
@@ -587,14 +588,14 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				oAttributes.checked = 'checked';
 			}
 
-			oNode.parentNode.insertBefore(
-				Common.Dom.createElement('input', oAttributes),
-				oNode
-				);
-
-			oNode = oNode.parentNode.removeChild(oNode);
-
-			oNode.outerHTML = '';
+			oNode
+				.parentNode
+				.replaceChild(
+					Common.Dom.createElement('input', oAttributes),
+					oNode
+					)
+				.outerHTML = ''
+				;
 
 		},
 

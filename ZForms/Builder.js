@@ -8,7 +8,8 @@ ZForms.Builder = Abstract.inheritTo(
 			this.aWidgets = [];
 			this.aSheetContainers = [];
 			this.aRepeatContainers = [];
-			this.aRepeatRoots = [];
+			//this.aRepeatRoots = [];
+			this.oLastRepeatRoot = null;
 			this.aDependencies = [];
 
 			var oThis = this;
@@ -69,6 +70,7 @@ ZForms.Builder = Abstract.inheritTo(
 			this.aWidgets.length = 0;
 			this.aSheetContainers.length = 0;
 			this.aRepeatContainers.length = 0;
+			this.oLastRepeatRoot = null;
 			this.aDependencies.length = 0;
 
 			return this.oForm;
@@ -89,7 +91,10 @@ ZForms.Builder = Abstract.inheritTo(
 				;
 
 			if(oParams.sRepeatGroup) {
-				this.aRepeatRoots[oResult.getId()] = oResult;
+
+				//this.aRepeatRoots[oResult.getId()] = oResult;
+				this.oLastRepeatRoot = oResult;
+
 			}
 
 			if(oParams.oRequired || oParams.oValid || oParams.oEnabled || oParams.oDependedOptions || oParams.oDependedClasses) {
@@ -216,7 +221,7 @@ ZForms.Builder = Abstract.inheritTo(
 				return this.getSheet(oElement);
 			}
 
-			if(sType == 'buttonadd' || sType == 'buttonadd' || sType == 'buttonup' || sType == 'buttondown') {
+			if(sType == 'buttonadd' || sType == 'buttonremove' || sType == 'buttonup' || sType == 'buttondown') {
 				return this.getRepeatRoot(oElement);
 			}
 
@@ -256,11 +261,15 @@ ZForms.Builder = Abstract.inheritTo(
 
 		getRepeatRoot : function(oElement) {
 
-			while(oElement = oElement.parentNode) {
+			return this.oLastRepeatRoot;
 
-				if(oElement.tagName.toLowerCase() == 'form' ||
-					Common.Class.match(oElement, this.__self.CLASS_NAME_WIDGET)
-					) {
+			/*while(oElement = oElement.parentNode) {
+
+				if(oElement.tagName.toLowerCase() == 'form') {
+					ZForms.throwException('repeat root not found');
+				}
+
+				if(Common.Class.match(oElement, this.__self.CLASS_NAME_WIDGET)) {
 
 					var oResult = this.aRepeatRoots[this.__self.getId(oElement)];
 					if(oResult) {
@@ -268,7 +277,7 @@ ZForms.Builder = Abstract.inheritTo(
 					}
 
 				}
-			}
+			}*/
 
 		},
 
@@ -551,7 +560,8 @@ ZForms.Builder = Abstract.inheritTo(
 									oFrom.oCompare.sValue,
 								iLogic     : iLogic,
 								bInverse   : oFrom.bInverse,
-								sClassName : oFrom.sClassName
+								sClassName : oFrom.sClassName,
+								bCheckForEmpty : oFrom.bCheckForEmpty
 							}
 							)
 						);

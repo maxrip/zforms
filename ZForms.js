@@ -262,7 +262,7 @@ var ZForms = {
 			oOptions = oOptions || {},
 			fFunction = function(oWidget, fFunction) {
 
-				var bResult = (arguments.callee.iType == ZForms.Dependence.TYPE_VALID &&
+				var bResult = (arguments.callee.iType == ZForms.Dependence.TYPE_VALID && !arguments.callee.oOptions.bCheckForEmpty &&
 					(arguments.callee.oWidget.getValue().isEmpty() || (arguments.callee.mArgument instanceof ZForms.Widget && arguments.callee.mArgument.getValue().isEmpty()))
 					) ||
 					arguments.callee.oWidget.getValue()[arguments.callee.sFunctionName](
@@ -271,11 +271,12 @@ var ZForms = {
 						arguments.callee.mArgument
 					);
 
-				if(arguments.callee.iType == ZForms.Dependence.TYPE_VALID && oOptions.sClassName) {
+				if(arguments.callee.iType == ZForms.Dependence.TYPE_VALID &&
+				   arguments.callee.oOptions.sClassName) {
 					fFunction.setResult(
 						{
 							bAdd       : !bResult,
-							sClassName : oOptions.sClassName
+							sClassName : arguments.callee.oOptions.sClassName
 						}
 						);
 				}
@@ -296,7 +297,8 @@ var ZForms = {
 		fFunction.oWidget = oWidget;
 		fFunction.mArgument = oOptions.mArgument;
 		fFunction.sFunctionName = this.Dependence.COMPARE_FUNCTIONS[oOptions.sCondition || '='];
-
+		fFunction.oOptions = oOptions;
+		
 		if(!(oOptions.mArgument instanceof ZForms.Widget)) {
 			return mResult;
 		}
