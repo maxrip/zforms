@@ -501,6 +501,7 @@ ZForms.Builder = Abstract.inheritTo(
 				Common.Object.extend(
 					oOptionsAdd,
 					{
+						sName          : oValid.sName,
 						bInverse       : oValid.bInverse,
 						sClassName     : oValid.sClassName,
 						bCheckForEmpty : oValid.bCheckForEmpty
@@ -540,7 +541,7 @@ ZForms.Builder = Abstract.inheritTo(
 						ZForms['create' + (iType == ZForms.Dependence.TYPE_VALID? 'Valid' : 'Enabled') + 'Dependence'](
 							oWidgetFrom,
 							{
-								rPattern       : oFrom.rPattern,
+								rPattern       : this.__self.toPattern(oFrom.rPattern),
 								iLogic         : iLogic,
 								bInverse       : oFrom.bInverse,
 								sClassName     : oFrom.sClassName,
@@ -550,6 +551,11 @@ ZForms.Builder = Abstract.inheritTo(
 						);
 				}
 				else if(oFrom.oCompare) {
+
+					if(oFrom.oCompare.sCondition && !ZForms.Dependence.COMPARE_FUNCTIONS[oFrom.oCompare.sCondition]) {
+						ZForms.throwException('unsupported type of compare condition: "' + oFrom.oCompare.sCondition + '"');
+					}
+
 					oWidget.addDependence(
 						ZForms['create' + (iType == ZForms.Dependence.TYPE_VALID? 'Valid' : 'Enabled') + 'CompareDependence'](
 							oWidgetFrom,
@@ -557,7 +563,7 @@ ZForms.Builder = Abstract.inheritTo(
 								sCondition : oFrom.oCompare.sCondition,
 								mArgument  : oFrom.oCompare.sName?
 									this.getWidgetByName(oFrom.oCompare.sName) :
-									oFrom.oCompare.sValue,
+									oFrom.oCompare.mValue,
 								iLogic     : iLogic,
 								bInverse   : oFrom.bInverse,
 								sClassName : oFrom.sClassName,
@@ -565,6 +571,7 @@ ZForms.Builder = Abstract.inheritTo(
 							}
 							)
 						);
+
 				}
 				else if(oFrom.fFunction) {
 					oWidget.addDependence(

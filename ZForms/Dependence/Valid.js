@@ -3,7 +3,7 @@ ZForms.Dependence.Valid = ZForms.Dependence.inheritTo(
 
 		__constructor :	function(
 			oFrom,
-			sPattern,
+			rPattern,
 			iLogic,
 			bInverse,
             sClassName,
@@ -13,7 +13,7 @@ ZForms.Dependence.Valid = ZForms.Dependence.inheritTo(
 			this.__base(
 				this.__self.TYPE_VALID,
 				oFrom,
-				sPattern,
+				rPattern,
 				iLogic,
 				bInverse
 				);

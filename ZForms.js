@@ -296,9 +296,9 @@ var ZForms = {
 		fFunction.iType = oOptions.iType;
 		fFunction.oWidget = oWidget;
 		fFunction.mArgument = oOptions.mArgument;
-		fFunction.sFunctionName = this.Dependence.COMPARE_FUNCTIONS[oOptions.sCondition || '='];
+		fFunction.sFunctionName = this.Dependence.COMPARE_FUNCTIONS[oOptions.sCondition || 'eq'];
 		fFunction.oOptions = oOptions;
-		
+
 		if(!(oOptions.mArgument instanceof ZForms.Widget)) {
 			return mResult;
 		}
@@ -380,6 +380,14 @@ var ZForms = {
 
 	},
 
+	bInited : false,
+
+	isInited : function() {
+
+		return this.bInited;
+
+	},
+
 	attachObserver : function(
 		mEventType,
 		mObserver,
@@ -389,7 +397,9 @@ var ZForms = {
 
 		Common.Observable.attach(mEventType, mObserver, mObservable || this);
 
-		if(bNotifyAtOnce) {
+		if((mEventType == this.EVENT_TYPE_ON_INIT && mObservable == this && this.isInited()) ||
+			bNotifyAtOnce
+			) {
 			mObserver(mEventType, mObservable);
 		}
 
@@ -439,6 +449,7 @@ Common.Event.add(
 			function() {
 
 				ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, ZForms, aForms);
+				ZForms.bInited = true;
 
 			},
 			1

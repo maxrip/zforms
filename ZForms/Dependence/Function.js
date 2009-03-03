@@ -1,4 +1,4 @@
-ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
+	ZForms.Dependence.Function = ZForms.Dependence.inheritTo(
 	{
 
 		__constructor : function(
