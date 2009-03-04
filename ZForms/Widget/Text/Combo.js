@@ -87,7 +87,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 			if(this.hasPlaceHolder()) {
 				Common.Event.add(
-					this.oElement,
+					this.oPasswordReplacerElement || this.oElement,
 					this.__self.DOM_EVENT_TYPE_FOCUS,
 					function() {
 
@@ -388,7 +388,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			setTimeout(
 				function() {
 
-					oThis.hideOptions()
+					oThis.hideOptions();
 
 				},
 				0
@@ -449,7 +449,10 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			}
 
 			if(!bFound) {
+
 				this.iSelectedIndex = -1;
+				this.oOptions.oOptionsElement.selectedIndex = -1;
+
 			}
 
 			if(iOptionsCount > 0) {
@@ -461,6 +464,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			else {
 				this.hideOptions();
 			}
+
 
 		},
 

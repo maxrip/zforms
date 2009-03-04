@@ -16,6 +16,8 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 			this.bPlaceHolderEnabled = false;
 
 			this.iMaxLength = oElement.maxLength? oElement.maxLength : 0;
+			this.bNeedReplaceElement = this.hasPlaceHolder() || this.oElement.type.toLowerCase() == 'password';
+			this.oPasswordReplacerElement = this.createPasswordElement();
 
 			if(!this.isTemplate()) {
 				this.addExtendedHandlers();
@@ -116,7 +118,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 			var oThis = this;
 
 			Common.Event.add(
-				this.oElement,
+				this.oPasswordReplacerElement || this.oElement,
 				this.__self.DOM_EVENT_TYPE_FOCUS,
 				function() {
 
@@ -147,13 +149,20 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				return;
 			}
 
-			this.addClass(this.__self.CLASS_NAME_PLACE_HOLDER, this.oElement);
+			this.addClass(this.__self.CLASS_NAME_PLACE_HOLDER, this.oPasswordReplacerElement || this.oElement);
 
 			if(this.iMaxLength > 0) {
 				this.oElement.maxLength = this.oOptions.sPlaceHolder.length;
 			}
 
-			this.oElement.value = this.oOptions.sPlaceHolder;
+			this.setPasswordAttribute(false);
+
+			if(this.oPasswordReplacerElement) {
+				this.oPasswordReplacerElement.value = this.oOptions.sPlaceHolder;
+			}
+			else {
+				this.oElement.value = this.oOptions.sPlaceHolder;
+			}
 
 			this.bPlaceHolderEnabled = true;
 
@@ -171,9 +180,80 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				this.oElement.maxLength = this.iMaxLength;
 			}
 
+			this.setPasswordAttribute(true);
+
 			this.oElement.value = '';
 
 			this.bPlaceHolderEnabled = false;
+
+		},
+
+		createPasswordElement : function() {
+
+			if(!this.bNeedReplaceElement || !Common.Browser.isIE()) {
+				return;
+			}
+
+			return Common.Dom.createElement(
+				this.oElement.tagName,
+				{
+					'type'      : 'text',
+					'name'      : this.oElement.name,
+					'id'        : this.oElement.id,
+					'class'     : this.oElement.className,
+					'size'      : this.oElement.size,
+					'maxlength' : this.oElement.maxLength,
+					'value'     : this.oElement.value,
+					'style'     : this.oElement.style.cssText
+				}
+				);
+
+
+		},
+
+		setPasswordAttribute : function(bPassword) {
+
+			if(!this.bNeedReplaceElement) {
+				return;
+			}
+
+			if(!this.oPasswordReplacerElement) {
+
+				this.oElement.type = bPassword? 'password' : 'text';
+				return;
+
+			}
+
+			// ie workaround for passworded input
+			if(bPassword) {
+
+				if(!this.oPasswordReplacerElement.parentNode) {
+					return;
+				}
+
+				this.oPasswordReplacerElement.parentNode.replaceChild(this.oElement, this.oPasswordReplacerElement);
+
+				var oThis = this;
+
+				setTimeout(
+					function() {
+
+						oThis.oElement.focus();
+
+					},
+					0
+					);
+
+			}
+			else {
+
+				if(!this.oElement.parentNode) {
+					return;
+				}
+
+				this.oElement.parentNode.replaceChild(this.oPasswordReplacerElement, this.oElement);
+
+			}
 
 		},
 
