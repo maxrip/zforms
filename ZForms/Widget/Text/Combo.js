@@ -233,7 +233,21 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 						bProcessFocus = false;
 
+						if(oThis.bPlaceHolderEnabled) {
+							oThis.disablePlaceHolder();
+						}
+
 						oThis.oElement.focus();
+
+						if(oThis.oElement.createTextRange && !Common.Browser.isOpera()) {
+
+							var range = oThis.oElement.createTextRange();
+      						range.collapse(true);
+							range.moveStart('character', 1000);
+      						range.moveEnd('character', 1000);
+      						range.select();
+
+						}
 
 					}
 					);
@@ -419,23 +433,24 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			var
 				i = 0,
 				iLength = this.aOptionsCurrent.length,
+				oOptionsCurrent,
 				iOptionsCount = 0,
 				bFound = false,
-				aOptions = this.oOptions.oOptionsElement.options
+				oOptionsElement = this.oOptions.oOptionsElement,
+				aOptions = oOptionsElement.options
 				;
 
 			this.sLastSearchValue = sNewValue;
 
-			this.oOptions.oOptionsElement.options.length = 0;
-			this.oOptions.oOptionsElement.innerHTML = '';
+			aOptions.length = 0;
+			oOptionsElement.innerHTML = '';
 
-			while(i < iLength) {
+			while(oOptionsCurrent = this.aOptionsCurrent[i++]) {
+				if(oOptionsCurrent.sSearchValue.indexOf(sNewValue) > -1) {
 
-				if(this.aOptionsCurrent[i].sSearchValue.indexOf(sNewValue) > -1) {
+					aOptions[iOptionsCount++] = new Option(oOptionsCurrent.sLabel, oOptionsCurrent.sValue);
 
-					aOptions[iOptionsCount++] = new Option(this.aOptionsCurrent[i].sLabel, this.aOptionsCurrent[i].sValue);
-
-					if(sSearchedValue == this.aOptionsCurrent[i].sSearchValue) {
+					if(sSearchedValue === oOptionsCurrent.sSearchValue) {
 
 						this.iSelectedIndex = iOptionsCount - 1;
 						bFound = true;
@@ -443,9 +458,6 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 					}
 
 				}
-
-				i++;
-
 			}
 
 			if(!bFound) {

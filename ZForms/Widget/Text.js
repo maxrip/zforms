@@ -16,7 +16,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 			this.bPlaceHolderEnabled = false;
 
 			this.iMaxLength = oElement.maxLength? oElement.maxLength : 0;
-			this.bNeedReplaceElement = this.hasPlaceHolder() || this.oElement.type.toLowerCase() == 'password';
+			this.bNeedReplaceType = this.hasPlaceHolder() && this.oElement.type.toLowerCase() == 'password';
 			this.oPasswordReplacerElement = this.createPasswordElement();
 
 			if(!this.isTemplate()) {
@@ -180,9 +180,13 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				this.oElement.maxLength = this.iMaxLength;
 			}
 
+			this.oElement.value = '';
+
 			this.setPasswordAttribute(true);
 
-			this.oElement.value = '';
+			if(this.bNeedReplaceType && Common.Browser.isOpera()) {
+				this.oElement.focus();
+			}
 
 			this.bPlaceHolderEnabled = false;
 
@@ -190,7 +194,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		createPasswordElement : function() {
 
-			if(!this.bNeedReplaceElement || !Common.Browser.isIE()) {
+			if(!this.bNeedReplaceType || !Common.Browser.isIE()) {
 				return;
 			}
 
@@ -213,7 +217,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		setPasswordAttribute : function(bPassword) {
 
-			if(!this.bNeedReplaceElement) {
+			if(!this.bNeedReplaceType) {
 				return;
 			}
 
