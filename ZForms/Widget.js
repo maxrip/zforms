@@ -685,7 +685,8 @@ ZForms.Widget = Abstract.inheritTo(
 		DOM_EVENT_TYPE_MOUSEMOVE    : 'mousemove',
 		DOM_EVENT_TYPE_SELECTSTART  : 'selectstart',
 		DOM_EVENT_TYPE_UNLOAD       : 'unload',
-		DOM_EVENT_TYPE_BEFOREUNLOAD : 'beforeunload'
+		DOM_EVENT_TYPE_BEFOREUNLOAD : 'beforeunload',
+		DOM_EVENT_TYPE_PASTE        : 'paste'
 
 	}
 	);

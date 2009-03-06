@@ -15,7 +15,12 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 			this.bPlaceHolderEnabled = false;
 
-			this.iMaxLength = oElement.maxLength? oElement.maxLength : 0;
+			this.iMaxLength = this.oOptions.iMaxLength?
+				this.oOptions.iMaxLength :
+				(oElement.maxLength > 0? oElement.maxLength : 0)
+				;
+
+			this.bTextArea = this.oElement.tagName.toLowerCase() == 'textarea';
 			this.bNeedReplaceType = this.hasPlaceHolder() && this.oElement.type.toLowerCase() == 'password';
 			this.oPasswordReplacerElement = this.createPasswordElement();
 
@@ -54,7 +59,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 			else {
 
 				this.disablePlaceHolder();
-				this.updateElementValue(oValue);
+				this.updateElementValue(this.processValueMaxLength(oValue));
 
 			}
 
@@ -79,7 +84,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				return;
 			}
 
-			this.oValue.set(this.oElement.value);
+			this.oValue = this.processValueMaxLength(this.createValue(this.oElement.value));
 
 			this.__base();
 
@@ -117,6 +122,8 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 			var oThis = this;
 
+			this.addMaxLengthHandlers();
+
 			Common.Event.add(
 				this.oPasswordReplacerElement || this.oElement,
 				this.__self.DOM_EVENT_TYPE_FOCUS,
@@ -143,6 +150,112 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		},
 
+		addMaxLengthHandlers : function() {
+
+			if(this.iMaxLength == 0) {
+				return;
+			}
+
+			if(!this.bTextArea) {
+				 this.oElement.maxLength = this.iMaxLength;
+			}
+			else {
+
+				var
+					oThis = this,
+					iKeyDownCode
+					;
+
+				// opera 9.5 is really fucking browser
+				if(Common.Browser.isOpera() && this.oElement.isSameNode) {
+					Common.Event.add(
+						this.oElement,
+						this.__self.DOM_EVENT_TYPE_KEYDOWN,
+						function(oEvent) {
+
+							iKeyDownCode = oEvent.keyCode;
+
+						}
+						);
+				}
+
+				Common.Event.add(
+					this.oElement,
+					this.__self.DOM_EVENT_TYPE_KEYPRESS,
+					function(oEvent) {
+
+						var oEvent = Common.Event.normalize(oEvent);
+
+						if(oEvent.iKeyCode != 13 && (
+								oEvent.ctrlKey ||
+								oEvent.metaKey ||
+								oEvent.charCode == 0 ||
+						    	oEvent.which == 0 ||
+								(iKeyDownCode == oEvent.keyCode && (oEvent.keyCode == 46 || oEvent.keyCode == 45 || oEvent.keyCode == 36 || oEvent.keyCode == 35 || oEvent.keyCode == 9 || oEvent.keyCode == 8))
+							)
+							) {
+							return;
+						}
+
+						var iSelectionLength = document.selection?
+							document.selection.createRange().text.length :
+							oThis.oElement.selectionEnd - oThis.oElement.selectionStart
+							;
+
+						if(iSelectionLength <= 0 && oThis.oElement.value.length >= oThis.iMaxLength) {
+							Common.Event.cancel(oEvent);
+						}
+
+					}
+					);
+
+				Common.Event.add(
+					this.oElement,
+					this.__self.DOM_EVENT_TYPE_PASTE,
+					function() {
+
+						setTimeout(
+							function() {
+
+								oThis.setValue(oThis.createValue(oThis.oElement.value));
+
+							},
+							0
+							);
+
+					}
+					);
+
+				if(Common.Browser.isOpera()) {
+					Common.Event.add(
+						this.oElement,
+						this.__self.DOM_EVENT_TYPE_BLUR,
+						function() {
+
+							oThis.setValue(oThis.createValue(oThis.oElement.value));
+
+						}
+						);
+				}
+
+			}
+
+		},
+
+		processValueMaxLength : function(oValue) {
+
+			if(this.iMaxLength == 0) {
+				return oValue;
+			}
+
+			if(oValue.toStr().length > this.iMaxLength) {
+				oValue.set(oValue.get().toString().substr(0, this.iMaxLength));
+			}
+
+			return oValue;
+
+		},
+
 		enablePlaceHolder : function() {
 
 			if(!this.hasPlaceHolder() || !this.getValue().isEmpty()) {
@@ -151,7 +264,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 			this.addClass(this.__self.CLASS_NAME_PLACE_HOLDER, this.oPasswordReplacerElement || this.oElement);
 
-			if(this.iMaxLength > 0) {
+			if(!this.bTextArea && this.iMaxLength > 0) {
 				this.oElement.maxLength = this.oOptions.sPlaceHolder.length;
 			}
 
@@ -176,7 +289,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 			this.removeClass(this.__self.CLASS_NAME_PLACE_HOLDER, this.oElement);
 
-			if(this.iMaxLength > 0) {
+			if(!this.bTextArea && this.iMaxLength > 0) {
 				this.oElement.maxLength = this.iMaxLength;
 			}
 

@@ -259,7 +259,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
-		getRepeatRoot : function(oElement) {
+		getRepeatRoot : function() {
 
 			return this.oLastRepeatRoot;
 
@@ -593,7 +593,28 @@ ZForms.Builder = Abstract.inheritTo(
 
 		buildOptionsDependence : function(oWidget, oDepended) {
 
-			var iLogic = this.getLogic(oDepended);
+			var
+				iLogic = this.getLogic(oDepended),
+				oOptionsAdd
+				;
+
+			if(oDepended.aData) {
+				oOptionsAdd = { aData : oDepended.aData };
+			}
+			else if(oDepended.fFunction) {
+				oOptionsAdd = { fFunction : oDepended.fFunction };
+			}
+
+			if(oOptionsAdd) {
+				Common.Object.extend(
+					oOptionsAdd,
+					{
+						sName : oDepended.sName
+					}
+					);
+			}
+
+			oDepended.aFrom = this.__self.prependToArray(oOptionsAdd, oDepended.aFrom);
 
 			var
 				i = 0,
