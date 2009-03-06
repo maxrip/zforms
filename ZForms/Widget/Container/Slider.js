@@ -456,21 +456,24 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 			var
 				oValue = this.calculateValueByOffset(this.calculateOffset(oEvent)),
 				iResult = -1,
-				dMinDifference = Math.abs(this.getMax() - this.getMin())
+				dMinDifference = Math.abs(this.getMax() - this.getMin()),
+				i = 0,
+				oChild,
+				dDifference
 				;
 
-			for(var i = 0, dDifference; i < this.aChildren.length; i++) {
+			while(oChild = this.aChildren[i++]) {
 
-				if(!this.aChildren[i].isEnabled()) {
+				if(!oChild.isEnabled()) {
 					continue;
 				}
 
-				dDifference = Math.abs(this.aChildren[i].getValue().get() - oValue.get());
+				dDifference = Math.abs(oChild.getValue().get() - oValue.get());
 
-				if(dDifference < dMinDifference || (Math.abs(dDifference - dMinDifference) < 0.00001 && this.aChildren[i].getValue().get() < oValue.get())) {
+				if(dDifference < dMinDifference || (Math.abs(dDifference - dMinDifference) < 0.00001 && oChild.getValue().get() < oValue.get())) {
 
 					dMinDifference = dDifference;
-					iResult = i;
+					iResult = i - 1;
 
 				}
 
@@ -583,9 +586,9 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 
 					oChild.setValue(oChild.createValue(parseFloat(dNewValue)), true);
 
-					this.iCurrentControlIndex--;
+					--this.iCurrentControlIndex;
 					this.setValue(oChild.createValue(parseFloat(dNewValue)), bUpdateSiblings);
-					this.iCurrentControlIndex++;
+					++this.iCurrentControlIndex;
 
 				}
 
@@ -600,9 +603,9 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 
 					oChild.setValue(oChild.createValue(parseFloat(dNewValue)), true);
 
-					this.iCurrentControlIndex++;
+					++this.iCurrentControlIndex;
 					this.setValue(oChild.createValue(parseFloat(dNewValue)), bUpdateSiblings);
-					this.iCurrentControlIndex--;
+					--this.iCurrentControlIndex;
 
 				}
 
