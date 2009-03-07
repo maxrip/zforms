@@ -41,7 +41,7 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				this.oHiddenElement.setAttribute('id', 'value-' + oElement.getAttribute('id'));
 			}
 
-			oElement.name = 'to-str-' + oElement.name;
+			oElement.removeAttribute('name');
 
 		},
 
