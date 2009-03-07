@@ -162,7 +162,7 @@ var ZForms = {
 
 		return new this.Dependence.Required(
 			oWidget,
-			oOptions.iMin? new RegExp('\\S{' + oOptions.iMin + ',}') : /\S+/,
+			oOptions.iMin > 1? new RegExp('\\S.{' + (oOptions.iMin - 2) + ',}\\S') : /\S+/,
 			oOptions.iLogic,
 			false,
 			oOptions.iMin
