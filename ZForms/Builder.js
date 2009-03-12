@@ -44,7 +44,7 @@ ZForms.Builder = Abstract.inheritTo(
 			var
 				aElements = Common.Dom.getElementsByClassName(this.oFormElement, this.__self.CLASS_NAME_WIDGET),
 				iLength = aElements.length,
-				aWidgets = []
+				aWidgets = [],
 				i = 0
 				;
 			while(i < iLength) {
@@ -86,11 +86,11 @@ ZForms.Builder = Abstract.inheritTo(
 				oResult = ZForms[this.getCreateWidgetFunction(sType)](
 					oElement,
 					this.getClassElement(oParams.sCId, sType, oElement),
-					this.processOptions(oParams.oOptions, oParentWidget)
+					this.processParams(oParams, oParentWidget)
 					)
 				;
 
-			if(oParams.sRepeatGroup) {
+			if(oParams.oRepeatOptions && oParams.oRepeatOptions.sGroup) {
 
 				//this.aRepeatRoots[oResult.getId()] = oResult;
 				this.oLastRepeatRoot = oResult;
@@ -106,7 +106,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			if(oParentWidget) {
 
-				if(oParams.sRepeatGroup && oResult.isTemplate()) {
+				if(oParams.oRepeatOptions && oParams.oRepeatOptions.sGroup && oResult.isTemplate()) {
 					oParentWidget.addTemplate(oResult);
 				}
 				else if(sType == 'buttonprev' || sType == 'buttonnext') {
@@ -128,41 +128,44 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
-		processOptions : function(
-			oOptions,
+		processParams : function(
+			oParams,
 			oParentWidget
 			) {
 
-			if(!oOptions) {
+			if(
+				(oParams.oRepeatOptions && oParams.oRepeatOptions.bTemplate) ||
+				(oParentWidget && oParentWidget.isTemplate())
+				) {
+				oParams.oOptions = Common.Object.extend({ bTemplate : true }, oParams.oOptions);
+			}
+
+			if(!oParams.oOptions) {
 				return;
 			}
 
-			if(oOptions.sPickerId) {
+			if(oParams.oOptions.sPickerId) {
 
-				oOptions.oPickerOpenerElement = this.$(oOptions.sPickerId);
-				delete oOptions.sPickerId;
-
-			}
-
-			if(oOptions.sListId) {
-
-				oOptions.oOptionsElement = this.$(oOptions.sListId);
-				delete oOptions.sListId;
+				oParams.oOptions.oPickerOpenerElement = this.$(oParams.oOptions.sPickerId);
+				delete oParams.oOptions.sPickerId;
 
 			}
 
-			if(oOptions.sListShowId) {
+			if(oParams.oOptions.sListId) {
 
-				oOptions.oShowOptionsElement = this.$(oOptions.sListShowId);
-				delete oOptions.sListShowId;
+				oParams.oOptions.oOptionsElement = this.$(oParams.oOptions.sListId);
+				delete oParams.oOptions.sListId;
 
 			}
 
-			if(oParentWidget && oParentWidget.isTemplate()) {
-				oOptions.bTemplate = true;
+			if(oParams.oOptions.sListShowId) {
+
+				oParams.oOptions.oShowOptionsElement = this.$(oParams.oOptions.sListShowId);
+				delete oParams.oOptions.sListShowId;
+
 			}
 
-			return oOptions;
+			return oParams.oOptions;
 
 		},
 
@@ -213,7 +216,7 @@ ZForms.Builder = Abstract.inheritTo(
 				return this.getSheetContainer(oParams, oElement);
 			}
 
-			if(oParams.sRepeatGroup) {
+			if(oParams.oRepeatOptions && oParams.oRepeatOptions.sGroup) {
 				return this.getRepeatContainer(oParams, oElement);
 			}
 
@@ -248,14 +251,14 @@ ZForms.Builder = Abstract.inheritTo(
 			oElement
 			) {
 
-			if(!this.aRepeatContainers[oParams.sRepeatGroup]) {
-				this.aRepeatContainers[oParams.sRepeatGroup] = this
+			if(!this.aRepeatContainers[oParams.oRepeatOptions.sGroup]) {
+				this.aRepeatContainers[oParams.oRepeatOptions.sGroup] = this
 					.getParentWidget({}, null, oElement)
 					.addChild(ZForms.createMultiplicator(null, null, oParams.oRepeatOptions))
 					;
 			}
 
-			return this.aRepeatContainers[oParams.sRepeatGroup];
+			return this.aRepeatContainers[oParams.oRepeatOptions.sGroup];
 
 		},
 
@@ -487,7 +490,7 @@ ZForms.Builder = Abstract.inheritTo(
 			if(oValid.sType) {
 				oOptionsAdd = { sType : oValid.sType };
 			}
-			else if(oValid.rPattern) {
+			else if(typeof(oValid.rPattern) != 'undefined') {
 				oOptionsAdd = { rPattern : oValid.rPattern };
 			}
 			else if(oValid.fFunction) {
@@ -686,6 +689,15 @@ ZForms.Builder = Abstract.inheritTo(
 			}
 			else if(oClass.aData) {
 				oOptionsAdd = { aData : oClass.aData };
+			}
+
+			if(oOptionsAdd) {
+				Common.Object.extend(
+					oOptionsAdd,
+					{
+						sName : oClass.sName
+					}
+					);
 			}
 
 			oClass.aFrom = this.__self.prependToArray(oOptionsAdd, oClass.aFrom);

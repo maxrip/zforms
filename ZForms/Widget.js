@@ -195,11 +195,13 @@ ZForms.Widget = Abstract.inheritTo(
 
 			this.processEvents(false, true);
 
+			if(this.oMultiplier) {
+				this.oMultiplier.init();
+			}
+
 			this.addClass(this.getInitedClassName());
 
 			ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, this);
-
-			this.addClass(this.getInitedClassName());
 
 		},
 

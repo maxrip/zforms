@@ -376,7 +376,13 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		destruct : function() {
 
-			this.disablePlaceHolder();
+			if(this.oPasswordReplacerElement) {
+				this.oPasswordReplacerElement = null;
+			}
+
+			if(this.oElement) {
+				this.disablePlaceHolder();
+			}
 
 			this.__base();
 

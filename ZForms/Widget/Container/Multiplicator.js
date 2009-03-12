@@ -626,7 +626,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 		REG_EXP_REPLACE : new RegExp('^(.+)_\\d+(\\[\\])?$'),
 
-		CHILD_INDEX_CLASS_NAME_PREFIX : 'child_'
+		CHILD_INDEX_CLASS_NAME_PREFIX : 'zf-child_'
 
 	}
 	);

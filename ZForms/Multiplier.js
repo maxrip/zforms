@@ -179,7 +179,7 @@ ZForms.Multiplier = Abstract.inheritTo(
 				return;
 			}
 
-			if(this.oUpButton) {				
+			if(this.oUpButton) {
 				this.oUpButton.enable();
 			}
 
@@ -252,6 +252,26 @@ ZForms.Multiplier = Abstract.inheritTo(
 			}
 			else {
 				this.disableDown();
+			}
+
+		},
+
+		init : function() {
+
+			if(this.oAddButton) {
+				this.oAddButton.init();
+			}
+
+			if(this.oRemoveButton) {
+				this.oRemoveButton.init();
+			}
+
+			if(this.oUpButton) {
+				this.oUpButton.init();
+			}
+
+			if(this.oDownButton) {
+				this.oDownButton.init();
 			}
 
 		},
