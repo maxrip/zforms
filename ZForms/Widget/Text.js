@@ -130,7 +130,10 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				function() {
 
 					oThis.addClass(oThis.__self.CLASS_NAME_FOCUSED);
-					oThis.disablePlaceHolder();
+					if(oThis.disablePlaceHolder() && Common.Browser.isIE()) {
+						//refocus for IE
+						oThis.oElement.createTextRange().select();
+					}
 
 				}
 				);
@@ -259,7 +262,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 		enablePlaceHolder : function() {
 
 			if(!this.hasPlaceHolder() || !this.getValue().isEmpty()) {
-				return;
+				return false;
 			}
 
 			this.addClass(this.__self.CLASS_NAME_PLACE_HOLDER, this.oPasswordReplacerElement || this.oElement);
@@ -279,12 +282,14 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 			this.bPlaceHolderEnabled = true;
 
+			return true;
+
 		},
 
 		disablePlaceHolder : function() {
 
 			if(!this.hasPlaceHolder() || !this.getValue().isEmpty()) {
-				return;
+				return false;
 			}
 
 			this.removeClass(this.__self.CLASS_NAME_PLACE_HOLDER, this.oElement);
@@ -302,6 +307,8 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 			}
 
 			this.bPlaceHolderEnabled = false;
+
+			return true;
 
 		},
 
