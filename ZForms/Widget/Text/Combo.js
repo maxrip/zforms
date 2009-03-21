@@ -119,8 +119,9 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 					}
 
-					if(oThis.bPlaceHolderEnabled) {
-						oThis.disablePlaceHolder();
+					if(oThis.disablePlaceHolder() && Common.Browser.isIE()) {
+						//refocus for IE
+						oThis.oElement.createTextRange().select();
 					}
 
 					oThis.updateOptions(true);
@@ -152,10 +153,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 					}
 
 					oThis.hideOptions();
-
-					if(!oThis.bPlaceHolderEnabled) {
-						oThis.enablePlaceHolder();
-					}
+					oThis.enablePlaceHolder();
 
 				}
 				);
@@ -233,9 +231,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 						bProcessFocus = false;
 
-						if(oThis.bPlaceHolderEnabled) {
-							oThis.disablePlaceHolder();
-						}
+						oThis.disablePlaceHolder();
 
 						oThis.oElement.focus();
 

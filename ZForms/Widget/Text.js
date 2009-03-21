@@ -261,7 +261,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		enablePlaceHolder : function() {
 
-			if(!this.hasPlaceHolder() || !this.getValue().isEmpty()) {
+			if(this.bPlaceHolderEnabled || !this.hasPlaceHolder() || !this.getValue().isEmpty()) {
 				return false;
 			}
 
@@ -288,7 +288,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		disablePlaceHolder : function() {
 
-			if(!this.hasPlaceHolder() || !this.getValue().isEmpty()) {
+			if(!this.bPlaceHolderEnabled || !this.hasPlaceHolder() || !this.getValue().isEmpty()) {
 				return false;
 			}
 
