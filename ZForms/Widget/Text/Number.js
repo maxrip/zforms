@@ -119,8 +119,13 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 						oEvent.which == 0 ||
 						(iKeyDownCode == oEvent.keyCode && (oEvent.keyCode == 46 || oEvent.keyCode == 45 || oEvent.keyCode == 36 || oEvent.keyCode == 35 || oEvent.keyCode == 9 || oEvent.keyCode == 8)) ||
 						(oEvent.iKeyCode >= 48 && oEvent.iKeyCode <= 57) ||
-						(oThis.oOptions.bFloat && (oEvent.iKeyCode == 44 || oEvent.iKeyCode == 46) && !oThis.getValue().match(/\.|\,/)) ||
-						(oThis.oOptions.bNegative && oEvent.iKeyCode == 45 && oThis.oElement.value.charAt(0) != '-')
+						(oThis.oOptions.bFloat && (oEvent.iKeyCode == 44 || oEvent.iKeyCode == 46) && !/\.|\,/.test(oThis.oElement.value)) ||
+						(
+							oThis.oOptions.bNegative &&
+						 	oEvent.iKeyCode == 45 &&
+						 	oThis.oElement.value.charAt(0) != '-' &&
+						 	oThis.getCursorPosition() == 0
+						)
 						) {
 						return;
 					}
@@ -143,6 +148,36 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 
 				}
 				);
+
+		},
+
+		getCursorPosition : function() {
+
+			if('selectionStart' in this.oElement) {
+				return this.oElement.selectionStart;
+			}
+
+
+			if(document.selection) {
+
+				var oRange = document.selection.createRange();
+
+				if(!oRange) {
+					return 0;
+				}
+
+				var
+					oInputRange = this.oElement.createTextRange(),
+					oDuplicateRange = oInputRange.duplicate()
+					;
+
+				oInputRange.moveToBookmark(oRange.getBookmark());
+				oDuplicateRange.setEndPoint('EndToStart', oInputRange);
+				return oDuplicateRange.text.length;
+
+			}
+
+			return 0;
 
 		},
 
