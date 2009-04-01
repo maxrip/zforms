@@ -8,7 +8,6 @@ ZForms.Builder = Abstract.inheritTo(
 			this.aWidgets = [];
 			this.aSheetContainers = [];
 			this.aRepeatContainers = [];
-			//this.aRepeatRoots = [];
 			this.oLastRepeatRoot = null;
 			this.aDependencies = [];
 
@@ -80,8 +79,8 @@ ZForms.Builder = Abstract.inheritTo(
 		createWidgetByElement : function(oElement) {
 
 			var
-				oParams = oElement.onclick instanceof Function? oElement.onclick() || {} : {},
-				sType = oParams.sType || this.extractTypeFromElement(oElement),
+				oParams = this.extractParamsFromElement(oElement),
+				sType = oParams.sType,
 				oParentWidget = this.getParentWidget(oParams, sType, oElement),
 				oResult = ZForms[this.getCreateWidgetFunction(sType)](
 					oElement,
@@ -91,10 +90,7 @@ ZForms.Builder = Abstract.inheritTo(
 				;
 
 			if(oParams.oRepeatOptions && oParams.oRepeatOptions.sGroup) {
-
-				//this.aRepeatRoots[oResult.getId()] = oResult;
 				this.oLastRepeatRoot = oResult;
-
 			}
 
 			if(oParams.oRequired || oParams.oValid || oParams.oEnabled || oParams.oDependedOptions || oParams.oDependedClasses) {
@@ -320,6 +316,19 @@ ZForms.Builder = Abstract.inheritTo(
 
 				}
 			}
+
+		},
+
+		extractParamsFromElement : function(oElement) {
+
+			var oResult = oElement.onclick instanceof Function? oElement.onclick() || {} : {};
+
+			oResult.sType = oResult.sType || this.extractTypeFromElement(oElement);
+
+			oElement.onclick = null;
+			oElement.removeAttribute('onclick');
+
+			return oResult;
 
 		},
 

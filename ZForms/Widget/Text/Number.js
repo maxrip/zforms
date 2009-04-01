@@ -215,7 +215,7 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 
 			this.__base();
 
-			if(this.oElement.value !== this.getValue().toStr()) {
+			if(!this.bPlaceHolderEnabled) {
 				this.setValue(this.getValue());
 			}
 

@@ -16,7 +16,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 			if(this.isTemplate()) {
 				return;
 			}
-			
+
 			this.oDayInput = this.createNumberInput('day', 2, this.oOptions.oPlaceHolders.sDay);
 			this.oMonthInput = this.createMonthInput('month');
 			this.oYearInput = this.createNumberInput('year', 4, this.oOptions.oPlaceHolders.sYear);
@@ -235,7 +235,6 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 						{
 							'type'      : this.oOptions.bOnlyMonths && sPrefix == 'day'? 'hidden' : 'text',
 							'id'        : sPrefix + '-' + this.oElement.id,
-							'name'      : sPrefix + '-' + this.oElement.name,
 							'size'      : iSize,
 							'maxlength' : iSize,
 							'class'     : 'zf-input-' + sPrefix
@@ -266,7 +265,6 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 					'select',
 					{
 						'id'    : sPrefix + '-' + this.oElement.id,
-						'name'  : sPrefix + '-' + this.oElement.name,
 						'class' : 'zf-input-' + sPrefix
 					}
 					),

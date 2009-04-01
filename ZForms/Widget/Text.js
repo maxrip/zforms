@@ -52,7 +52,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 			if(oValue.isEmpty()) {
 
-				this.updateElementValue(oValue);
+				this.updateElementValue(oValue);				
 				this.enablePlaceHolder();
 
 			}
