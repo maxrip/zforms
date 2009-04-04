@@ -30,7 +30,6 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 					'input',
 					{
 						'type'  : 'hidden',
-						'name'  : oElement.getAttribute('name'),
 						'value' : oElement.value
 					}
 					),
@@ -41,7 +40,12 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				this.oHiddenElement.setAttribute('id', 'value-' + oElement.getAttribute('id'));
 			}
 
-			oElement.removeAttribute('name');
+			if(oElement.getAttribute('name')) {
+
+				this.oHiddenElement.setAttribute('name', oElement.getAttribute('name'));
+				oElement.removeAttribute('name');
+				
+			}
 
 		},
 
