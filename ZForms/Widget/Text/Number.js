@@ -14,6 +14,7 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				);
 
 			this.oHiddenElement = null;
+			this.iTimer = null;
 
 			if(this.isTemplate()) {
 				return;
@@ -63,8 +64,9 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 			return Common.Object.extend(
 				this.__base(),
 				{
-					bFloat    : false,
-					bNegative : false
+					bFloat        : false,
+					bNegative     : false,
+					iErrorTimeout : 230
 				},
 				true
 				);
@@ -114,6 +116,13 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				this.__self.DOM_EVENT_TYPE_KEYPRESS,
 				function(oEvent) {
 
+					if(oThis.iTimer) {
+
+						clearTimeout(oThis.iTimer);
+						oThis.removeClass(oThis.__self.CLASS_NAME_INVALID_KEY);
+						
+					}
+
 					var oEvent = Common.Event.normalize(oEvent);
 
 					if(
@@ -135,6 +144,17 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 					}
 
 					Common.Event.cancel(oEvent);
+
+					oThis.addClass(oThis.__self.CLASS_NAME_INVALID_KEY);
+
+					oThis.iTimer = setTimeout(
+						function() {
+
+							oThis.removeClass(oThis.__self.CLASS_NAME_INVALID_KEY);
+
+						},
+						oThis.oOptions.iErrorTimeout
+						);
 
 				}
 				);
@@ -252,6 +272,11 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 			this.__base();
 
 		}
+
+	},
+	{
+
+		CLASS_NAME_INVALID_KEY : 'zf-invalid-key'
 
 	}
 	);
