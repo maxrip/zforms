@@ -478,8 +478,9 @@ ZForms.Builder = Abstract.inheritTo(
 						ZForms.createRequiredDependence(
 							oWidgetFrom,
 							{
-								iLogic : iLogic,
-								iMin   : oFrom.iMin? oFrom.iMin : 1
+								rPattern : oFrom.rPattern,
+								iLogic   : iLogic,
+								iMin     : oFrom.iMin? oFrom.iMin : 1
 							}
 							)
 						);

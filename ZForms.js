@@ -162,7 +162,9 @@ var ZForms = {
 
 		return new this.Dependence.Required(
 			oWidget,
-			oOptions.iMin > 1? new RegExp('\\S.{' + (oOptions.iMin - 2) + ',}\\S') : /\S+/,
+			oOptions.rPattern?
+				oOptions.rPattern :
+				(oOptions.iMin > 1? new RegExp('\\S.{' + (oOptions.iMin - 2) + ',}\\S') : /\S+/),
 			oOptions.iLogic,
 			false,
 			oOptions.iMin
@@ -428,7 +430,7 @@ Common.Event.add(
 	document,
 	Common.Event.TYPE_DOM_CONTENT_LOADED,
 	function() {
-		
+
 		var
 			aFormElements = Common.Dom.getElementsByClassName(
 				document,
