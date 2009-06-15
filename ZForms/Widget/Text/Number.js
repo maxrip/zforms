@@ -44,7 +44,7 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 
 				this.oHiddenElement.setAttribute('name', oElement.getAttribute('name'));
 				oElement.removeAttribute('name');
-				
+
 			}
 
 		},
@@ -222,6 +222,26 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 			if(!this.bPlaceHolderEnabled) {
 				this.setValue(this.getValue());
 			}
+
+		},
+
+		disable : function(bByParent) {
+
+			if(!this.__base(bByParent)) {
+				return false;
+			}
+
+			return this.oHiddenElement.disabled = true;
+
+		},
+
+		enable : function(bByParent) {
+
+			if(!this.__base(bByParent)) {
+				return false;
+			}
+
+			return !(this.oHiddenElement.disabled = false);
 
 		},
 

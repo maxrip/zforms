@@ -9,7 +9,7 @@ ZForms.Value.Number = ZForms.Value.inheritTo(
 
 		match : function(rPattern) {
 
-			return !isNaN(this.mValue) && rPattern.test(this.mValue.toString());
+			return rPattern.test(isNaN(this.mValue)? '' : this.mValue.toString());
 
 		},
 
