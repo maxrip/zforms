@@ -990,20 +990,6 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 				return;
 			}
 
-			var oThis = this;
-
-			if(this.aAll.isEmpty()) {
-				Common.Event.add(
-					document,
-					this.DOM_EVENT_TYPE_KEYUP,
-					function(oEvent) {
-
-						oThis.processKeyPress(oEvent);
-
-					}
-					);
-			}
-
 			this.aAll.push(oSliderInput);
 
 			return this.aAll.length - 1;
@@ -1013,34 +999,6 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 		setActiveIndex : function(iIndex) {
 
 			this.iActiveIndex = iIndex;
-
-		},
-
-		processKeyPress : function(oEvent) {
-
-			var
-				oEvent = Common.Event.normalize(oEvent),
-				oSliderInput = this.aAll[this.iActiveIndex]
-				;
-
-			if(!oSliderInput) {
-				return;
-			}
-
-			switch(oEvent.iKeyCode) {
-
-				case this.KEY_CODE_ARROW_RIGHT:
-					oSliderInput.next();
-				break;
-
-				case this.KEY_CODE_ARROW_LEFT:
-					oSliderInput.prev();
-				break;
-
-				default:
-				break;
-
-			}
 
 		}
 
