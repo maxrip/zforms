@@ -23,7 +23,7 @@ Common.Event.add(
 		setTimeout(
 			function() {
 
-				ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, ZForms, aForms);
+				ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, ZForms);
 				ZForms.bInited = true;
 
 			},

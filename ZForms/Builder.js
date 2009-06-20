@@ -147,6 +147,13 @@ ZForms.Builder = Abstract.inheritTo(
 
 			}
 
+			if(oParams.oOptions.sTabId) {
+
+				oParams.oOptions.oElementLegend = this.$(oParams.oOptions.sTabId);
+				delete oParams.oOptions.sTabId;
+
+			}
+
 			if(oParams.oOptions.sListId) {
 
 				oParams.oOptions.oOptionsElement = this.$(oParams.oOptions.sListId);
