@@ -369,7 +369,7 @@ ZForms.Widget = Abstract.inheritTo(
 
 			this.bValid = true;
 
-			this.removeClass(this.__self.CLASS_NAME_INVALID);
+			this.replaceClass(this.__self.CLASS_NAME_INVALID, this.__self.CLASS_NAME_INVALID_OK);
 
 		},
 
@@ -377,7 +377,7 @@ ZForms.Widget = Abstract.inheritTo(
 
 			this.bValid = false;
 
-			this.addClass(this.__self.CLASS_NAME_INVALID);
+			this.replaceClass(this.__self.CLASS_NAME_INVALID_OK, this.__self.CLASS_NAME_INVALID);
 
 		},
 
@@ -656,6 +656,7 @@ ZForms.Widget = Abstract.inheritTo(
 		CLASS_NAME_REQUIRED         : 'zf-required',
 		CLASS_NAME_REQUIRED_OK      : 'zf-required-ok',
 		CLASS_NAME_INVALID          : 'zf-invalid',
+		CLASS_NAME_INVALID_OK       : 'zf-invalid-ok',
 		CLASS_NAME_DISABLED         : 'zf-disabled',
 		CLASS_NAME_INVISIBLE        : 'zf-invisible',
 		CLASS_NAME_SELECTED         : 'zf-selected',
