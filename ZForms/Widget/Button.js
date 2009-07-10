@@ -74,7 +74,7 @@ ZForms.Widget.Button = ZForms.Widget.inheritTo(
 					this.fDisableHandler
 					);
 			}
-
+			
 			return bBaseReturnValue;
 
 		},

@@ -7,8 +7,6 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			oOptions
 			) {
 
-			var oElement = oElement || document.createElement('div');
-
 			this.oTemplate = null;
 			this.sButtonAddId = oOptions? oOptions.sButtonAddId : null;
 			this.sButtonRemoveId = oOptions? oOptions.sButtonRemoveId : null;
@@ -18,7 +16,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.sLastProcessedChildrenHash = null;
 
 			this.__base(
-				oElement,
+				oElement || document.createElement('div'),
 				oClassElement,
 				oOptions
 				);
@@ -79,6 +77,8 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 		addTemplate : function(oTemplate) {
 
 			this.oTemplate = oTemplate;
+
+			oTemplate.setMultiplier(new ZForms.Multiplier(this, oTemplate));
 
 			if(this.oForm) {
 				oTemplate.setForm(this.oForm);
@@ -145,8 +145,13 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				ZForms.throwException('template not found');
 			}
 
+			for(var i = 0; i < this.aChildren.length; i++) {
+				this.aChildren[i].addId(i);
+			}
+
 			this.oTemplate.hide();
 			this.oTemplate.disable();
+			this.oTemplate.addId(this.oOptions.iMax + 1);
 
 			this.normalizeTemplateAttributes(this.oTemplate);
 
@@ -195,29 +200,28 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				iChildIndex
 				);
 
-			var oMultiplier = this.aChildren[0].getMultiplier();
+			var oMultiplier = this.oTemplate.getMultiplier();
 
 			if(!this.sButtonAddId && oMultiplier.oAddButton) {
-				this.sButtonAddId = oMultiplier.oAddButton.getId();
+				this.sButtonAddId = oMultiplier.oAddButton.oElement.id.match(this.__self.REG_EXP_REPLACE)[1];
 			}
 
 			if(!this.sButtonRemoveId && oMultiplier.oRemoveButton) {
-				this.sButtonRemoveId = oMultiplier.oRemoveButton.getId();
+				this.sButtonRemoveId = oMultiplier.oRemoveButton.oElement.id.match(this.__self.REG_EXP_REPLACE)[1];
 			}
 
 			if(!this.sButtonUpId && oMultiplier.oUpButton) {
-				this.sButtonUpId = oMultiplier.oUpButton.getId();
+				this.sButtonUpId = oMultiplier.oUpButton.oElement.id.match(this.__self.REG_EXP_REPLACE)[1];
 			}
 
 			if(!this.sButtonDownId && oMultiplier.oDownButton) {
-				this.sButtonDownId = oMultiplier.oDownButton.getId();
+				this.sButtonDownId = oMultiplier.oDownButton.oElement.id.match(this.__self.REG_EXP_REPLACE)[1];
 			}
 
 			this.addChild(oNewChild, iChildIndex);
 
 			oNewChild.disable();
 			oNewChild.enable();
-			this.addInitedClassName(oNewChild);
 			oNewChild.show();
 
 			this.updateMultipliers();
@@ -229,18 +233,6 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			this.repaintFix();
 
 			this.processChildrenHashChanged();
-
-		},
-
-		addInitedClassName : function(oNewChild) {
-
-			if(oNewChild instanceof ZForms.Widget.Container) {
-				for(var i = 0; i < oNewChild.aChildren.length; i++) {
-					this.addInitedClassName(oNewChild.aChildren[i]);
-				}
-			}
-
-			oNewChild.addClass(oNewChild.getInitedClassName());
 
 		},
 
@@ -624,7 +616,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 		POSTFIX_ID : '_multiplicator',
 
-		REG_EXP_REPLACE : new RegExp('^(.+)_\\d+(\\[\\])?$'),
+		REG_EXP_REPLACE : /^(.+)_\d+(\[\])?$/,
 
 		CHILD_INDEX_CLASS_NAME_PREFIX : 'zf-child_'
 

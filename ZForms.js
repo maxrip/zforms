@@ -352,15 +352,9 @@ var ZForms = {
 
 	},
 
-	// creation builder method
+	buildForm : function(oElement) {
 
-	/**
-	 * @param {Element} oFormElement
-	 * @returns {ZForms.Builder}
-	 */
-	createBuilder : function(oFormElement) {
-
-		return new this.Builder(oFormElement);
+		return new this.Builder(oElement).build();
 
 	},
 

@@ -97,9 +97,6 @@ ZForms.Builder = Abstract.inheritTo(
 				this.aDependencies.push({ oWidget : oResult, oParams : oParams });
 			}
 
-			oElement.onclick = null;
-			oElement.removeAttribute('onclick');
-
 			if(oParentWidget) {
 
 				if(oParams.oRepeatOptions && oParams.oRepeatOptions.sGroup && oResult.isTemplate()) {
@@ -108,7 +105,7 @@ ZForms.Builder = Abstract.inheritTo(
 				else if(sType == 'buttonprev' || sType == 'buttonnext') {
 					oParentWidget['add' + (sType == 'buttonprev'? 'Prev' : 'Next') + 'Button'](oResult);
 				}
-				else if((sType == 'buttonadd' || sType == 'buttonremove' || sType == 'buttonup' || sType == 'buttondown') && !oParentWidget.isTemplate()) {
+				else if(sType == 'buttonadd' || sType == 'buttonremove' || sType == 'buttonup' || sType == 'buttondown') {
 
 					var aMatches = sType.match(/button(\w)(.+)/);
 					oParentWidget.getMultiplier()['add' + aMatches[1].toUpperCase() + aMatches[2] + 'Button'](oResult);
@@ -332,9 +329,6 @@ ZForms.Builder = Abstract.inheritTo(
 
 			oResult.sType = oResult.sType || this.extractTypeFromElement(oElement);
 
-			oElement.onclick = null;
-			oElement.removeAttribute('onclick');
-
 			return oResult;
 
 		},
@@ -549,9 +543,10 @@ ZForms.Builder = Abstract.inheritTo(
 						ZForms.createValidEmailDependence(
 							oWidgetFrom,
 							{
-								iLogic     : iLogic,
-								bInverse   : oFrom.bInverse,
-								sClassName : oFrom.sClassName
+								iLogic         : iLogic,
+								bInverse       : oFrom.bInverse,
+								sClassName     : oFrom.sClassName,
+								bCheckForEmpty : oFrom.bCheckForEmpty
 							}
 							)
 						);

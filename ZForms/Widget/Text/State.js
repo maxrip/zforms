@@ -53,6 +53,15 @@ ZForms.Widget.Text.State = ZForms.Widget.Text.inheritTo(
 
 			this.bLastProcessedChecked = this.oElement.checked;
 
+		},
+
+		addId : function(iIndex) {
+
+			var iAddIndex = this.oParent.getChildren().indexOf(this) + 1;
+
+			this.addIdToElement(this.oElement, this.__self.ID_PREFIX + iAddIndex + '-', iIndex);
+			this.addIdToElement(this.oClassElement, this.__self.ROW_ID_PREFIX + iAddIndex + '-', iIndex);
+
 		}
 
 	}

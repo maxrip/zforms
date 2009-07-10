@@ -16,7 +16,7 @@ Common.Event.add(
 
 		while(oElement = aFormElements[i++]) {
 			if(!Common.Class.match(oElement, ZForms.Widget.Container.Form.CLASS_NAME_INITED)) {
-				ZForms.createBuilder(oElement).build();
+				ZForms.buildForm(oElement);
 			}
 		}
 

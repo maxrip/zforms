@@ -18,6 +18,8 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 			this.aWidgets = [];
 			this.aWidgets[this.getId()] = this;
 			this.aSubmits = [];
+			this.oCurrentSubmit = null;
+			this.oHiddenSubmitElement = null;
 
 			this.iChangedCounter = 0;
 			this.bSubmitted = false;
@@ -104,6 +106,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 					ZForms.Widget.Container.prototype.init.call(oThis);
 					oThis.updateSubmit();
+					oThis.addClass(oThis.__self.CLASS_NAME_INITED);
 
 				},
 				0
@@ -259,11 +262,42 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 			this.oElement.reset();
 
+		},
+
+		prepareForSubmit : function() {
+
+			this.__base();
+
+			if(this.oHiddenSubmitElement) {
+				this.oHiddenSubmitElement.parentNode.remove(this.oHiddenSubmitElement);
+			}
+
+			if(this.oCurrentSubmit && this.oCurrentSubmit.oOptions.bDisableOnSubmit) {
+				this.oHiddenSubmitElement = this.oElement.appendChild(
+					Common.Dom.createElement(
+						'input',
+						{
+							type  : 'hidden',
+							name  : this.oCurrentSubmit.oElement.name,
+							value : this.oCurrentSubmit.oElement.value
+						}
+						)
+					);
+				this.oCurrentSubmit = null;
+			}
+
+		},
+
+		setCurrentSubmit : function(oSubmit) {
+
+			this.oCurrentSubmit = oSubmit;
+
 		}
 
 	},
 	{
 
+		CLASS_NAME_INITED    : 'zf-inited',
 		CLASS_NAME_SUBMITTED : 'zf-submitted',
 
 		DOM_EVENT_TYPE_SUBMIT : 'submit'

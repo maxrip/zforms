@@ -276,6 +276,26 @@ ZForms.Multiplier = Abstract.inheritTo(
 
 		},
 
+		addId : function(iIndex) {
+
+			if(this.oAddButton) {
+				this.oAddButton.addId(iIndex);
+			}
+
+			if(this.oRemoveButton) {
+				this.oRemoveButton.addId(iIndex);
+			}
+
+			if(this.oUpButton) {
+				this.oUpButton.addId(iIndex);
+			}
+
+			if(this.oDownButton) {
+				this.oDownButton.addId(iIndex);
+			}
+
+		},
+
 		destruct : function() {
 
 			if(this.oAddButton) {

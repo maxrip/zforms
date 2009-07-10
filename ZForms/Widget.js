@@ -199,8 +199,6 @@ ZForms.Widget = Abstract.inheritTo(
 				this.oMultiplier.init();
 			}
 
-			this.addClass(this.getInitedClassName());
-
 			ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, this);
 
 		},
@@ -270,12 +268,6 @@ ZForms.Widget = Abstract.inheritTo(
 		replaceClass : function(sClassNameFrom, sClassNameTo, oElement) {
 
 			Common.Class.replace(oElement? oElement : this.oClassElement, sClassNameFrom, sClassNameTo);
-
-		},
-
-		getInitedClassName : function() {
-
-			return this.__self.CLASS_NAME_INITED;
 
 		},
 
@@ -589,6 +581,27 @@ ZForms.Widget = Abstract.inheritTo(
 
 		},
 
+		addId : function(iIndex) {
+
+			this.addIdToElement(this.oElement, this.__self.ID_PREFIX, iIndex);
+			this.addIdToElement(this.oClassElement, this.__self.ROW_ID_PREFIX, iIndex);
+
+			if(this.oMultiplier) {
+				this.oMultiplier.addId(iIndex);
+			}
+
+		},
+
+		addIdToElement : function(oElement, sPrefix, iIndex) {
+
+			if(!!oElement.getAttribute('id')) {
+				return;
+			}
+
+			oElement.setAttribute('id', sPrefix + (oElement.getAttribute('name') || (Common.Dom.getUniqueId(oElement) + (iIndex > 0? '_' + iIndex : ''))));
+
+		},
+
 		addChild : function(oChild) {
 
 			return oChild;
@@ -661,7 +674,6 @@ ZForms.Widget = Abstract.inheritTo(
 		CLASS_NAME_INVISIBLE        : 'zf-invisible',
 		CLASS_NAME_SELECTED         : 'zf-selected',
 		CLASS_NAME_HIDDEN           : 'zf-hidden',
-		CLASS_NAME_INITED           : 'zf-inited',
 		CLASS_NAME_SELECTED_INITIAL : 'zf-selected-initial',
 		CLASS_NAME_CHANGED          : 'zf-changed',
 
@@ -689,7 +701,10 @@ ZForms.Widget = Abstract.inheritTo(
 		DOM_EVENT_TYPE_SELECTSTART  : 'selectstart',
 		DOM_EVENT_TYPE_UNLOAD       : 'unload',
 		DOM_EVENT_TYPE_BEFOREUNLOAD : 'beforeunload',
-		DOM_EVENT_TYPE_PASTE        : 'paste'
+		DOM_EVENT_TYPE_PASTE        : 'paste',
+
+		ID_PREFIX     : 'input-',
+		ROW_ID_PREFIX : 'row-'
 
 	}
 	);

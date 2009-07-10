@@ -84,7 +84,7 @@ ZForms.Calendar = Abstract.inheritTo(
 				document,
 				'click',
 				function(oEvent) {
-
+					
 					if(Common.Event.normalize(oEvent).target != oThis.oPickerButton.oElement) {
 						oThis.hide();
 					}

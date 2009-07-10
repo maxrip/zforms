@@ -44,6 +44,10 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		updateElementValue : function(oValue) {
 
+			if(oValue.isEmpty() && this.bPlaceHolderEnabled) {
+				return;
+			}
+
 			this.oElement.value = oValue.toStr();
 
 		},
@@ -52,7 +56,7 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 			if(oValue.isEmpty()) {
 
-				this.updateElementValue(oValue);				
+				this.updateElementValue(oValue);
 				this.enablePlaceHolder();
 
 			}
@@ -377,6 +381,16 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 				this.oElement.parentNode.replaceChild(this.oPasswordReplacerElement, this.oElement);
 
+			}
+
+		},
+
+		addId : function(iIndex) {
+
+			this.__base(iIndex);
+
+			if(this.oPasswordReplacerElement) {
+				this.addIdToElement(this.oPasswordReplacerElement, this.__self.ID_PREFIX, iIndex);
 			}
 
 		},

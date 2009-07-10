@@ -233,12 +233,22 @@ ZForms.Widget.Container = ZForms.Widget.inheritTo(
 
 		},
 
+		addId : function(iIndex) {
+
+			this.__base(iIndex);
+
+			for(var i = 0, iLength = this.aChildren.length; i < iLength; i++) {
+				this.aChildren[i].addId(iIndex);
+			}
+
+		},
+
 		clone : function(
 			oElement,
 			oClassElement,
 			iIndex
 			) {
-
+			
 			var oResult = this.__base(
 				oElement,
 				oClassElement,

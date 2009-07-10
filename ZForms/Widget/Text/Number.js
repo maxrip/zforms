@@ -120,7 +120,7 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 
 						clearTimeout(oThis.iTimer);
 						oThis.removeClass(oThis.__self.CLASS_NAME_INVALID_KEY);
-						
+
 					}
 
 					var oEvent = Common.Event.normalize(oEvent);
@@ -131,6 +131,7 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 						oEvent.charCode == 0 ||
 						oEvent.which == 0 ||
 						(iKeyDownCode == oEvent.keyCode && (oEvent.keyCode == 46 || oEvent.keyCode == 45 || oEvent.keyCode == 36 || oEvent.keyCode == 35 || oEvent.keyCode == 9 || oEvent.keyCode == 8)) ||
+						oEvent.keyCode == 13 ||																
 						(oEvent.iKeyCode >= 48 && oEvent.iKeyCode <= 57) ||
 						(oThis.oOptions.bFloat && (oEvent.iKeyCode == 44 || oEvent.iKeyCode == 46) && !/\.|\,/.test(oThis.oElement.value)) ||
 						(
@@ -251,7 +252,11 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				return false;
 			}
 
-			return this.oHiddenElement.disabled = true;
+			if(this.oHiddenElement) {
+				this.oHiddenElement.disabled = true;
+			}
+
+			return true;
 
 		},
 
@@ -261,7 +266,11 @@ ZForms.Widget.Text.Number = ZForms.Widget.Text.inheritTo(
 				return false;
 			}
 
-			return !(this.oHiddenElement.disabled = false);
+			if(this.oHiddenElement) {
+				this.oHiddenElement.disabled = false;
+			}
+
+			return true;
 
 		},
 

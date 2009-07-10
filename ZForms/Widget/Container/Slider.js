@@ -979,7 +979,6 @@ ZForms.Widget.Container.Slider = ZForms.Widget.Container.inheritTo(
 		CLASS_NAME_MARK_ELEMENT             : 'zf-slider-mark',
 		CLASS_NAME_MARK_ELEMENT_SELECTED    : 'zf-slider-mark-selected',
 		CLASS_NAME_RANGE_ELEMENT            : 'zf-slider-range',
-		CLASS_NAME_INITED                   : 'zf-slider-inited',
 
 		aAll : [],
 		iActiveIndex : 0,

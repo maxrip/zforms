@@ -85,17 +85,18 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				bProcessBlur = true
 				;
 
-			if(this.hasPlaceHolder()) {
-				Common.Event.add(
-					this.oPasswordReplacerElement || this.oElement,
-					this.__self.DOM_EVENT_TYPE_FOCUS,
-					function() {
+			Common.Event.add(
+				this.oPasswordReplacerElement || this.oElement,
+				this.__self.DOM_EVENT_TYPE_FOCUS,
+				function() {
 
+					oThis.addClass(oThis.__self.CLASS_NAME_FOCUSED);
+					if(oThis.hasPlaceHolder()) {
 						oThis.disablePlaceHolder();
-
 					}
-					);
-			}
+
+				}
+				);
 
 			Common.Event.add(
 				this.oElement,
@@ -148,7 +149,9 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				this.__self.DOM_EVENT_TYPE_CLICK,
 				function(oEvent) {
 
-					if(Common.Event.normalize(oEvent).target == oThis.oElement) {
+					var oTarget = Common.Event.normalize(oEvent).target;
+					if(oTarget == oThis.oElement ||
+					   (oThis.oOptions.oShowOptionsElement &&oThis.oOptions.oShowOptionsElement == oTarget)) {
 						return;
 					}
 
@@ -168,6 +171,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 					}
 
 					if(bProcessBlur) {
+						oThis.removeClass(oThis.__self.CLASS_NAME_FOCUSED);
 						oThis.hideOptions();
 					}
 
@@ -224,8 +228,6 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 				this.oShowOptionsButton.setHandler(
 					function(oEvent) {
-
-						Common.Event.cancel(oEvent);
 
 						oThis.updateOptions(true, '');
 
@@ -428,7 +430,6 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 			var
 				i = 0,
-				iLength = this.aOptionsCurrent.length,
 				oOptionsCurrent,
 				iOptionsCount = 0,
 				bFound = false,
@@ -459,7 +460,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 			if(!bFound) {
 
 				this.iSelectedIndex = -1;
-				this.oOptions.oOptionsElement.selectedIndex = -1;
+				oOptionsElement.selectedIndex = -1;
 
 			}
 
@@ -583,6 +584,18 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 				);
 
 			this.__base(iIndex);
+
+		},
+
+		addId : function(iIndex) {
+
+			this.__base(iIndex);
+
+			this.addIdToElement(this.oOptions.oOptionsElement, 'options-', iIndex);
+
+			if(this.oOptions.oShowOptionsElement) {
+				this.addIdToElement(this.oOptions.oShowOptionsElement, 'show-', iIndex);
+			}
 
 		},
 

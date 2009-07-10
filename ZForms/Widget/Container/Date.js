@@ -234,7 +234,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 						'input',
 						{
 							'type'      : this.oOptions.bOnlyMonths && sPrefix == 'day'? 'hidden' : 'text',
-							'id'        : sPrefix + '-' + this.oElement.id,
+							'id'        : this.oElement.id? sPrefix + '-' + this.oElement.id : '',
 							'size'      : iSize,
 							'maxlength' : iSize,
 							'class'     : 'zf-input-' + sPrefix
@@ -264,7 +264,7 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 				oElement = Common.Dom.createElement(
 					'select',
 					{
-						'id'    : sPrefix + '-' + this.oElement.id,
+						'id'    : this.oElement.id? sPrefix + '-' + this.oElement.id : '',
 						'class' : 'zf-input-' + sPrefix
 					}
 					),
@@ -358,12 +358,23 @@ ZForms.Widget.Container.Date = ZForms.Widget.Container.inheritTo(
 
 		},
 
+		addId : function(iIndex) {
+
+			this.__base(iIndex);
+
+			if(this.oOptions.oPickerOpenerElement) {
+				this.addIdToElement(this.oOptions.oPickerOpenerElement, 'opener-', iIndex);
+			}
+
+		},
+
+
 		clone : function(
 			oElement,
 			oClassElement,
 			iIndex
 			) {
-
+			
 			return new this.__self(
 				oElement,
 				oClassElement,
