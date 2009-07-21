@@ -6,13 +6,15 @@ ZForms.Calendar = Abstract.inheritTo(
 			this.oWidget = oWidget;
 
 			this.oPickerButton = ZForms.createButton(oWidget.oOptions.oPickerOpenerElement);
-			this.oElement             = Common.Dom.createElement('table', { 'class' : this.__self.CLASS_NAME_CALENDAR + ' ' + this.__self.CLASS_NAME_HIDDEN }).appendChild(Common.Dom.createElement('tbody'));
-			this.oYearTitleElement    = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });
-			this.oMonthTitleElement   = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });
+			this.oElement = Common.Dom.createElement('table', { 'class' : this.__self.CLASS_NAME_CALENDAR + ' ' + this.__self.CLASS_NAME_HIDDEN }).appendChild(Common.Dom.createElement('tbody'));
+			this.oYearTitleElement = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });
+			this.oMonthTitleElement = Common.Dom.createElement('span', { 'class' : this.__self.CLASS_NAME_TITLE });
 
 			this.oDate = new Date();
 			this.oDateNow = new Date();
 			this.bShowed = false;
+			this.fClickHandler = null;
+			this.fMouseHandler = null;
 
 			this.init();
 
@@ -84,7 +86,7 @@ ZForms.Calendar = Abstract.inheritTo(
 				document,
 				'click',
 				function(oEvent) {
-					
+
 					if(Common.Event.normalize(oEvent).target != oThis.oPickerButton.oElement) {
 						oThis.hide();
 					}
@@ -134,6 +136,55 @@ ZForms.Calendar = Abstract.inheritTo(
 				);
 
 			this.oPickerButton.oElement.parentNode.appendChild(this.oElement.parentNode);
+
+			this.fClickHandler = function(oEvent) {
+
+				oThis.hide();
+
+				var
+					oTarget = Common.Event.normalize(oEvent).target,
+					iDay = parseInt(oTarget.innerHTML, 10)
+					;
+
+				oThis.setDate(
+					new Date(
+						oThis.oDate.getFullYear(),
+						oThis.oDate.getMonth() + (Common.Class.match(oTarget, oThis.__self.CLASS_NAME_ADD)? (iDay > 15? -1 : 1) : 0),
+						oTarget.innerHTML
+						)
+					);
+
+				if(oThis.oWidget.oOptions.bWithTime) {
+
+					oThis.oDate.setHours(oThis.oWidget.oHourInput.getValue().isEmpty()? 0 : oThis.oWidget.oHourInput.getValue().get());
+					oThis.oDate.setMinutes(oThis.oWidget.oMinuteInput.getValue().isEmpty()? 0 : oThis.oWidget.oMinuteInput.getValue().get());
+					oThis.oDate.setSeconds(oThis.oWidget.oSecondInput.getValue().isEmpty()? 0 : oThis.oWidget.oSecondInput.getValue().get());
+
+				}
+
+				oThis.oWidget.setValue(oThis.oWidget.createValue(oThis.oDate));
+
+			};
+
+			this.fMouseHandler = function(oEvent) {
+
+				if(Common.Browser.isOpera()) {
+
+					oEvent.target.style.display = 'none';
+					oEvent.target.style.display = 'table-cell';
+
+				}
+				else {
+
+					var oEvent = Common.Event.normalize(oEvent);
+
+					Common.Class[oEvent.type == 'mouseover'? 'add' : 'remove'](oEvent.target, oThis.__self.CLASS_NAME_HOVERED);
+
+				}
+
+
+			};
+
 
 		},
 
@@ -274,70 +325,45 @@ ZForms.Calendar = Abstract.inheritTo(
 			oBodyElement.innerHTML = oBuffer.get();
 			oBodyElement = oBodyElement.getElementsByTagName('tbody')[0];
 
-			this.oElement.parentNode.replaceChild(oBodyElement, this.oElement);
-
-			this.oElement = oBodyElement;
-
-			var oThis = this;
-
-			Common.Event.add(
+			Common.Event.remove(
 				this.oElement,
 				'click',
-				function(oEvent) {
+				this.fClickHandler
+				);
 
-					oThis.hide();
-
-					var
-						oTarget = Common.Event.normalize(oEvent).target,
-						iDay = parseInt(oTarget.innerHTML, 10)
-						;
-
-					oThis.setDate(
-						new Date(
-							oThis.oDate.getFullYear(),
-							oThis.oDate.getMonth() + (Common.Class.match(oTarget, oThis.__self.CLASS_NAME_ADD)? (iDay > 15? -1 : 1) : 0),
-							oTarget.innerHTML
-							)
-						);
-
-					if(oThis.oWidget.oOptions.bWithTime) {
-
-						oThis.oDate.setHours(oThis.oWidget.oHourInput.getValue().isEmpty()? 0 : oThis.oWidget.oHourInput.getValue().get());
-						oThis.oDate.setMinutes(oThis.oWidget.oMinuteInput.getValue().isEmpty()? 0 : oThis.oWidget.oMinuteInput.getValue().get());
-						oThis.oDate.setSeconds(oThis.oWidget.oSecondInput.getValue().isEmpty()? 0 : oThis.oWidget.oSecondInput.getValue().get());
-
-					}
-
-					oThis.oWidget.setValue(oThis.oWidget.createValue(oThis.oDate));
-
-				}
+			Common.Event.add(
+				oBodyElement,
+				'click',
+				this.fClickHandler
 				);
 
 			if(Common.Browser.isOpera() || (Common.Browser.isIE() && (!document.compatMode || document.compatMode == 'BackCompat' || !window.XMLHttpRequest))) {
-				Common.Event.add(
-					this.oElement.getElementsByTagName('td'),
-					['mouseover', 'mouseout'],
-					function(oEvent) {
 
+				var aCells = this.oElement.getElementsByTagName('td');
 
-						if(Common.Browser.isOpera()) {
+				for(var i = 0; i < aCells.length; i++) {
+					Common.Event.remove(
+						aCells[i],
+						['mouseover', 'mouseout'],
+						this.fMouseHandler
+						);
+				}
 
-							oEvent.target.style.display = 'none';
-							oEvent.target.style.display = 'table-cell';
+				aCells = oBodyElement.getElementsByTagName('td');
 
-						}
-						else {
+				for(var i = 0; i < aCells.length; i++) {
+					Common.Event.add(
+						aCells[i],
+						['mouseover', 'mouseout'],
+						this.fMouseHandler
+						);
+				}
 
-							var oEvent = Common.Event.normalize(oEvent);
-
-							Common.Class[oEvent.type == 'mouseover'? 'add' : 'remove'](oEvent.target, oThis.__self.CLASS_NAME_HOVERED);
-
-						}
-
-
-					}
-					);
 			}
+
+			this.oElement.parentNode.replaceChild(oBodyElement, this.oElement);
+
+			this.oElement = oBodyElement;
 
 		},
 
@@ -381,9 +407,9 @@ ZForms.Calendar = Abstract.inheritTo(
 		destruct : function() {
 
 			this.oWidget = null;
-			this.oElement             = null;
-			this.oYearTitleElement    = null;
-			this.oMonthTitleElement   = null;
+			this.oElement = null;
+			this.oYearTitleElement = null;
+			this.oMonthTitleElement = null;
 
 			this.oPickerButton.destruct();
 

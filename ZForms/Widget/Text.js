@@ -147,8 +147,10 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				this.__self.DOM_EVENT_TYPE_BLUR,
 				function() {
 
-					oThis.removeClass(oThis.__self.CLASS_NAME_FOCUSED);
-					oThis.enablePlaceHolder();
+					if(oThis.oElement) { // condition for ie
+						oThis.removeClass(oThis.__self.CLASS_NAME_FOCUSED);
+						oThis.enablePlaceHolder();
+					}
 
 				}
 				);
@@ -164,87 +166,87 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 			}
 
 			if(!this.bTextArea) {
-				 this.oElement.maxLength = this.iMaxLength;
+
+				this.oElement.maxLength = this.iMaxLength;
+				return;
+
 			}
-			else {
 
-				var
-					oThis = this,
-					iKeyDownCode
-					;
+			var
+				oThis = this,
+				iKeyDownCode
+				;
 
-				// opera 9.5 is really fucking browser
-				if(Common.Browser.isOpera() && this.oElement.isSameNode) {
-					Common.Event.add(
-						this.oElement,
-						this.__self.DOM_EVENT_TYPE_KEYDOWN,
-						function(oEvent) {
-
-							iKeyDownCode = oEvent.keyCode;
-
-						}
-						);
-				}
-
+			// opera 9.5 is really fucking browser
+			if(Common.Browser.isOpera() && this.oElement.isSameNode) {
 				Common.Event.add(
 					this.oElement,
-					this.__self.DOM_EVENT_TYPE_KEYPRESS,
+					this.__self.DOM_EVENT_TYPE_KEYDOWN,
 					function(oEvent) {
 
-						var oEvent = Common.Event.normalize(oEvent);
-
-						if(oEvent.iKeyCode != 13 && (
-								oEvent.ctrlKey ||
-								oEvent.metaKey ||
-								oEvent.charCode == 0 ||
-						    	oEvent.which == 0 ||
-								(iKeyDownCode == oEvent.keyCode && (oEvent.keyCode == 46 || oEvent.keyCode == 45 || oEvent.keyCode == 36 || oEvent.keyCode == 35 || oEvent.keyCode == 9 || oEvent.keyCode == 8))
-							)
-							) {
-							return;
-						}
-
-						var iSelectionLength = document.selection?
-							document.selection.createRange().text.length :
-							oThis.oElement.selectionEnd - oThis.oElement.selectionStart
-							;
-
-						if(iSelectionLength <= 0 && oThis.oElement.value.length >= oThis.iMaxLength) {
-							Common.Event.cancel(oEvent);
-						}
+						iKeyDownCode = oEvent.keyCode;
 
 					}
 					);
+			}
 
-				Common.Event.add(
-					this.oElement,
-					this.__self.DOM_EVENT_TYPE_PASTE,
-					function() {
+			Common.Event.add(
+				this.oElement,
+				this.__self.DOM_EVENT_TYPE_KEYPRESS,
+				function(oEvent) {
 
-						setTimeout(
-							function() {
+					var oEvent = Common.Event.normalize(oEvent);
 
-								oThis.setValue(oThis.createValue(oThis.oElement.value));
-
-							},
-							0
-							);
-
+					if(oEvent.iKeyCode != 13 && (
+							oEvent.ctrlKey ||
+							oEvent.metaKey ||
+							oEvent.charCode == 0 ||
+							oEvent.which == 0 ||
+							(iKeyDownCode == oEvent.keyCode && (oEvent.keyCode == 46 || oEvent.keyCode == 45 || oEvent.keyCode == 36 || oEvent.keyCode == 35 || oEvent.keyCode == 9 || oEvent.keyCode == 8))
+						)
+						) {
+						return;
 					}
-					);
 
-				if(Common.Browser.isOpera()) {
-					Common.Event.add(
-						this.oElement,
-						this.__self.DOM_EVENT_TYPE_BLUR,
+					var iSelectionLength = document.selection?
+						document.selection.createRange().text.length :
+						oThis.oElement.selectionEnd - oThis.oElement.selectionStart
+						;
+
+					if(iSelectionLength <= 0 && oThis.oElement.value.length >= oThis.iMaxLength) {
+						Common.Event.cancel(oEvent);
+					}
+
+				}
+				);
+
+			Common.Event.add(
+				this.oElement,
+				this.__self.DOM_EVENT_TYPE_PASTE,
+				function() {
+
+					setTimeout(
 						function() {
 
 							oThis.setValue(oThis.createValue(oThis.oElement.value));
 
-						}
+						},
+						0
 						);
-				}
 
+				}
+				);
+
+			if(Common.Browser.isOpera()) {
+				Common.Event.add(
+					this.oElement,
+					this.__self.DOM_EVENT_TYPE_BLUR,
+					function() {
+
+						oThis.setValue(oThis.createValue(oThis.oElement.value));
+
+					}
+					);
 			}
 
 		},

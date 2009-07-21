@@ -3,6 +3,7 @@ var ZForms = {
 	EVENT_TYPE_ON_INIT          : 'zf:oninit',
 	EVENT_TYPE_ON_CHANGE        : 'zf:onchange',
 	EVENT_TYPE_ON_BEFORE_SUBMIT : 'zf:onbeforesubmit',
+	EVENT_TYPE_ON_READY_CHANGE  : 'zf:onreadychange',
 
 	// static widget creation methods
 
@@ -398,6 +399,9 @@ var ZForms = {
 			) {
 			mObserver(mEventType, mObservable);
 		}
+		else if(mEventType == this.EVENT_TYPE_ON_READY_CHANGE) {
+			mObserver(mEventType, mObservable, mObservable.isReadyForSubmit());
+		}
 
 	},
 
@@ -411,9 +415,9 @@ var ZForms = {
 
 	},
 
-	notifyObservers : function(sEventType, oObservable) {
+	notifyObservers : function(sEventType, oObservable, mData) {
 
-		Common.Observable.notify(sEventType, oObservable);
+		Common.Observable.notify(sEventType, oObservable, mData);
 
 	}
 

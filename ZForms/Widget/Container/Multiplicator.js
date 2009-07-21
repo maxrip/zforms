@@ -28,8 +28,9 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 			return Common.Object.extend(
 				this.__base(),
 				{
-					iMin : 1,
-					iMax : 10
+					iMin            : 1,
+					iMax            : 10,
+					bNameHasPostfix : false
 				},
 				true
 				);
@@ -487,7 +488,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				oNode.htmlFor = oNode.htmlFor.replace(this.__self.REG_EXP_REPLACE, '$1' + (iPostfix > 0? '_' + iPostfix : ''));
 			}
 
-			if(oNode.name) {
+			if(this.oOptions.bNameHasPostfix && oNode.name) {
 
 				oNode.name = oNode.name.replace(this.__self.REG_EXP_REPLACE, '$1' + (iPostfix > 0? '_' + iPostfix : '') + '$2');
 
@@ -509,7 +510,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 
 		removePostfixFromNode : function(oNode) {
 
-			if(oNode.name) {
+			if(this.oOptions.bNameHasPostfix && oNode.name) {
 				oNode.name = oNode.name.replace(this.__self.REG_EXP_REPLACE, '$1$2');
 			}
 
@@ -543,7 +544,7 @@ ZForms.Widget.Container.Multiplicator = ZForms.Widget.Container.inheritTo(
 				oNode.htmlFor += '_' + iPostfix;
 			}
 
-			if(oNode.name) {
+			if(this.oOptions.bNameHasPostfix && oNode.name) {
 
 				oNode.name = oNode.name.replace(/^([^\[]+)(\[\])?$/, '$1_' + iPostfix + '$2');
 				this.fixNode(oNode);

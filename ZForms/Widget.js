@@ -583,7 +583,7 @@ ZForms.Widget = Abstract.inheritTo(
 
 		addId : function(iIndex) {
 
-			this.addIdToElement(this.oElement, this.__self.ID_PREFIX, iIndex);
+			this.setId(this.addIdToElement(this.oElement, this.__self.ID_PREFIX, iIndex));
 			this.addIdToElement(this.oClassElement, this.__self.ROW_ID_PREFIX, iIndex);
 
 			if(this.oMultiplier) {
@@ -595,10 +595,14 @@ ZForms.Widget = Abstract.inheritTo(
 		addIdToElement : function(oElement, sPrefix, iIndex) {
 
 			if(!!oElement.getAttribute('id')) {
-				return;
+				return oElement.getAttribute('id');
 			}
 
-			oElement.setAttribute('id', sPrefix + (oElement.getAttribute('name') || (Common.Dom.getUniqueId(oElement) + (iIndex > 0? '_' + iIndex : ''))));
+			var sId = sPrefix + Common.Dom.getUniqueId(oElement) + (iIndex > 0? '_' + iIndex : '');
+
+			oElement.setAttribute('id', sId);
+
+			return sId;
 
 		},
 
@@ -687,6 +691,7 @@ ZForms.Widget = Abstract.inheritTo(
 		KEY_CODE_END         : 35,
 		KEY_CODE_ENTER       : 13,
 		KEY_CODE_TAB         : 9,
+		KEY_CODE_ESCAPE      : 27,
 
 		DOM_EVENT_TYPE_KEYUP        : 'keyup',
 		DOM_EVENT_TYPE_KEYDOWN      : 'keydown',

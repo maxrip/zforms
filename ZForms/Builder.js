@@ -6,6 +6,7 @@ ZForms.Builder = Abstract.inheritTo(
 			this.oFormElement = oFormElement;
 			this.oForm = null;
 			this.aWidgets = [];
+			this.aWidgetsById = [];
 			this.aSheetContainers = [];
 			this.aRepeatContainers = [];
 			this.oLastRepeatRoot = null;
@@ -57,6 +58,7 @@ ZForms.Builder = Abstract.inheritTo(
 
 			while(oWidget = aWidgets[i++]) {
 				this.aWidgets[oWidget.getName()] = oWidget;
+				this.aWidgetsById[oWidget.getId()] = oWidget;
 			}
 
 			this.buildDependencies();
@@ -65,12 +67,13 @@ ZForms.Builder = Abstract.inheritTo(
 				this.oForm.init();
 			}
 
-			this.oFormElement = null;
-			this.aWidgets.length = 0;
-			this.aSheetContainers.length = 0;
-			this.aRepeatContainers.length = 0;
-			this.oLastRepeatRoot = null;
-			this.aDependencies.length = 0;
+			delete this.oFormElement;
+			delete this.aWidgets;
+			delete this.aWidgetsById;
+			delete this.aSheetContainers;
+			delete this.aRepeatContainers;
+			delete this.oLastRepeatRoot;
+			delete this.aDependencies;
 
 			return this.oForm;
 
@@ -266,22 +269,6 @@ ZForms.Builder = Abstract.inheritTo(
 
 			return this.oLastRepeatRoot;
 
-			/*while(oElement = oElement.parentNode) {
-
-				if(oElement.tagName.toLowerCase() == 'form') {
-					ZForms.throwException('repeat root not found');
-				}
-
-				if(Common.Class.match(oElement, this.__self.CLASS_NAME_WIDGET)) {
-
-					var oResult = this.aRepeatRoots[this.__self.getId(oElement)];
-					if(oResult) {
-						return oResult;
-					}
-
-				}
-			}*/
-
 		},
 
 		getSheetContainer : function(
@@ -403,6 +390,12 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
+		getWidgetById : function(sId) {
+
+			return this.aWidgetsById[sId];
+
+		},
+
 		buildDependencies : function() {
 
 			var
@@ -455,11 +448,7 @@ ZForms.Builder = Abstract.inheritTo(
 				;
 			while(oFrom = oRequired.aFrom[i++]) {
 
-				oWidgetFrom = oFrom.sName? this.getWidgetByName(oFrom.sName) : oWidget;
-
-				if(!oWidgetFrom) {
-					this.throwDependenceException(oFrom.sName);
-				}
+				oWidgetFrom = this.getWidgetFrom(oFrom, oWidget);
 
 				if(oFrom.fFunction) {
 					oWidget.addDependence(
@@ -515,6 +504,7 @@ ZForms.Builder = Abstract.inheritTo(
 				Common.Object.extend(
 					oOptionsAdd,
 					{
+						sId            : oValid.sId,
 						sName          : oValid.sName,
 						bInverse       : oValid.bInverse,
 						sClassName     : oValid.sClassName,
@@ -532,11 +522,7 @@ ZForms.Builder = Abstract.inheritTo(
 				;
 			while(oFrom = oValid.aFrom[i++]) {
 
-				oWidgetFrom = oFrom.sName? this.getWidgetByName(oFrom.sName) : oWidget;
-
-				if(!oWidgetFrom) {
-					this.throwDependenceException(oFrom.sName);
-				}
+				oWidgetFrom = this.getWidgetFrom(oFrom, oWidget);
 
 				if(oFrom.sType && oFrom.sType == 'email' && iType == ZForms.Dependence.TYPE_VALID) {
 					oWidget.addDependence(
@@ -575,13 +561,14 @@ ZForms.Builder = Abstract.inheritTo(
 						ZForms['create' + (iType == ZForms.Dependence.TYPE_VALID? 'Valid' : 'Enabled') + 'CompareDependence'](
 							oWidgetFrom,
 							{
-								sCondition : oFrom.oCompare.sCondition,
-								mArgument  : oFrom.oCompare.sName?
-									this.getWidgetByName(oFrom.oCompare.sName) :
-									oFrom.oCompare.mValue,
-								iLogic     : iLogic,
-								bInverse   : oFrom.bInverse,
-								sClassName : oFrom.sClassName,
+								sCondition     : oFrom.oCompare.sCondition,
+								mArgument      : oFrom.oCompare.sId?
+									this.getWidgetById(oFrom.oCompare.sId) :
+									(oFrom.oCompare.sName? this.getWidgetByName(oFrom.oCompare.sName) : oFrom.oCompare.mValue)
+									,
+								iLogic         : iLogic,
+								bInverse       : oFrom.bInverse,
+								sClassName     : oFrom.sClassName,
 								bCheckForEmpty : oFrom.bCheckForEmpty
 							}
 							)
@@ -624,6 +611,7 @@ ZForms.Builder = Abstract.inheritTo(
 				Common.Object.extend(
 					oOptionsAdd,
 					{
+						sId   : oDepended.sId,
 						sName : oDepended.sName
 					}
 					);
@@ -640,11 +628,7 @@ ZForms.Builder = Abstract.inheritTo(
 				;
 			while(oFrom = oDepended.aFrom[i++]) {
 
-				oWidgetFrom = oFrom.sName? this.getWidgetByName(oFrom.sName) : oWidget;
-
-				if(!oWidgetFrom) {
-					this.throwDependenceException(oFrom.sName);
-				}
+				oWidgetFrom = this.getWidgetFrom(oFrom, oWidget);
 
 				if(oFrom.aData) {
 
@@ -707,6 +691,7 @@ ZForms.Builder = Abstract.inheritTo(
 				Common.Object.extend(
 					oOptionsAdd,
 					{
+						sId   : oClass.sId,
 						sName : oClass.sName
 					}
 					);
@@ -723,11 +708,7 @@ ZForms.Builder = Abstract.inheritTo(
 				;
 			while(oFrom = oClass.aFrom[i++]) {
 
-				oWidgetFrom = oFrom.sName? this.getWidgetByName(oFrom.sName) : oWidget;
-
-				if(!oWidgetFrom) {
-					this.throwDependenceException(oFrom.sName);
-				}
+				oWidgetFrom = this.getWidgetFrom(oFrom, oWidget);
 
 				if(oFrom.aData) {
 
@@ -779,9 +760,24 @@ ZForms.Builder = Abstract.inheritTo(
 
 		},
 
+		getWidgetFrom : function(oFrom, oWidgetDefault) {
+
+			var oResult = oFrom.sId?
+				this.getWidgetById(oFrom.sId) :
+				(oFrom.sName? this.getWidgetByName(oFrom.sName) : oWidgetDefault);
+
+
+			if(!oResult) {
+				this.throwDependenceException(oFrom.sId || oFrom.sName);
+			}
+
+			return oResult;
+
+		},
+
 		throwDependenceException : function(sName) {
 
-			ZForms.throwException('Widget with name "' + sName + '" no exists');
+			ZForms.throwException('Widget with name/id "' + sName + '" no exists');
 
 		}
 

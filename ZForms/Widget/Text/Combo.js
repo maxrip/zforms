@@ -137,7 +137,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 
 					var oEvent = Common.Event.normalize(oEvent);
 
-					if(oEvent.iKeyCode == oThis.__self.KEY_CODE_ENTER) {
+					if(oEvent.iKeyCode == oThis.__self.KEY_CODE_ENTER && oThis.bOptionsShowed) {
 						Common.Event.cancel(oEvent);
 					}
 
@@ -170,7 +170,7 @@ ZForms.Widget.Text.Combo = ZForms.Widget.Text.inheritTo(
 						oThis.enablePlaceHolder();
 					}
 
-					if(bProcessBlur) {
+					if(bProcessBlur && oThis.oElement) {
 						oThis.removeClass(oThis.__self.CLASS_NAME_FOCUSED);
 						oThis.hideOptions();
 					}
