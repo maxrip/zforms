@@ -420,7 +420,7 @@ ZForms.Builder = Abstract.inheritTo(
 				}
 
 				if(oParams.oEnabled) {
-					this.buildValidOrEnabledDependence(oDependence.oWidget, oParams.oEnabled, ZForms.Dependence.TYPE_ENABLE);
+					this.buildValidOrEnabledDependence(oDependence.oWidget, oParams.oEnabled, ZForms.Dependence.TYPE_ENABLED);
 				}
 
 				if(oParams.oDependedOptions) {
@@ -508,7 +508,8 @@ ZForms.Builder = Abstract.inheritTo(
 						sName          : oValid.sName,
 						bInverse       : oValid.bInverse,
 						sClassName     : oValid.sClassName,
-						bCheckForEmpty : oValid.bCheckForEmpty
+						bCheckForEmpty : oValid.bCheckForEmpty,
+						bFocusOnEnable : oValid.bFocusOnEnable
 					}
 					);
 			}
@@ -546,7 +547,8 @@ ZForms.Builder = Abstract.inheritTo(
 								iLogic         : iLogic,
 								bInverse       : oFrom.bInverse,
 								sClassName     : oFrom.sClassName,
-								bCheckForEmpty : oFrom.bCheckForEmpty
+								bCheckForEmpty : oFrom.bCheckForEmpty,
+								bFocusOnEnable : oFrom.bFocusOnEnable
 							}
 							)
 						);
@@ -569,7 +571,8 @@ ZForms.Builder = Abstract.inheritTo(
 								iLogic         : iLogic,
 								bInverse       : oFrom.bInverse,
 								sClassName     : oFrom.sClassName,
-								bCheckForEmpty : oFrom.bCheckForEmpty
+								bCheckForEmpty : oFrom.bCheckForEmpty,
+								bFocusOnEnable : oFrom.bFocusOnEnable
 							}
 							)
 						);

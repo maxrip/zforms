@@ -107,7 +107,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 					oThis.addClass(oThis.__self.CLASS_NAME_INITED);
 					ZForms.Widget.Container.prototype.init.call(oThis);
-					oThis.updateSubmit();
+					oThis.updateSubmit(true);
 
 				},
 				0
@@ -153,11 +153,11 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 		},
 
-		updateSubmit : function() {
+		updateSubmit : function(bAlways) {
 
 			var bReadyForSubmit = this.isReadyForSubmit(true);
 
-			if(bReadyForSubmit == this.bReadyForSubmit) {
+			if(!bAlways && bReadyForSubmit == this.bReadyForSubmit) {
 				return;
 			}
 
@@ -165,7 +165,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 			if(this.oOptions.bUpdatableSubmit && this.aSubmits.length > 0) {
 
-				if(this.shouldEnableSubmit(bReadyForSubmit)) {
+				if(bReadyForSubmit) {
 					this.enableSubmit();
 				}
 				else {
@@ -175,13 +175,6 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 			}
 
 			ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_READY_CHANGE, this, bReadyForSubmit);
-
-		},
-
-		shouldEnableSubmit : function(bReadyForSubmit) {
-
-			return bReadyForSubmit &&
-				(!this.oOptions.bCheckForChanged || this.isChanged());
 
 		},
 
@@ -247,7 +240,7 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 
 			}
 
-			return true;
+			return !this.oOptions.bCheckForChanged || this.isChanged();
 
 		},
 

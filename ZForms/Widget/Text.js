@@ -96,10 +96,21 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 
 		init : function() {
 
-			this.__base();
-
 			if(!this.isTemplate()) {
 				this.enablePlaceHolder();
+			}
+
+			this.__base();
+
+		},
+
+		focus : function() {
+
+			if(this.oPasswordReplacerElement && this.bPlaceHolderEnabled) {
+				this.oPasswordReplacerElement.focus();
+			}
+			else {
+				this.__base();
 			}
 
 		},
@@ -362,17 +373,6 @@ ZForms.Widget.Text = ZForms.Widget.inheritTo(
 				}
 
 				this.oPasswordReplacerElement.parentNode.replaceChild(this.oElement, this.oPasswordReplacerElement);
-
-				var oThis = this;
-
-				setTimeout(
-					function() {
-
-						oThis.oElement.focus();
-
-					},
-					0
-					);
 
 			}
 			else {

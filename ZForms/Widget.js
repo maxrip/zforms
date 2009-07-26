@@ -44,6 +44,7 @@ ZForms.Widget = Abstract.inheritTo(
 			this.oInitialValue = this.oValue.clone();
 			this.oLastProcessedValue = this.oValue.clone();
 			this.bInitialValueChanged = false;
+			this.bInited = false;
 
 			this.addHandlers();
 
@@ -52,7 +53,8 @@ ZForms.Widget = Abstract.inheritTo(
 		getDefaultOptions : function() {
 
 			return {
-				bTemplate : false
+				bTemplate    : false,
+				bFocusOnInit : false
 				};
 
 		},
@@ -199,7 +201,19 @@ ZForms.Widget = Abstract.inheritTo(
 				this.oMultiplier.init();
 			}
 
+			if(this.oOptions.bFocusOnInit) {
+				this.focus();
+			}
+
+			this.bInited = true;
+
 			ZForms.notifyObservers(ZForms.EVENT_TYPE_ON_INIT, this);
+
+		},
+
+		isInited : function() {
+
+			return this.bInited;
 
 		},
 
@@ -337,17 +351,17 @@ ZForms.Widget = Abstract.inheritTo(
 
 		setRequired : function() {
 
-			this.bRequired = true;
-
 			this.replaceClass(this.__self.CLASS_NAME_REQUIRED_OK, this.__self.CLASS_NAME_REQUIRED);
+
+			this.bRequired = true;
 
 		},
 
 		unsetRequired : function() {
 
-			this.bRequired = false;
-
 			this.replaceClass(this.__self.CLASS_NAME_REQUIRED, this.__self.CLASS_NAME_REQUIRED_OK);
+
+			this.bRequired = false;
 
 		},
 
@@ -359,17 +373,22 @@ ZForms.Widget = Abstract.inheritTo(
 
 		setValid : function() {
 
-			this.bValid = true;
+			if(this.hasValue() && this.getValue().isEmpty()) {
+				this.removeClass(this.bValid? this.__self.CLASS_NAME_INVALID_OK : this.__self.CLASS_NAME_INVALID);
+			}
+			else {
+				this.replaceClass(this.__self.CLASS_NAME_INVALID, this.__self.CLASS_NAME_INVALID_OK);
+			}
 
-			this.replaceClass(this.__self.CLASS_NAME_INVALID, this.__self.CLASS_NAME_INVALID_OK);
+			this.bValid = true;
 
 		},
 
 		setInvalid : function() {
 
-			this.bValid = false;
-
 			this.replaceClass(this.__self.CLASS_NAME_INVALID_OK, this.__self.CLASS_NAME_INVALID);
+
+			this.bValid = false;
 
 		},
 

@@ -55,7 +55,9 @@ ZForms.Dependence.Valid = ZForms.Dependence.inheritTo(
 				oFrom,
 				this.getPattern(),
 				this.getLogic(),
-				this.isInverse()
+				this.isInverse(),
+				this.sClassName,
+				this.bCheckForEmpty
 				);
 
 		}

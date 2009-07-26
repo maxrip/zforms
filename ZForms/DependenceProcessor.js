@@ -7,7 +7,7 @@ ZForms.DependenceProcessor = Abstract.inheritTo(
 			this.aDependenceGroups = [];
 
 			this.aCheckingOrder = [
-				ZForms.Dependence.TYPE_ENABLE,
+				ZForms.Dependence.TYPE_ENABLED,
 				ZForms.Dependence.TYPE_VALID,
 				ZForms.Dependence.TYPE_REQUIRED,
 				ZForms.Dependence.TYPE_OPTIONS,
@@ -79,7 +79,7 @@ ZForms.DependenceProcessor = Abstract.inheritTo(
 
 			switch(sType) {
 
-				case ZForms.Dependence.TYPE_ENABLE:
+				case ZForms.Dependence.TYPE_ENABLED:
 					this.processEnableDependencies();
 				break;
 
@@ -109,11 +109,30 @@ ZForms.DependenceProcessor = Abstract.inheritTo(
 
 		processEnableDependencies : function() {
 
-			if(this.aDependenceGroups[ZForms.Dependence.TYPE_ENABLE].check()) {
+			var
+				bCheckResult = this.aDependenceGroups[ZForms.Dependence.TYPE_ENABLED].check(),
+				aResult = this.aDependenceGroups[ZForms.Dependence.TYPE_ENABLED].getResult()
+				;
+
+			if(bCheckResult) {
 				this.oWidget.enable();
 			}
 			else {
 				this.oWidget.disable();
+			}
+
+			if(!this.oWidget.isInited()) {
+				return;
+			}
+
+			var
+				oResult,
+				i = 0
+				;
+			while(oResult = aResult[i++]) {
+				if(oResult.bFocusOnEnable) {
+					return this.oWidget.focus();
+				}
 			}
 
 		},

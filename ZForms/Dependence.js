@@ -79,7 +79,7 @@ ZForms.Dependence = Abstract.inheritTo(
 
 		TYPE_REQUIRED : 1,
 		TYPE_VALID    : 2,
-		TYPE_ENABLE   : 3,
+		TYPE_ENABLED   : 3,
 		TYPE_OPTIONS  : 4,
 		TYPE_CLASS    : 5,
 		TYPE_CHECK    : 6,

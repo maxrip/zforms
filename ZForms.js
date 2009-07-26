@@ -144,12 +144,12 @@ var ZForms = {
 		oOptions
 		) {
 
-		return new this.Dependence(
-			this.Dependence.TYPE_ENABLE,
+		return new this.Dependence.Enabled(
 			oWidget,
 			oOptions.rPattern,
 			oOptions.iLogic,
-			oOptions.bInverse
+			oOptions.bInverse,
+			oOptions.bFocusOnEnable
 			);
 
 	},
@@ -265,8 +265,8 @@ var ZForms = {
 			oOptions = oOptions || {},
 			fFunction = function(oWidget, fFunction) {
 
-				var bResult = (arguments.callee.iType == ZForms.Dependence.TYPE_VALID && !arguments.callee.oOptions.bCheckForEmpty &&
-					(arguments.callee.oWidget.getValue().isEmpty() || (arguments.callee.mArgument instanceof ZForms.Widget && arguments.callee.mArgument.getValue().isEmpty()))
+				var bResult = (arguments.callee.iType == ZForms.Dependence.TYPE_VALID &&
+					!arguments.callee.oOptions.bCheckForEmpty && arguments.callee.oWidget.getValue().isEmpty()
 					) ||
 					arguments.callee.oWidget.getValue()[arguments.callee.sFunctionName](
 					arguments.callee.mArgument instanceof ZForms.Widget?
@@ -280,6 +280,14 @@ var ZForms = {
 						{
 							bAdd       : !bResult,
 							sClassName : arguments.callee.oOptions.sClassName
+						}
+						);
+				}
+				else if(arguments.callee.iType == ZForms.Dependence.TYPE_ENABLED &&
+				   arguments.callee.oOptions.bFocusOnEnable) {
+					fFunction.setResult(
+						{
+							bFocusOnEnable : bResult
 						}
 						);
 				}
@@ -345,7 +353,7 @@ var ZForms = {
 			oWidget,
 			Common.Object.extend(
 				{
-					iType : this.Dependence.TYPE_ENABLE
+					iType : this.Dependence.TYPE_ENABLED
 				},
 				oOptions
 				)
