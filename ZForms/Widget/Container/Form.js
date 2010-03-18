@@ -90,7 +90,10 @@ ZForms.Widget.Container.Form = ZForms.Widget.Container.inheritTo(
 				return true;
 			}
 
-			this.getFirstErrorWidget().focus();
+			var oFirstErrorWidget = this.getFirstErrorWidget();
+			if(oFirstErrorWidget) {
+				oFirstErrorWidget.focus();
+			}
 
 			this.addClass(this.__self.CLASS_NAME_SUBMITTED);
 
